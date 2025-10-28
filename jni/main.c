@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 Rem01Gaming
+ * Copyright (C) 2024-2025 Rem01Gaming x Zexshia
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 #include <libgen.h>
 unsigned int LOOP_INTERVAL = 5;
 char* gamestart = NULL;
-bool preload_active = false;
-bool did_log_preload = true;
 pid_t game_pid = 0;
 
 int main(int argc, char* argv[]) {

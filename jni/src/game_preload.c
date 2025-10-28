@@ -110,11 +110,9 @@ void GamePreload(const char *package) {
 
                 if (is_already_processed(lib)) continue;
 
-                // --- ⭐ IMPROVEMENT 2: Restore the full logic from the shell script ---
                 bool filename_match = (regexec(&game_lib_regex, lib, 0, NULL, 0) == 0);
                 bool content_match = false;
 
-                // Only perform the expensive content scan if the filename doesn't match
                 if (!filename_match) {
                     char check_cmd[768];
                     snprintf(check_cmd, sizeof(check_cmd), "strings \"%s\" | grep -qE '%s'", lib, GPU_RENDER_REGEX);
@@ -167,7 +165,7 @@ void GamePreload(const char *package) {
 
                 if (filename_match || content_match) {
                     char cmd[1024];
-                    snprintf(cmd, sizeof(cmd), "unzip -p \"%s\" \"%s\" | sys.azenith-preloadbin2 -dL -", apk_file, innerlib);
+                    snprintf(cmd, sizeof(cmd), "unzip -p \"%s\" \"%s\" | sys.azenith-preloadbin -dL -", apk_file, innerlib);
                     if (systemv(cmd) == 0) {
                         log_preload(LOG_INFO, "Preloaded from APK: %s", innerlib);
                     }
