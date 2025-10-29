@@ -275,6 +275,7 @@ void stop_preloading(unsigned int* LOOP_INTERVAL) {
         *LOOP_INTERVAL = 5;
         did_log_preload = true;
         preload_active = false;
+        systemv("rm -f /data/adb/.config/AZenith/preload/processed_files.txt");
         int status;
         pid_t wpid;
         while ((wpid = waitpid(-1, &status, WNOHANG)) > 0) {

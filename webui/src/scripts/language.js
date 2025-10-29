@@ -132,7 +132,7 @@ async function setupLang() {
   const selector = document.getElementById('languageSelector');
   if (!selector) return;
 
-  const LANG_FILE = '/data/adb/.config/AZenith/debug/Lang';
+  const LANG_FILE = '/data/adb/.config/AZenith/API/current_language';
   const allLanguages = { en: "English", ...languages };
 
   try {
