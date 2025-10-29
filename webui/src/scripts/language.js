@@ -174,19 +174,17 @@ async function setupLang() {
     // Handle language change
     selector.addEventListener('change', async (e) => {
       const newLang = e.target.value;
-      const oldTranslations = currentTranslations;
+      if (newLang === lang) return;
 
       try {
-        currentTranslations = await loadTranslations(newLang);
-        applyTranslations(currentTranslations);
         await writeFile(LANG_FILE, newLang);
+        setTimeout(() => {
+          location.reload();
+        }, 300);
       } catch (error) {
-        currentTranslations = oldTranslations;
+        console.error('Failed to switch language:', error);
         selector.value = lang;
-        console.error('Language switch failed:', error);
       }
-
-      lang = newLang;
     });
 
   } catch (error) {
