@@ -129,9 +129,6 @@ function applyTranslations(translations) {
 
 // --- Initialize language system ---
 async function setupLang() {
-  const selector = document.getElementById('languageSelector');
-  if (!selector) return;
-
   const LANG_FILE = '/data/adb/.config/AZenith/debug/Lang';
   const allLanguages = { en: "English", ...languages };
 
@@ -198,6 +195,4 @@ async function setupLang() {
 // --- Initialize automatically when DOM ready ---
 if (document.readyState !== 'loading') {
   setupLang();
-} else {
-  document.addEventListener('DOMContentLoaded', setupLang);
 }
