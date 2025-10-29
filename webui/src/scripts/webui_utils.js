@@ -31,6 +31,8 @@ const executeCommand = async (cmd, cwd = null) => {
   }
 };
 
+window.executeCommand = executeCommand;
+
 const showToast = async (c) => {
   ksu.toast(c);
 };

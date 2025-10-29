@@ -24,12 +24,32 @@ let currentTranslations = null;
 
 // Dynamic imports for non-English translations
 const translationModules = import.meta.glob(
-  '../locales/strings/!(en).json',  // Exclude en.json from dynamic imports
+  '../locales/strings/!(en).json',  // Exclude en.json
   { eager: false }
 );
 
-// Synchronous translation lookup
-// This function also will parse args from it's input
+// --- File helper functions ---
+async function readFile(path) {
+  try {
+    const { stdout, errno } = await window.executeCommand(`cat ${path}`);
+    if (errno === 0 && stdout.trim()) return stdout.trim();
+  } catch (e) {
+    console.warn('Failed to read file:', e);
+  }
+  return null;
+}
+
+async function writeFile(path, data) {
+  try {
+    const dir = path.substring(0, path.lastIndexOf('/'));
+    await window.executeCommand(`mkdir -p ${dir}`);
+    await window.executeCommand(`echo '${data}' > ${path}`);
+  } catch (e) {
+    console.error('Failed to write file:', e);
+  }
+}
+
+// --- Synchronous translation lookup ---
 function getTranslationSync(key, ...args) {
   if (!currentTranslations) {
     console.error('Translations not loaded!');
@@ -38,13 +58,13 @@ function getTranslationSync(key, ...args) {
 
   const keys = key.split('.');
   let value = currentTranslations;
-  
-  // Try current language
+
+  // Try current language first
   for (const k of keys) {
     value = value?.[k];
     if (!value) break;
   }
-  
+
   // Fallback to English
   if (!value) {
     value = cachedEnglishTranslations;
@@ -54,10 +74,9 @@ function getTranslationSync(key, ...args) {
     }
   }
 
-  // Return key if no translation found
   if (!value) return key;
 
-  // Handle placeholder replacement
+  // Handle placeholders like {0}, {1}, ...
   if (args.length > 0 && typeof value === 'string') {
     return value.replace(/\{(\d+)\}/g, (match, index) => {
       const idx = parseInt(index);
@@ -68,15 +87,15 @@ function getTranslationSync(key, ...args) {
   return value;
 }
 
-// Expose to global scope
+// Expose globally
 window.getTranslation = getTranslationSync;
 
+// --- Load translation file dynamically ---
 async function loadTranslations(lang) {
-  // Use static import for English
   if (lang === 'en') return cachedEnglishTranslations;
 
   const filePath = `../locales/strings/${lang}.json`;
-  
+
   if (translationModules[filePath]) {
     try {
       const module = await translationModules[filePath]();
@@ -91,30 +110,32 @@ async function loadTranslations(lang) {
   }
 }
 
+// --- Apply translations to elements ---
 function applyTranslations(translations) {
   document.querySelectorAll('[data-lang]').forEach(el => {
     const keys = el.getAttribute('data-lang').split('.');
     let value = translations;
-    
+
     for (const key of keys) {
       value = value?.[key];
       if (value === undefined) break;
     }
-    
+
     if (value !== undefined) {
       el.textContent = value;
     }
   });
 }
 
+// --- Initialize language system ---
 async function setupLang() {
   const selector = document.getElementById('languageSelector');
   if (!selector) return;
 
-  try {
-    // Merge languages with English as default
-    const allLanguages = { en: "English", ...languages };
+  const LANG_FILE = '/data/adb/.config/AZenith/debug/Lang';
+  const allLanguages = { en: "English", ...languages };
 
+  try {
     // Populate selector
     selector.innerHTML = '';
     for (const [code, name] of Object.entries(allLanguages)) {
@@ -124,57 +145,56 @@ async function setupLang() {
       selector.appendChild(option);
     }
 
-    // Determine initial language
-    const savedLang = localStorage.getItem('selectedLanguage');
-    const browserLangs = [
-      ...(navigator.languages || []),
-      navigator.language,
-      navigator.userLanguage
-    ].filter(Boolean);
-    
-    let lang = savedLang || 'en';
-    if (!savedLang) {
+    // Read saved language from file
+    let lang = await readFile(LANG_FILE);
+    if (!lang) {
+      // Detect browser/system language
+      const browserLangs = [
+        ...(navigator.languages || []),
+        navigator.language,
+        navigator.userLanguage
+      ].filter(Boolean);
+
+      lang = 'en';
       for (const browserLang of browserLangs) {
-        const normalizedLang = browserLang.toLowerCase().replace(/_/g, '-');
-        if (allLanguages[normalizedLang]) {
-          lang = normalizedLang;
-          break;
-        }
-        const baseLang = normalizedLang.split('-')[0];
-        if (allLanguages[baseLang]) {
-          lang = baseLang;
-          break;
-        }
+        const normalized = browserLang.toLowerCase().replace(/_/g, '-');
+        if (allLanguages[normalized]) { lang = normalized; break; }
+        const baseLang = normalized.split('-')[0];
+        if (allLanguages[baseLang]) { lang = baseLang; break; }
       }
+
+      // Save detected language
+      await writeFile(LANG_FILE, lang);
     }
-    
+
     selector.value = lang;
     currentTranslations = await loadTranslations(lang);
     applyTranslations(currentTranslations);
-    
+
     // Handle language change
     selector.addEventListener('change', async (e) => {
       const newLang = e.target.value;
       const oldTranslations = currentTranslations;
-      
+
       try {
         currentTranslations = await loadTranslations(newLang);
         applyTranslations(currentTranslations);
-        localStorage.setItem('selectedLanguage', newLang);
+        await writeFile(LANG_FILE, newLang);
       } catch (error) {
         currentTranslations = oldTranslations;
         selector.value = lang;
         console.error('Language switch failed:', error);
       }
-      
+
       lang = newLang;
     });
+
   } catch (error) {
     console.error('i18n initialization failed:', error);
   }
 }
 
-// Initialize immediately if DOM is ready, otherwise wait
+// --- Initialize immediately if DOM ready ---
 if (document.readyState !== 'loading') {
   setupLang();
 } else {
