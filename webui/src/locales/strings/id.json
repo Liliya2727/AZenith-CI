@@ -26,7 +26,7 @@
       "title": "Preferensi",
       "description": "Penyesuaian atau tambahan yang diterapkan saat boot."
     }
-  }
+  },
   
     "cpu": {
     "title": "Pengaturan CPU",
@@ -68,7 +68,7 @@
     "title": "Terima Kasih!✨",
     "message": "Terima kasih telah menggunakan AZenith! Kami sangat menghargai dukunganmu. Tanpamu, modul ini tidak akan ada hingga hari ini. AZenith akan selalu bersamamu!",
     "footer": "WebUI dibuat oleh @kanaochar & @Zexshia"
-  }
+  },
   
   "preference": {
     "title": "Pengaturan Preferensi",
@@ -105,7 +105,7 @@
       "title": "Disable Thermal",
       "desc": "Matikan thermal service (dapat menyebabkan overheating)."
     }
-  }
+  },
   
   "settingsAddi": {
     "additional": {
