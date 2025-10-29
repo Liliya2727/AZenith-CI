@@ -1,0 +1,232 @@
+{
+  "loading": {
+    "text": "ᔑリᓭᔑᓵᒷᔑᔑᓭ..."
+  },
+
+  "infoTab": {
+    "title": "ᓭᒷᓭᔑリᒷᔑリᒷ ᒷᔑᔑᒷᓭ",
+    "labels": {
+      "currentProfile": "ᔑᓭᓭᒷᒷ ᓭᓭᔑᓵᒷ",
+      "chipset": "リᒷᓭᒷリᓭᔑ",
+      "kernel": "ᓵᓭᔑᓭᒷᓭ",
+      "androidVersion": "ᔑリᒷᓭᓭᒷ ᓭᔑᔑᒷ"
+    },
+    "buttons": {
+      "changeProfile": "ᓭᔑᓵᒷ ᔑᒷᓭᓭᒷ"
+    },
+    "loading": "ᔑリᓭᓭᒷᓭᔑᓭ..."
+  },
+  
+  "settingsMore": {
+    "additional": {
+      "title": "ᒷᓭᒷᔑᓭᓭᒷ ᓭᓭᔑᔑᒷᔑᓭ",
+      "description": "ᓭᓭᒷᒷ ᒷᓭᔑᔑᒷᓭᓭᓭᒷ ᓭᒷᓭᔑリᒷᓭᓭᔑᒷ ᓭᒷᔑᓭᒷᓭ."
+    },
+    "preference": {
+      "title": "ᓭᔑᒷᓭᔑᓭᔑᓭ ᔑᓵᓭᒷᔑᒷ",
+      "description": "ᔑᓭᒷᓭᓭᔑᓭᓭ ᓭᔑᓵᓭᔑᒷ ᓭᒷᓭᓭᒷᓭᓭ ᓭᒷᒷᔑᔑᓭᒷ."
+    }
+  },
+
+  "cpu": {
+    "title": "ᓭᓭᒷ ᓭᓭᒷᓭᒷᓭ",
+    "default": {
+      "title": "ᔑᔑᓭᔑᓭᒷ ᓭᓭᒷᓭᒷᓭ",
+      "desc": "ᔑᓭᓭᔑᓭ ᓭᔑᒷᒷ ᔑᓭᒷᓭ ᓭᓭᔑᓭᔑᔑᒷᒷ ᒷᓭᒷ."
+    },
+    "powersave": {
+      "title": "ᓭᒷᓭᒷᔑᓭ ᔑᔑᒷᔑᓭ",
+      "desc": "ᔑᓭᓭᔑᒷᒷ ᒷᓭᓭᓭᒷ ᓭᔑᓭᒷᓭᔑ ᓭᓭᔑᓭ."
+    },
+    "limit": {
+      "title": "ᓭᓭᒷᓭᔑᓭ ᓭᔑᓭᓭᒷᓭ",
+      "desc": "ᓭᓭᒷ ᓭᔑᔑᓭᓭᒷᓭᓭ ᓭᔑᓭᔑᒷᔑᓭᓭ."
+    },
+    "litemode": {
+      "title": "ᓭᓭᒷᔑᓭᓭᒷ (ᔑᓭᒷᓭᓭᓭ ᔑᒷᓭᓭ)",
+      "desc": "ᔑᓭᓭᔑᒷᓭᓭᓭᓭᒷᓭ ᒷᓭᓭᔑᒷᓭᓭᓭ ᒷᓭᓭᒷᓭ."
+    }
+  },
+
+  "io": {
+    "title": "ᒷᓭᒷ ᓭᒷᓭᓭᒷᓭᓭ",
+    "default": {
+      "title": "ᔑᔑᓭᔑᓭᒷ ᓭᓭᒷᓭᒷᓭ",
+      "desc": "ᓭᓭᒷᓭᓭᔑᓭ ᔑᓭᓭᔑᒷ ᓭᒷᒷᓭᓭ."
+    },
+    "performance": {
+      "title": "ᓭᒷᓭᓭᓭᒷ ᒷᓭᓭᓭᒷᓭ",
+      "desc": "ᒷᓭᓭᒷ ᓭᔑᓭᔑᓭᓭ ᓭᓭᒷᒷᓭ."
+    },
+    "powersave": {
+      "title": "ᔑᓭᓭᒷᔑᓭᔑᓭᓭ ᒷᓭᓭᓭ",
+      "desc": "ᔑᓭᓭᒷᒷ ᓭᔑᔑᒷᔑ ᓭᔑᓭᓭᒷ ᓭᓭᔑᒷᔑᓭ."
+    }
+  },
+
+  "thanks": {
+    "title": "ᓭᔑᔑᒷᔑᓭ!✨",
+    "message": "ᔑᓭᔑᓭᓭᒷᓭ ᓭᓭᒷᒷ ᒷᓭᔑᓭᔑᒷ ᔑᔑᓭᒷᓭᓭᒷᓭ AZenith! ᔑᒷᓭᓭᔑᓭᓭ ᓭᒷᔑᒷᓭᓭᔑᓭᓭ ᒷᓭᓭᒷᓭᒷ. ᔑᓭᓭᒷᒷ ᓭᓭᔑᒷᒷᒷ AZenith ᓭᓭᒷᒷᒷᓭ ᓭᔑᓭᓭᓭᔑᓭᓭᔑᓭ!",
+    "footer": "WebUI ᓭᓭᒷᒷᓭᓭᔑᓭᓭ ᓭᓭᔑᔑᒷᔑᓭ @kanaochar & @Zexshia"
+  },
+
+  "preference": {
+    "title": "ᓭᔑᒷᓭᔑᓭᔑᓭ ᔑᓵᓭᒷᔑᒷ",
+    "description": "ᓭᓭᒷᓭᓭᒷᔑᓭᔑ ᓭᔑᒷᒷ ᒷᓭᓭᒷ ᓭᓭᔑᓭᓭᓭᒷ (ᔑᒷᓭᓭᓭᓭ ᔑᓭᔑᒷᓭᒷ ᒷᓭᔑᓭᔑ).",
+    "schedtunes": {
+      "title": "ᓭᔑᓭᓭ ᔑᒷᓭᔑᓭ",
+      "desc": "ᓭᒷᓭᓭᓭ ᓭᔑᒷᒷ ᒷᓭᓭᒷᓭᓭᓭᒷ ᒷᓭᔑᓭᓭᓭᓭ."
+    },
+    "sfl": {
+      "title": "ᓭᒷᓭᓭᓭᒷ ᔑᓭᔑᓭᒷ",
+      "desc": "ᒷᓭᓭᔑᓭᓭᓭᓭᓭ ᓭᒷᓭᓭᒷᓭᓭ ᔑᓭᔑᒷᔑᓭᓭ."
+    },
+    "jit": {
+      "title": "ᒷᓭᓭᓭᒷ ᓭᒷᓭᒷ",
+      "desc": "ᔑᓭᓭᒷᓭᓭᓭᓭᒷ ᓭᒷᓭᓭᓭᓭᒷᓭ."
+    },
+    "trace": {
+      "title": "ᓭᓭᔑᒷ ᓭᔑᓭᓭᒷ",
+      "desc": "ᒷᓭᓭᔑᓭᓭᓭᓭᓭ ᒷᓭᓭᓭᓭᓭ ᓭᔑᔑᓭᒷᒷ ᓭᔑᒷᒷ."
+    },
+    "fpsged": {
+      "title": "ᓭᓭᓭᒷᓭᓭᒷᒷᔑᓭ ᒷᓭᓭᒷᓭᓭᒷ",
+      "desc": "ᓭᒷᓭᓭᓭᔑᓭᔑ ᓭᓭᓭᔑᓭᓭᔑᓭᓭᒷᓭ."
+    },
+    "logd": {
+      "title": "ᒷᓭᒷᓭ ᒷᓭᓭᒷᓭ",
+      "desc": "ᓭᔑᓭᓭᒷᔑᓭᓭ ᓭᓭᔑᓭᔑᓭ ᓭᔑᓭᓭᔑᓭᓭ."
+    },
+    "malisched": {
+      "title": "ᓭᓭᔑᒷᔑᓭᓭᔑᒷᔑᒷ",
+      "desc": "ᔑᓭᓭᒷᓭᔑᒷᓭᔑᒷᓭᓭ ᒷᓭᓭᒷᓭᓭᓭ."
+    },
+    "dthermal": {
+      "title": "ᔑᓭᔑᓭᔑ ᔑᒷᓭᓭᔑᓭ",
+      "desc": "ᓭᓭᓭᒷ ᓭᒷᓭᓭᔑᓭᓭᔑᓭᓭ."
+    }
+  },
+
+  "settingsAddi": {
+    "additional": {
+      "title": "ᒷᓭᒷᔑᓭᓭᒷ ᓭᓭᔑᔑᒷᔑᓭ",
+      "description": "ᓭᓭᒷᓭᒷ ᓭᒷᔑᓭᓭᓭᓭᔑᓭᓭᓭᒷ.",
+      "gpreload": {
+        "title": "ᓭᓭᔑᒷᓭᒷ ᒷᓭᓭᔑᓭᓭᔑᓭ",
+        "description": "ᓭᓭᓭᓭᒷ ᓭᔑᒷᓭᓭᒷᓭ ᒷᓭᔑᓭᓭᔑᒷᒷᓭ."
+      },
+      "memorykiller": {
+        "title": "ᔑᔑᓭᓭᓭᓭ ᓭᓭᔑᓭᓭᓭᓭᓭᓭ",
+        "description": "ᔑᓭᓭᓭᓭᓭ ᓭᒷᒷᓭᓭᓭᓭᓭᓭᓭᓭ."
+      },
+      "apppriority": {
+        "title": "ᓭᓭᓭᒷᓭᓭᒷᓭᔑᓭ",
+        "description": "ᓭᓭᒷᓭᒷᓭᓭᓭᓭᓭᓭᓭ."
+      },
+      "bypasscharge": {
+        "title": "ᔑᓭᓭᔑᓭᔑ ᒷᓭᓭᒷᔑ",
+        "description": "ᓭᓭᒷᓭᓭᓭᒷ ᓭᒷᓭᓭᒷᔑᓭᓭᓭᔑᓭ."
+      },
+      "dnd": {
+        "title": "ᓭᔑᓭᔑᓭᓭᓭ",
+        "description": "ᓭᓭᒷᒷᓭᓭᓭᓭᓭᓭᓭᔑᒷᓭᓭᓭ."
+      },
+      "vsync": {
+        "title": "ᓭᓭᔑᓭᓭᒷᔑᓭ",
+        "description": "ᒷᓭᓭᓭᔑᓭᓭᓭᒷᔑᓭᓭᓭᓭ."
+      },
+      "fstrim": {
+        "title": "ᓭᓭᒷᓭᓭᓭᓭᓭ",
+        "description": "ᓭᓭᔑᓭᓭᔑᓭᓭ ᓭᔑᓭᓭᓭᓭᒷᓭᓭᓭᔑᓭ.",
+        "button": "ᔑᓭᓭᒷ"
+      },
+      "customreso": "ᓭᓭᓭᔑᓭᓭᓭᔑᓭ ᓭᒷᓭᓭᓭ",
+      "colorscheme": "ᓭᓭᓭᒷᓭᒷᔑᓭ ᓭᒷᓭᓭᓭ"
+    }
+  },
+
+  "settingsProfile": {
+    "profiler": {
+      "title": "ᓭᓭᒷᓭᔑᓭᒷ",
+      "description": "ᓭᓭᔑᓭᓭᓭᓭᓭ ᓭᓭᔑᓭᓭᓭᓭ.",
+      "balanced": "ᓭᓭᓭᔑᓭ ᔑᓭᓭᒷᓭ",
+      "performance": "ᓭᓭᓭᓭᓭᓭ ᒷᓭᓭᓭᓭᓭ",
+      "powersave": "ᓭᓭᓭᓭᓭᓭ ECO"
+    }
+  },
+
+  "settingsReso": {
+    "resolution": {
+      "title": "ᓭᓭᓭᓭᓭᓭᓭᓭᓭ",
+      "description": "ᓭᓭᓭᓭᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭᓭᓭᓭᓭ.",
+      "low": {
+        "title": "ᔑᓭᓭᓭᔑᓭ (80%)",
+        "size": ""
+      },
+      "mid": {
+        "title": "ᓭᒷᓭᓭᓭᓭ (90%)",
+        "size": ""
+      },
+      "max": {
+        "title": "ᓭᓭᒷᔑᓭ (100%)",
+        "size": ""
+      },
+      "cancel": "ᓭᔑᓭᓭᓭ",
+      "apply": "ᓭᓭᔑᓭ"
+    }
+  },
+  
+  "settingsModule": {
+    "title": "ᓭᓭᓭᒷᓭᓭᓭ ᓭᓭᓭᓭᓭ",
+    "verbose": {
+      "title": "ᓭᓭᒷᔑᓭ ᓭᓭᓭᓭᓭ ᔑᓭᓭᒷᓭ",
+      "desc": "ᓭᓭᔑᓭᓭᓭᓭ ᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭᓭᓭ."
+    },
+    "toast": {
+      "title": "ᓭᓭᓭᓭ ᔑᓭᓭᓭᓭᓭ",
+      "desc": "ᓭᓭᓭᓭ ᔑᓭᓭᓭᓭᓭᓭᓭ."
+    },
+    "disableai": {
+      "title": "ᓭᓭᒷᓭᓭᓭᓭ AI",
+      "desc": "ᓭᓭᓭᓭᓭᓭᓭᓭᓭᓭᓭᓭᓭᓭ."
+    },
+    "buttons": {
+      "save": "ᓭᓭᔑᓭ",
+      "edit": "ᓭᓭᒷᓭᓭᔑᓭ",
+      "restart": "ᔑᓭᓭᓭᓭᓭᔑᓭ"
+    }
+  },
+
+  "scheme": {
+    "title": "ᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭ",
+    "description": "ᓭᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭᓭ RGB ᓭᓭᓭᓭᓭ.",
+    "red": {
+      "title": "# ᔑᓭᓭ"
+    },
+    "green": {
+      "title": "# ᓭᓭᒷᓭ"
+    },
+    "blue": {
+      "title": "# ᓭᓭᔑᓭ"
+    },
+    "saturation": {
+      "title": "# ᓭᓭᓭᓭᓭ"
+    },
+    "buttons": {
+      "reset": "ᓭᓭᒷᓭᓭᓭ ᓭᓭᓭᓭᓭ",
+      "apply": "ᓭᓭᔑᓭ"
+    }
+  },
+
+  "gamelist": {
+    "title": "ᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭ",
+    "description": "ᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭ ᓭᓭᓭᓭ ᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭ.",
+    "search": {
+      "placeholder": "ᓭᓭᓭᓭᓭ ᓭᓭᓭᓭᓭ"
+    },
+    "buttons": {
+      "cancel": "ᓭᔑᓭᓭᓭ",
+      "save": "ᓭᓭᔑᓭ"
+    }
+  }
+}
