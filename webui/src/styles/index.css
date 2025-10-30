@@ -12,6 +12,11 @@
     height: 100vh
 }
 
+.root_layout {
+  padding-top: var(--window-inset-top, 0px);
+  padding-bottom: var(--window-inset-bottom, 0px);
+}
+
 .sr-only,
 body.modal-open {
     overflow: hidden
@@ -2064,3 +2069,10 @@ input[type=range]::-ms-track {
         border-color: rgba(0, 0, 0, .25)
     }
 }
+
+@import url('https://mui.kernelsu.org/internal/insets.css');
+@import url('https://mui.kernelsu.org/internal/colors.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

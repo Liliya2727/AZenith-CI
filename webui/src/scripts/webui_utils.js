@@ -20,6 +20,8 @@ import AvatarZenith from "/webui.avatar.avif";
 import SchemeBanner from "/webui.schemebanner.avif";
 import ResoBanner from "/webui.reso.avif";
 import { exec } from "kernelsu";
+const moduleInterface = window.$azenith;
+const fileInterface = window.$FILE;
 const RESO_PROP = "persist.sys.azenithconf.resosettings";
 
 const executeCommand = async (cmd, cwd = null) => {
