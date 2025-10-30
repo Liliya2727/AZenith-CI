@@ -1037,15 +1037,18 @@ input[type=checkbox]:checked+.toggle::after {
     transition: .2s
 }
 
-.bigbutton,
-.modal-btn.apply {
-    font-weight: 500;
-    transition: .25s
-}
-
 .schemetext:focus {
     border-color: #7fa9ff;
     box-shadow: 0 0 3px #0079c880
+}
+
+.bigbutton,
+.modal-btn.apply {
+    font-weight: 500;
+    transition: 
+        background 0.25s ease,   
+        box-shadow 0.2s ease,  
+        transform 0.2s ease;   
 }
 
 .modal-btn.apply,
@@ -1054,27 +1057,34 @@ input[type=checkbox]:checked+.toggle::after {
     padding: .75rem;
     font-size: .875rem;
     font-weight: 500;
-    transition: background-color .2s;
-    cursor: pointer
+    cursor: pointer;
 }
 
 .modal-btn.cancel {
     flex: 1;
     background-color: #201f24;
     color: #fff;
-    border-radius: 1.25rem
+    border-radius: 6rem;
+    transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
 .modal-btn.cancel:active {
-    background-color: #444
+    background-color: #444;
+    transform: scale(0.97); /* subtle press-in effect */
 }
 
 .modal-btn.apply {
     flex: 1;
     background: linear-gradient(135deg, #7fa9ff, #a5b8ff);
     color: #e8ecff;
-    border-radius: 1.25rem;
-    box-shadow: 0 3px 10px rgba(120, 150, 255, .25)
+    border-radius: 6rem;
+    box-shadow: 0 3px 10px rgba(120, 150, 255, .25);
+}
+
+.modal-btn.apply:active {
+    background: linear-gradient(135deg, #6a74c0, #7b8aff);
+    box-shadow: 0 0 8px rgba(110, 130, 255, .3);
+    transform: scale(0.97);
 }
 
 .bigbutton {
@@ -1084,16 +1094,15 @@ input[type=checkbox]:checked+.toggle::after {
     padding: 12px 18px;
     margin-top: 4px;
     margin-bottom: 0;
-    border-radius: 2rem;
+    border-radius: 6rem;
     border: none;
-    box-shadow: 0 3px 10px rgba(130, 140, 255, .25)
+    box-shadow: 0 3px 10px rgba(130, 140, 255, .25);
 }
 
-.bigbutton:active,
-.modal-btn.apply:active {
+.bigbutton:active {
     background: linear-gradient(135deg, #6a74c0, #7b8aff);
     box-shadow: 0 0 8px rgba(110, 130, 255, .3);
-    animation: .6s clickFlash
+    transform: scale(0.99);
 }
 
 #settingsButton:active,
@@ -1319,9 +1328,9 @@ input[type=checkbox]:checked+.toggle::after {
     margin-top: -1rem;
     margin-left: 0;
     margin-bottom: 0.3rem;
-    padding-top: calc(1.6rem + var(--window-inset-top, 0px));
+    padding-top: calc(.9rem + var(--window-inset-top, 0px));
     padding-right: 1rem;
-    padding-bottom: 1.5rem;
+    padding-bottom: .7rem;
     padding-left: 1rem;
 }
 
@@ -1358,22 +1367,20 @@ input[type=checkbox]:checked+.toggle::after {
     margin-bottom: 60px;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .15);
     border-radius: 50%;
     padding: 6px;
     transition: .25s
 }
 
 #settingsButton:active {
-    border-color: #eaeaea;
+    border-color: #C9C6FF;
     box-shadow: 0 0 0 1px rgba(0, 100, 255, .3)
 }
 
 #settingsButton svg {
     width: 22px;
     height: 22px;
-    stroke: rgba(230, 235, 255, 0.7);
-    opacity: .85;
     transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), stroke .25s, opacity .25s
 }
 
@@ -1390,27 +1397,27 @@ input[type=checkbox]:checked+.toggle::after {
     right: 45px;
     color: #ebedff;
     border-radius: 20px;
-    padding: 9px 23px 9px 9px;
-    font-size: 9.5px;
+    padding: 10px 20px 10px 12px;
+    font-size: 8.5px;
     font-family: Inter, Roboto, sans-serif;
     outline: 0;
-    transition: background .25s, border-color .25s, box-shadow .25s;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     background-image: url("data:image/svg+xml;charset=UTF-8,<svg fill='white' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>");
     background-repeat: no-repeat;
-    background-position: right 1px center;
-    background-size: 20px 20px
+    background-position: right 2px center;
+    background-size: 20px 20px;
+    transition: 
+        transform .4s cubic-bezier(.34, 1.56, .64, 1), 
+        stroke .25s, 
+        opacity .25s,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 .langSect:active {
-    border-color: #e6e6e6;
-    box-shadow: 0 0 0 1px rgba(0, 100, 255, .3)
-}
-
-.langSect:active-visible {
-    border-color: #f1f1f1;
-    box-shadow: 0 0 0 3px rgba(0, 100, 255, .35)
+    border-color: #C9C6FF;
+    box-shadow: 0 0 0 1px rgba(0, 100, 255, .3);
 }
 
 .avatar-kanan:active {
@@ -2034,8 +2041,9 @@ input[type=range]::-ms-track {
         border: 1px solid rgba(55, 55, 55, .08)
     }
     .backdrop-blur-md {
-        -webkit-backdrop-filter: blur(15px);
-        backdrop-filter: blur(15px)
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.4);
     }
     .textver {
         color: #ededed;
@@ -2054,24 +2062,34 @@ input[type=range]::-ms-track {
     }
     #settingsButton:active {
         border-color: #eaeaea;
-        box-shadow: 0 0 0 1px rgba(0, 100, 255, .3);
-        transform: scale(.98)
+        box-shadow: 0 0 0 1px rgba(100, 100, 255, .3);
+        transform: scale(.98);
+        background-color: rgba(155, 155, 155, 0.2);
     }
-    #settingsButton {
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px)
+    #settingsButton {       
+        background-color: rgba(195, 195, 195, 0.2);
+        border: 1px solid rgba(105, 105, 105, .1);
     }
-    .langSect {
-        transition: background .25s, border-color .25s, box-shadow .25s;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+    .langSect {        
+        appearance: none;
+        border: 1px solid rgba(105, 105, 105, .1);
+        background-color: rgba(195, 195, 195, 0.2);
         background-image: url("data:image/svg+xml;charset=UTF-8,<svg fill='currentColor' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>");
         background-repeat: no-repeat;
         background-position: right 1px center;
         background-size: 20px 20px;
-        color: #303030
+        color: #030303;
+        transition: 
+            transform .4s cubic-bezier(.34, 1.56, .64, 1), 
+            stroke .25s, 
+            opacity .25s,
+            border-color 0.3s ease,
+            box-shadow 0.3s ease;
     }
+    
     .langSect:active {
-        border-color: rgba(0, 0, 0, .25)
+        border-color: #FFFFFF;
+        background-color: rgba(155, 155, 155, 0.2);
+        box-shadow: 0 0 0 1px rgba(100, 100, 255, .3);
     }
 };
