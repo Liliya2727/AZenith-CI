@@ -2068,11 +2068,4 @@ input[type=range]::-ms-track {
     .langSect:active {
         border-color: rgba(0, 0, 0, .25)
     }
-}
-
-@import url('https://mui.kernelsu.org/internal/insets.css');
-@import url('https://mui.kernelsu.org/internal/colors.css');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+};
