@@ -1319,7 +1319,7 @@ input[type=checkbox]:checked+.toggle::after {
     margin-top: -1rem;
     margin-left: 0;
     margin-bottom: 0.3rem;
-    padding-top: calc(0rem + var(--window-inset-top, 0px));
+    padding-top: calc(1.6rem + var(--window-inset-top, 0px));
     padding-right: 1rem;
     padding-bottom: 1.5rem;
     padding-left: 1rem;
