@@ -16,10 +16,8 @@
 }
 
 .root_layout {
-  padding-top: calc(1.6rem + var(--window-inset-top, 0px));
-    padding-right: 1rem;
-    padding-bottom: calc(1.5rem + var(--window-inset-bottom, 0px));
-    padding-left: 1rem;
+  padding-top: var(--window-inset-top, 0px);
+  padding-bottom: var(--window-inset-bottom, 0px);
 }
 
 .sr-only,
