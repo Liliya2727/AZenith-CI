@@ -1,3 +1,6 @@
+@import url('https://mui.kernelsu.org/internal/insets.css');
+@import url('https://mui.kernelsu.org/internal/colors.css');
+
 .additional-modal,
 .gamelist-modal,
 .preference-modal,
@@ -1315,8 +1318,11 @@ input[type=checkbox]:checked+.toggle::after {
 .toptiga {
     margin-top: -1rem;
     margin-left: 0;
-    margin-bottom: .3rem;
-    padding: 1.6rem 1rem 1.5rem
+    margin-bottom: 0.3rem;
+    padding-top: calc(1.6rem + var(--window-inset-top, 0px));
+    padding-right: 1rem;
+    padding-bottom: calc(1.5rem + var(--window-inset-bottom, 0px));
+    padding-left: 1rem;
 }
 
 .avatar-kanan {
