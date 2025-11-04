@@ -311,7 +311,8 @@ void runthermalcore(void) {
 }
 
 // Helper to read file contents safely
-    static void read_conf_value(const char* name, char* buf, size_t bufsize, const char* def) {
+    
+    void read_conf_value(const char* name, char* buf, size_t bufsize, const char* def) {
         char path[PATH_MAX];
         snprintf(path, sizeof(path), "%s/%s", CONF_DIR, name);
     
