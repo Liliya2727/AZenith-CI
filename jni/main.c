@@ -139,9 +139,30 @@ int main(int argc, char* argv[]) {
     // Set Default ThermalPath
     runthermalcore();
     run_profiler(PERFCOMMON);
-    char prev_ai_state[PROP_VALUE_MAX] = "0";
-    __system_property_get("persist.sys.azenithconf.AIenabled", prev_ai_state);
 
+    // Helper to read file contents safely
+    static void read_conf_value(const char* name, char* buf, size_t bufsize, const char* def) {
+        char path[PATH_MAX];
+        snprintf(path, sizeof(path), "%s/%s", CONF_DIR, name);
+    
+        FILE* f = fopen(path, "r");
+        if (!f) {
+            strncpy(buf, def, bufsize - 1);
+            buf[bufsize - 1] = '\0';
+            return;
+        }
+    
+        if (!fgets(buf, bufsize, f)) {
+            strncpy(buf, def, bufsize - 1);
+            buf[bufsize - 1] = '\0';
+        } else {
+            buf[strcspn(buf, "\n")] = '\0';  // remove newline
+        }
+    
+        fclose(f);
+    }
+    char prev_ai_state[PROP_VALUE_MAX] = "0";
+    read_conf_value("AIenabled", prev_ai_state, sizeof(prev_ai_state), "0");
     while (1) {
         sleep(LOOP_INTERVAL);
 
@@ -156,14 +177,13 @@ int main(int argc, char* argv[]) {
         checkstate();
 
         char freqoffset[PROP_VALUE_MAX] = {0};
-        __system_property_get("persist.sys.azenithconf.freqoffset", freqoffset);
+        read_conf_value("freqoffset", freqoffset, sizeof(freqoffset), "Disabled");
+
         if (strstr(freqoffset, "Disabled") == NULL) {
             if (get_screenstate()) {
                 if (cur_mode == PERFORMANCE_PROFILE) {
                     // No exec
-                } else if (cur_mode == BALANCED_PROFILE) {
-                    systemv("sys.azenith-profilesettings applyfreqbalance");
-                } else if (cur_mode == ECO_MODE) {
+                } else if (cur_mode == BALANCED_PROFILE || cur_mode == ECO_MODE) {
                     systemv("sys.azenith-profilesettings applyfreqbalance");
                 }
             } else {
@@ -173,7 +193,7 @@ int main(int argc, char* argv[]) {
 
         // Update state
         char ai_state[PROP_VALUE_MAX] = {0};
-        __system_property_get("persist.sys.azenithconf.AIenabled", ai_state);
+        read_conf_value("AIenabled", ai_state, sizeof(ai_state), "0");
 
         if (did_notify_start) {
             if (strcmp(prev_ai_state, "1") == 0 && strcmp(ai_state, "0") == 0) {
@@ -189,8 +209,10 @@ int main(int argc, char* argv[]) {
                 cur_mode = BALANCED_PROFILE;
                 run_profiler(BALANCED_PROFILE);
             }
+
             strcpy(prev_ai_state, ai_state);
-            // Skip applying if enabled
+
+            // Skip applying if disabled
             if (strcmp(ai_state, "0") == 0) {
                 continue;
             }

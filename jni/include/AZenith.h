@@ -35,7 +35,6 @@
 #define INTDIR "/sdcard/AZenith/config"
 #define SEARCH_PATHS "/vendor/lib64/egl /vendor/lib64/hw"
 #define PROCESSED_FILE_LIST INTDIR "/preload/processed_files.txt"
-
 extern unsigned int LOOP_INTERVAL;
 #define MAX_DATA_LENGTH 1024
 #define MAX_COMMAND_LENGTH 600
@@ -50,6 +49,7 @@ extern unsigned int LOOP_INTERVAL;
 #define LOG_FILE_PRELOAD "/sdcard/AZenith/config/debug/AZenithPR.log"
 #define PROFILE_MODE "/sdcard/AZenith/config/API/current_profile"
 #define GAME_INFO "/sdcard/AZenith/config/API/gameinfo"
+#define CONF_DIR "/sdcard/AZenith/config/value"
 #define GAMELIST "/sdcard/AZenith/config/gamelist/gamelist.txt"
 #define MODULE_PROP "/data/data/com.android.shell/AxManager/plugins/AZenithNonr/module.prop"
 #define MODULE_UPDATE "/data/data/com.android.shell/AxManager/plugins/AZenithNonr/update"
