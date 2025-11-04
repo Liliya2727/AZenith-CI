@@ -50,8 +50,8 @@ extern unsigned int LOOP_INTERVAL;
 #define PROFILE_MODE "/sdcard/AZenith/config/API/current_profile"
 #define GAME_INFO "/sdcard/AZenith/config/API/gameinfo"
 #define GAMELIST "/sdcard/AZenith/config/gamelist/gamelist.txt"
-#define MODULE_PROP "/data/data/com.android.shell/AxManager/plugins/AZenith/module.prop"
-#define MODULE_UPDATE "/data/data/com.android.shell/AxManager/plugins/AZenith/update"
+#define MODULE_PROP "/data/data/com.android.shell/AxManager/plugins/AZenithNonr/module.prop"
+#define MODULE_UPDATE "/data/data/com.android.shell/AxManager/plugins/AZenithNonr/update"
 
 #define MY_PATH                                                                                                                    \
     "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/" \
