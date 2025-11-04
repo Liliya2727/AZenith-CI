@@ -38,7 +38,7 @@ void run_profiler(const int profile) {
     }
 
     write2file(PROFILE_MODE, false, false, "%d\n", profile);
-    (void)systemv("sys.azenith-profilesettings %d", profile);
+    (void)systemv("/data/data/com.android.shell/AxManager/plugins/AZenithNonr/system/bin/sys.azenith-profilesettings %d", profile);
 }
 
 /***********************************************************************************
