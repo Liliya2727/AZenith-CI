@@ -139,7 +139,7 @@ void toast(const char* message) {
  * Description        : Checks if the module renamed/modified by 3rd party.
  ***********************************************************************************/
 void is_kanged(void) {
-    if (systemv("grep -q '^name=AZenith火$' %s", MODULE_PROP) != 0) [[clang::unlikely]] {
+    if (systemv("grep -q '^name=AZenith Eunoia火$' %s", MODULE_PROP) != 0) [[clang::unlikely]] {
         goto doorprize;
     }
 
