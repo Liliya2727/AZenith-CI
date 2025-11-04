@@ -46,8 +46,8 @@ extern unsigned int LOOP_INTERVAL;
 #define LOG_TAG "AZenith"
 
 #define LOCK_FILE "/sdcard/AZenith/config/.lock"
-#define LOG_FILE "/sdcard/AZenith/config/debug/AZenith.log"
-#define LOG_FILE_PRELOAD "/sdcard/AZenith/config/debug/AZenithPR.log"
+#define LOG_FILE "/sdcard/AZenith/config/debug/AZenithlog.txt"
+#define LOG_FILE_PRELOAD "/sdcard/AZenith/config/debug/AZenithPRlog.txt"
 #define PROFILE_MODE "/sdcard/AZenith/config/API/current_profile"
 #define GAME_INFO "/sdcard/AZenith/config/API/gameinfo"
 #define CONF_DIR "/sdcard/AZenith/config/value"
