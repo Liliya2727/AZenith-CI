@@ -210,7 +210,7 @@ void setspid(void) {
     char cmd[128];
     pid_t pid = getpid();
 
-    snprintf(cmd, sizeof(cmd), "echo %d > /sdcard/AZenith/config/service", pid);
+    snprintf(cmd, sizeof(cmd), "echo %d > /sdcard/AZenith/config/servicePID", pid);
     systemv(cmd);
 }
 
@@ -289,17 +289,20 @@ void stop_preloading(unsigned int* LOOP_INTERVAL) {
  ***********************************************************************************/
 void runthermalcore(void) {
     char thermalcore[PROP_VALUE_MAX] = {0};
-    __system_property_get("persist.sys.azenithconf.thermalcore", thermalcore);
+    read_conf_value("thermalcore", thermalcore, sizeof(thermalcore), "0");
+
     if (strcmp(thermalcore, "1") == 0) {
-        systemv("sys.azenith-rianixiathermalcorev4 &");
-        FILE *fp = popen("pidof sys.azenith-rianixiathermalcorev4", "r");
-        if (fp == NULL) {
+        systemv("/data/data/com.android.shell/AxManager/plugins/AZenithNonr/system/bin/sys.azenith-rianixiathermalcorev4 &");
+
+        FILE* fp = popen("pidof sys.azenith-rianixiathermalcorev4", "r");
+        if (!fp) {
             perror("pidof failed");
             log_zenith(LOG_INFO, "Failed to run Thermalcore service");
             return;
         }
+
         char pid_str[32] = {0};
-        if (fgets(pid_str, sizeof(pid_str), fp) != NULL) {
+        if (fgets(pid_str, sizeof(pid_str), fp)) {
             int pid = atoi(pid_str);
             log_zenith(LOG_INFO, "Starting Thermalcore Service with pid %d", pid);
         } else {

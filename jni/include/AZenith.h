@@ -14,6 +14,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#define CONF_VALUE_MAX 128
 #define GAME_LIB \
     "libunity\\.so|libUE4\\.so|libUnreal|libframeestimation(VK|GL)\\.so|libflutter\\.so|libapp\\.so|libGGP\\.so|" \
     "libGame\\.so|libgamemaster\\.so|libvortekrenderer\\.so|libvirglrenderer\\.so|libwinlator\\.so|" \

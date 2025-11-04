@@ -119,9 +119,9 @@ int main(int argc, char* argv[]) {
     static bool did_notify_start = false;
 
     // Remove old logs before start initializing script
-    systemv("rm -f /data/adb/.config/AZenith/debug/AZenith.log");
-    systemv("rm -f /data/adb/.config/AZenith/debug/AZenithVerbose.log");
-    systemv("rm -f /data/adb/.config/AZenith/debug/AZenithPR.log");
+    systemv("rm -f /sdcard/AZenith/config/debug/AZenith.log");
+    systemv("rm -f /sdcard/AZenith/config/debug/AZenithVerbose.log");
+    systemv("rm -f /sdcard/AZenith/config/debug/AZenithPR.log");
 
     // Initiate Daemon
     log_zenith(LOG_INFO, "Daemon started as PID %d", getpid());
@@ -134,22 +134,21 @@ int main(int argc, char* argv[]) {
     runthermalcore();
     run_profiler(PERFCOMMON);
     
-    char prev_ai_state[PROP_VALUE_MAX] = "0";
+    
+    char prev_ai_state[CONF_VALUE_MAX] = "0";
     read_conf_value("AIenabled", prev_ai_state, sizeof(prev_ai_state), "0");
     while (1) {
         sleep(LOOP_INTERVAL);
 
-        // Handle case when module gets updated
         if (access(MODULE_UPDATE, F_OK) == 0) [[clang::unlikely]] {
             log_zenith(LOG_INFO, "Module update detected, exiting.");
             notify("Please reboot your device to complete module update.");
             break;
         }
 
-        // Check module state
         checkstate();
 
-        char freqoffset[PROP_VALUE_MAX] = {0};
+        char freqoffset[CONF_VALUE_MAX] = {0};
         read_conf_value("freqoffset", freqoffset, sizeof(freqoffset), "Disabled");
 
         if (strstr(freqoffset, "Disabled") == NULL) {
@@ -159,13 +158,10 @@ int main(int argc, char* argv[]) {
                 } else if (cur_mode == BALANCED_PROFILE || cur_mode == ECO_MODE) {
                     systemv("sys.azenith-profilesettings applyfreqbalance");
                 }
-            } else {
-                // Screen Off
             }
         }
 
-        // Update state
-        char ai_state[PROP_VALUE_MAX] = {0};
+        char ai_state[CONF_VALUE_MAX] = {0};
         read_conf_value("AIenabled", ai_state, sizeof(ai_state), "0");
 
         if (did_notify_start) {
@@ -185,11 +181,11 @@ int main(int argc, char* argv[]) {
 
             strcpy(prev_ai_state, ai_state);
 
-            // Skip applying if disabled
             if (strcmp(ai_state, "0") == 0) {
                 continue;
             }
         }
+    
 
         // Only fetch gamestart when user not in-game
         // prevent overhead from dumpsys commands.
