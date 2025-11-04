@@ -139,28 +139,7 @@ int main(int argc, char* argv[]) {
     // Set Default ThermalPath
     runthermalcore();
     run_profiler(PERFCOMMON);
-
-    // Helper to read file contents safely
-    static void read_conf_value(const char* name, char* buf, size_t bufsize, const char* def) {
-        char path[PATH_MAX];
-        snprintf(path, sizeof(path), "%s/%s", CONF_DIR, name);
     
-        FILE* f = fopen(path, "r");
-        if (!f) {
-            strncpy(buf, def, bufsize - 1);
-            buf[bufsize - 1] = '\0';
-            return;
-        }
-    
-        if (!fgets(buf, bufsize, f)) {
-            strncpy(buf, def, bufsize - 1);
-            buf[bufsize - 1] = '\0';
-        } else {
-            buf[strcspn(buf, "\n")] = '\0';  // remove newline
-        }
-    
-        fclose(f);
-    }
     char prev_ai_state[PROP_VALUE_MAX] = "0";
     read_conf_value("AIenabled", prev_ai_state, sizeof(prev_ai_state), "0");
     while (1) {

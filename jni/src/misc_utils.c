@@ -309,3 +309,25 @@ void runthermalcore(void) {
         pclose(fp);
     }
 }
+
+// Helper to read file contents safely
+    static void read_conf_value(const char* name, char* buf, size_t bufsize, const char* def) {
+        char path[PATH_MAX];
+        snprintf(path, sizeof(path), "%s/%s", CONF_DIR, name);
+    
+        FILE* f = fopen(path, "r");
+        if (!f) {
+            strncpy(buf, def, bufsize - 1);
+            buf[bufsize - 1] = '\0';
+            return;
+        }
+    
+        if (!fgets(buf, bufsize, f)) {
+            strncpy(buf, def, bufsize - 1);
+            buf[bufsize - 1] = '\0';
+        } else {
+            buf[strcspn(buf, "\n")] = '\0';  // remove newline
+        }
+    
+        fclose(f);
+    }
