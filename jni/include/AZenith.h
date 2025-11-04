@@ -45,6 +45,7 @@ extern unsigned int LOOP_INTERVAL;
 #define NOTIFY_TITLE "AZenith"
 #define LOG_TAG "AZenith"
 
+#define LOCK_FILE "/sdcard/AZenith/config/.lock"
 #define LOG_FILE "/sdcard/AZenith/config/debug/AZenith.log"
 #define LOG_FILE_PRELOAD "/sdcard/AZenith/config/debug/AZenithPR.log"
 #define PROFILE_MODE "/sdcard/AZenith/config/API/current_profile"
@@ -123,6 +124,7 @@ int systemv(const char* format, ...);
 // Utilities
 int check_running_state(void);
 int write2file(const char* filename, const bool append, const bool use_flock, const char* data, ...);
+int create_lock_file(void);
 
 // system
 void log_preload(LogLevel level, const char* message, ...);

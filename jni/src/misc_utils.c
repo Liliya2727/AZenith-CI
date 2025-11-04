@@ -152,8 +152,6 @@ void is_kanged(void) {
 doorprize:
     log_zenith(LOG_FATAL, "Module modified by 3rd party, exiting.");
     notify("Trying to rename me?");
-    systemv("setprop persist.sys.azenith.service \"\"");
-    systemv("setprop persist.sys.azenith.state stopped");
     exit(EXIT_FAILURE);
 }
 
@@ -177,8 +175,6 @@ void checkstate(void) {
     return;
 killsvc:
     log_zenith(LOG_FATAL, "Service killed by checkstate().");
-    systemv("setprop persist.sys.azenith.service \"\"");
-    systemv("setprop persist.sys.azenith.state stopped");
     exit(EXIT_FAILURE);
 }
 
@@ -214,7 +210,7 @@ void setspid(void) {
     char cmd[128];
     pid_t pid = getpid();
 
-    snprintf(cmd, sizeof(cmd), "setprop persist.sys.azenith.service %d", pid);
+    snprintf(cmd, sizeof(cmd), "echo %d > /sdcard/AZenith/config/service", pid);
     systemv(cmd);
 }
 

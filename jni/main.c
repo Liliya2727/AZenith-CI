@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Make sure only one instance is running
-    if (check_running_state() == 1) {
+    if (create_lock_file() != 0) {
         fprintf(stderr, "\033[31mERROR:\033[0m Another instance of Daemon is already running!\n");
         exit(EXIT_FAILURE);
     }
@@ -116,8 +116,6 @@ int main(int argc, char* argv[]) {
     // Daemonize service
     if (daemon(0, 0)) {
         log_zenith(LOG_FATAL, "Unable to daemonize service");
-        systemv("setprop persist.sys.azenith.service \"\"");
-        systemv("setprop persist.sys.azenith.state stopped");
         exit(EXIT_FAILURE);
     }
 
@@ -140,13 +138,10 @@ int main(int argc, char* argv[]) {
     log_zenith(LOG_INFO, "Daemon started as PID %d", getpid());
     // Set daemon PID to Prop
     setspid();
-    systemv("setprop persist.sys.rianixia.learning_enabled true");
-    systemv("setprop persist.sys.azenith.state running");
     // Clean old VMT
     cleanup_vmt();
     notify("Initializing...");
     // Set Default ThermalPath
-    systemv("setprop persist.sys.rianixia.thermalcore-bigdata.path /data/adb/.config/AZenith/debug");
     runthermalcore();
     run_profiler(PERFCOMMON);
     char prev_ai_state[PROP_VALUE_MAX] = "0";
@@ -159,8 +154,6 @@ int main(int argc, char* argv[]) {
         if (access(MODULE_UPDATE, F_OK) == 0) [[clang::unlikely]] {
             log_zenith(LOG_INFO, "Module update detected, exiting.");
             notify("Please reboot your device to complete module update.");
-            systemv("setprop persist.sys.azenith.service \"\"");
-            systemv("setprop persist.sys.azenith.state stopped");
             break;
         }
 
