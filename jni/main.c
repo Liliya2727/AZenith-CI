@@ -23,11 +23,6 @@ bool did_log_preload = true;
 pid_t game_pid = 0;
 
 int main(int argc, char* argv[]) {
-    // Handle case when not running on root
-    if (getuid() != 0) {
-        fprintf(stderr, "\033[31mERROR:\033[0m Please run this program as root\n");
-        exit(EXIT_FAILURE);
-    }
 
     // Expose logging interface for other modules
     char* base_name = basename(argv[0]);
@@ -143,10 +138,16 @@ int main(int argc, char* argv[]) {
 
     // Initiate Daemon
     log_zenith(LOG_INFO, "Daemon started as PID %d", getpid());
+    // Set daemon PID to Prop
     setspid();
+    systemv("setprop persist.sys.rianixia.learning_enabled true");
     systemv("setprop persist.sys.azenith.state running");
+    // Clean old VMT
     cleanup_vmt();
     notify("Initializing...");
+    // Set Default ThermalPath
+    systemv("setprop persist.sys.rianixia.thermalcore-bigdata.path /data/adb/.config/AZenith/debug");
+    runthermalcore();
     run_profiler(PERFCOMMON);
     char prev_ai_state[PROP_VALUE_MAX] = "0";
     __system_property_get("persist.sys.azenithconf.AIenabled", prev_ai_state);

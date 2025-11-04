@@ -42,11 +42,11 @@
  * Description        : Push a notification.
  ***********************************************************************************/
 void notify(const char* message) {
-    int exit = systemv("su -lp 2000 -c \"/system/bin/cmd notification post "
+    int exit = systemv("/system/bin/cmd notification post "
                        "-t '%s' "
                        "-i file:///data/local/tmp/module.avatar.webp "
                        "-I file:///data/local/tmp/module.avatar.webp "
-                       "'AZenith' '%s'\" >/dev/null",
+                       "'AZenith' '%s' >/dev/null",
                        NOTIFY_TITLE, message);
 
     if (exit != 0) [[clang::unlikely]] {
@@ -117,10 +117,12 @@ char* timern(void) {
  ***********************************************************************************/
 void toast(const char* message) {
     char val[PROP_VALUE_MAX] = {0};
+
     if (__system_property_get("persist.sys.azenithconf.showtoast", val) > 0) {
         if (val[0] == '1') {
-            int exit = systemv("su -lp 2000 -c \"/system/bin/am start -a android.intent.action.MAIN "
-                               "-e toasttext '%s' -n azenith.toast/.MainActivity >/dev/null 2>&1\"",
+            int exit = systemv("/system/bin/am start -a android.intent.action.MAIN "
+                               "-e toasttext '%s' "
+                               "-n azenith.toast/.MainActivity >/dev/null 2>&1",
                                message);
 
             if (exit != 0) [[clang::unlikely]] {
@@ -280,5 +282,34 @@ void stop_preloading(unsigned int* LOOP_INTERVAL) {
         pid_t wpid;
         while ((wpid = waitpid(-1, &status, WNOHANG)) > 0) {
         }
+    }
+}
+
+/***********************************************************************************
+ * Function Name      : runthermalcore
+ * Inputs             : none
+ * Returns            : None
+ * Description        : run thermalcore service if enabled
+ ***********************************************************************************/
+void runthermalcore(void) {
+    char thermalcore[PROP_VALUE_MAX] = {0};
+    __system_property_get("persist.sys.azenithconf.thermalcore", thermalcore);
+    if (strcmp(thermalcore, "1") == 0) {
+        systemv("sys.azenith-rianixiathermalcorev4 &");
+        FILE *fp = popen("pidof sys.azenith-rianixiathermalcorev4", "r");
+        if (fp == NULL) {
+            perror("pidof failed");
+            log_zenith(LOG_INFO, "Failed to run Thermalcore service");
+            return;
+        }
+        char pid_str[32] = {0};
+        if (fgets(pid_str, sizeof(pid_str), fp) != NULL) {
+            int pid = atoi(pid_str);
+            log_zenith(LOG_INFO, "Starting Thermalcore Service with pid %d", pid);
+        } else {
+            log_zenith(LOG_INFO, "Thermalcore Service started but PID not found");
+        }
+
+        pclose(fp);
     }
 }

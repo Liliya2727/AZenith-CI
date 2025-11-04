@@ -17,7 +17,8 @@
 SKIPUNZIP=1
 
 # Paths
-MODULE_CONFIG="/data/adb/.config/AZenith"
+MODULE_CONFIG="/sdcard/AZenith/config"
+VALUE_DIR="$MODULE_CONFIG/value"   
 device_codename=$(getprop ro.product.board)
 chip=$(getprop ro.hardware)
 
@@ -51,6 +52,7 @@ ui_print "- Extracting system directory..."
 extract "$ZIPFILE" 'system/bin/sys.azenith-profilesettings' "$MODPATH"
 extract "$ZIPFILE" 'system/bin/sys.azenith-utilityconf' "$MODPATH"
 extract "$ZIPFILE" 'system/bin/sys.azenith-preloadbin' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.azenith-rianixiathermalcorev4' "$MODPATH"
 ui_print "- Extracting service.sh..."
 extract "$ZIPFILE" service.sh "$MODPATH"
 ui_print "- Extracting module.prop..."
@@ -100,7 +102,7 @@ if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
 			ln -sf "$BIN_PATH/sys.azenith-profilesettings" "$dir/sys.azenith-profilesettings"
 			ln -sf "$BIN_PATH/sys.azenith-utilityconf" "$dir/sys.azenith-utilityconf"
 			ln -sf "$BIN_PATH/sys.azenith-preloadbin" "$dir/sys.azenith-preloadbin"
-
+            ln -sf "$BIN_PATH/sys.azenith-rianixiathermalcorev4" "$dir/sys.azenith-rianixiathermalcorev4"
 		}
 	done
 fi
@@ -158,60 +160,62 @@ unzip -o "$ZIPFILE" "webroot/*" -d "$TMPDIR" >&2
 cp -r "$TMPDIR/webroot/"* "$MODPATH/webroot/"
 rm -rf "$TMPDIR/webroot"
 
-# Make Properties
-ui_print "- Setting UP AZenith Properties"
-setprop persist.sys.azenithdebug.freqlist "Disabled 90% 80% 70% 60% 50% 40%"
-setprop persist.sys.azenithdebug.vsynclist "Disabled 60hz 90hz 120hz"
 
-# Set default freqoffset if not set
-if [ -z "$(getprop persist.sys.azenithconf.freqoffset)" ]; then
-	setprop persist.sys.azenithconf.freqoffset "Disabled"
-fi
+# Set AZenith Config Files
+mkdir -p "$VALUE_DIR"
+ui_print "- Setting up AZenith Config Files"
+echo "Disabled 90% 80% 70% 60% 50% 40%" >"$VALUE_DIR/freqlist"
+echo "Disabled 60hz 90hz 120hz" >"$VALUE_DIR/vsynclist"
 
-# Set default vsync config if not set
-if [ -z "$(getprop persist.sys.azenithconf.vsync)" ]; then
-	setprop persist.sys.azenithconf.vsync "Disabled"
-fi
+# Default values for specific configs
+[ ! -f "$VALUE_DIR/freqoffset" ] && echo "Disabled" >"$VALUE_DIR/freqoffset"
+[ ! -f "$VALUE_DIR/vsync" ] && echo "Disabled" >"$VALUE_DIR/vsync"
+[ ! -f "$VALUE_DIR/schemeconfig" ] && echo "1000 1000 1000 1000" >"$VALUE_DIR/schemeconfig"
 
-# Set default color scheme if not set
-if [ -z "$(getprop persist.sys.azenithconf.schemeconfig)" ]; then
-	setprop persist.sys.azenithconf.schemeconfig "1000 1000 1000 1000"
-fi
+ui_print "- Creating default config files..."
 
-# Set config properties to use
-ui_print "- Setting config properties..."
 props="
-persist.sys.azenithconf.logd
-persist.sys.azenithconf.DThermal
-persist.sys.azenithconf.SFL
-persist.sys.azenithconf.malisched
-persist.sys.azenithconf.fpsged
-persist.sys.azenithconf.schedtunes
-persist.sys.azenithconf.clearbg
-persist.sys.azenithconf.bypasschg
-persist.sys.azenithconf.APreload
-persist.sys.azenithconf.iosched
-persist.sys.azenithconf.cpulimit
-persist.sys.azenithconf.dnd
-persist.sys.azenithconf.justintime
-persist.sys.azenithconf.disabletrace
+logd
+DThermal
+SFL
+malisched
+fpsged
+schedtunes
+clearbg
+bypasschg
+APreload
+iosched
+cpulimit
+dnd
+justintime
+disabletrace
+thermalcore
+showtoast
+AIenabled
+debugmode
 "
-for prop in $props; do
-	curval=$(getprop "$prop")
-	if [ -z "$curval" ]; then
-		setprop "$prop" 0
-	fi
+
+# Generate files for all properties if missing
+for name in $props; do
+  path="$VALUE_DIR/$name"
+  case "$name" in
+    showtoast)
+      [ ! -f "$path" ] && echo "1" >"$path"
+      ;;
+    AIenabled)
+      [ ! -f "$path" ] && echo "1" >"$path"
+      ;;
+    debugmode)
+      [ ! -f "$path" ] && echo "false" >"$path"
+      ;;
+    *)
+      [ ! -f "$path" ] && echo "0" >"$path"
+      ;;
+  esac
 done
-if [ -z "$(getprop persist.sys.azenithconf.showtoast)" ]; then
-	setprop persist.sys.azenithconf.showtoast 1
-fi
 
-# Make sure to enable Auto Every installment and Update
-ui_print "- Enabling Auto Mode"
-setprop persist.sys.azenithconf.AIenabled 1
-
-ui_print "- Disable Debugmode"
-setprop persist.sys.azenith.debugmode "false"
+ui_print "- All AZenith config values saved in:"
+ui_print "  $VALUE_DIR/"
 
 # Install toast if not installed
 if pm list packages | grep -q azenith.toast; then
@@ -231,6 +235,6 @@ chmod +x "$MODPATH/system/bin/sys.azenith-service"
 chmod +x "$MODPATH/system/bin/sys.azenith-profilesettings"
 chmod +x "$MODPATH/system/bin/sys.azenith-utilityconf"
 chmod +x "$MODPATH/system/bin/sys.azenith-preloadbin"
-chmod +x "$MODPATH/system/bin/sys.azenith-preloadbin2"
+chmod +x "$MODPATH/system/bin/sys.azenith-rianixiathermalcorev4"
 
 ui_print "- Installation complete!"

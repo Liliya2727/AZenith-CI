@@ -42,6 +42,10 @@
       "title": "Watesi Frekuensi CPU",
       "desc": "Nentokaké frekuensi maksimum CPU ing profil Seimbang utawa ECO Mode"
     },
+    "thermal": {
+      "title": "AI Thermalcore Service",
+      "desc": "Ngatur kinerja lan suhu piranti kanthi cerdas kanthi sinau saka prilaku piranti kanggo nyegah panas banget lan njaga stabilitas. (Pateni yen kinerja krasa alon ing profil performa)"
+    },
     "litemode": {
       "title": "Mode Enteng (Reboot kanggo nerapaké)",
       "desc": "Ngurangi panas kanthi nyuda frekuensi CPU ing Profil Performa"
@@ -201,16 +205,16 @@
     "title": "Skema Warna",
     "description": "Ngatur saturasi lan warna RGB layar.",
     "red": {
-      "title": "# Abang"
+      "title": "Abang"
     },
     "green": {
-      "title": "# Ijo"
+      "title": "Ijo"
     },
     "blue": {
-      "title": "# Biru"
+      "title": "Biru"
     },
     "saturation": {
-      "title": "# Saturasi"
+      "title": "Saturasi"
     },
     "buttons": {
       "reset": "Balèkaké Setelan Warna",
@@ -221,12 +225,78 @@
   "gamelist": {
     "title": "Daftar Game",
     "description": "Aplikasi utawa game ing kéné bakal ngaktifaké Profil Game.",
-    "search": {
-      "placeholder": "Telusuri jeneng paket"
-    },
     "buttons": {
       "cancel": "Batal",
       "save": "Simpen"
     }
+  },
+  
+  "banner": {
+    "serviceStatus": "Ditangguhkan💤",
+    "servicePID": "Layanan Mati",
+    "msg": "Data durung ana"
+  },
+  
+  "randomMessages": {
+    "0": "Langit dina iki ayu tenan... kowe weruh ora?",
+    "1": "Kilauan nggawe kabeh luwih apik ✨",
+    "2": "Kowe wis nyoba sing paling apik, kuwi wis cukup~",
+    "3": "Ora apa-apa kanggo ngaso. Malah lintang butuh wektu kanggo sumunar.",
+    "4": "Ngombe panas, ambegan jero… kabeh bakal apik-apik wae.",
+    "5": "Mega alus, atimu tentrem. Ayo alon-alon dina iki~",
+    "6": "Kowe ora butuh alesan kanggo mesem — mung mesem wae~",
+    "7": "Sanajan langkah cilik bisa mimpin marang impen gedhe~",
+    "8": "Angin dina iki alus… kaya pelukan saka jagad.",
+    "9": "Kowe kaya kembang cilik sing tuwuh ing celah — ayu lan wani.",
+    "10": "Aku percaya karo kowe~ sanajan kadang jagad abot.",
+    "11": "Ayo ngejar cahya, sanajan dalan alon.",
+    "12": "Lintang tansah ngawasi… lan bangga karo kowe.",
+    "13": "Kowe luwih sumunar tinimbang sing kowe kira ✨",
+    "14": "Kadhang nindakake apa-apa iku paling wani.",
+    "15": "Ayo srengenge nyorot pipimu lan rasa kuwatirmu ilang.",
+    "16": "Cahya rembulan ora kesusu, kowe uga ora usah kesusu~",
+    "17": "Genggem tanganku, sanajan mung ing pikiranmu~",
+    "18": "Esuk sing lembut diwiwiti kanthi mesem — sanajan mesem ngantuk.",
+    "19": "Ngambang kaya mega, alus lan bebas~",
+    "20": "Kowe swara alus ing jagad sing cepet — aja kesusu.",
+    "21": "Secangkir teh, kaos kaki anget, lan atimu sing mari~",
+    "22": "Dina udan kanggo ngimpi alus ing selimut~",
+    "23": "Kembang mekar kanthi tenang — kowe uga bakal.",
+    "24": "Langit ora njaluk ijin kanggo ayu, kowe uga ora perlu.",
+    "25": "Kowe digawe saka cahya alus lan keberanian sing tenang~",
+    "26": "Ndeleng lintang ora nundha — iki kanggo nyenengake jiwa.",
+    "27": "Ora apa-apa nduwe dina sepi. Rembulan uga kaya ngono.",
+    "28": "Vibe dina iki: langit tenang, teh anget, ati alus.",
+    "29": "Kowe ora perlu sumunar rame — sawetara lintang sumunar ing sepi ✨"
+  },
+
+  "serviceStatus": {
+    "initializing": "Nglakokno...\uD83C\uDF31",
+    "runningAuto": "Mlaku - Mode Otomatis\uD83C\uDF43",
+    "runningIdle": "Mlaku - Mode Ngaso\uD83D\uDCAB",
+    "unknownProfile": "Profil Ora Dikenal",
+    "suspended": "Ditangguhkan\uD83D\uDCA4",
+    "servicePID": "PID Layanan: {0}"
+  },
+
+  "toast": {
+    "fstrim": "Blok sing ora digunakake wis dibersihake",
+    "showcantaccess": "Ora bisa diakses ing mode saiki",
+    "savedPackages": "{0} paket wis disimpen",
+    "cantRestart": "Ora bisa Restart, Daemon lagi inisialisasi",
+    "serviceDead": "Layanan mati, mangga reboot!",
+    "restartingDaemon": "Ngulang Daemon...",
+    "restartFailed": "Gagal restart daemon",
+    "colorSchemeSaved": "Setelan warna wis disimpen.",
+    "invalidColorScheme": "Format color_scheme ora valid, nganggo default aman.",
+    "colorSchemeNotFound": "Color_scheme ora ditemokake, nganggo default.",
+    "displayReset": "Setelan tampilan wis direset!",
+    "alreadyPerformance": "Kowe wis ana ing Profil Performance",
+    "alreadyBalanced": "Wis ana ing Profil Balanced",
+    "alreadyECO": "Wis ana ing Mode ECO",
+    "logSaved": "Log wis disimpen",
+    "logSaveFailed": "Gagal nyimpen log",
+    "unableDetectResolution": "Ora bisa ndeteksi resolusi layar",
+    "noResolutionSelected": "Durung milih resolusi"
   }
 }

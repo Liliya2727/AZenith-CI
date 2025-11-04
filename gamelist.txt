@@ -994,3 +994,4 @@ xd.sce.promotion
 xyz.aethersx2.android
 com.cygames.umamusume
 com.YoStarEN.StellaSora
+com.panstudio.gplay.duetnightabyss.arpg.global

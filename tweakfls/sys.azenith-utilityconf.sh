@@ -20,6 +20,7 @@
 
 MODDIR=${0%/*}
 logpath="/data/adb/.config/AZenith/debug/AZenithVerbose.log"
+logpathdm="/data/adb/.config/AZenith/debug/AZenith.log"
 
 AZLog() {
 	if [ "$(getprop persist.sys.azenith.debugmode)" = "true" ]; then
@@ -35,8 +36,10 @@ AZLog() {
 dlog() {
 	local message log_tag
 	message="$1"
-	log_tag="AZenith"
-	sys.azenith-service_log "$log_tag" 1 "$message"
+	timestamp=$(date +"%Y-%m-%d %H:%M:%S.%3N")
+	log_tag="AZenith_Utility"
+	echo "$timestamp I $log_tag: $message" >>"$logpathdm"
+    log -t "$log_tag" "$message"
 }
 
 zeshia() {
@@ -114,6 +117,7 @@ setsgov() {
 	chmod 644 /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 	echo "$1" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 	chmod 444 /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+	dlog "Set current CPU Governor to $1"
 }
 
 setsIO() {
@@ -124,8 +128,27 @@ setsIO() {
 			chmod 444 "/sys/block/$block/queue/scheduler"
 		fi
 	done
+	dlog "Set current IO Scheduler to $1"
 }
 
+setthermalcore() {
+    local state="$1"
+    if [ "$state" -eq 1 ]; then
+        /data/adb/modules/AZenith/system/bin/sys.azenith-rianixiathermalcorev4 &
+        sleep 1
+        local pid
+        pid="$(pgrep -f sys.azenith-rianixiathermalcorev4)"
+        if [ -n "$pid" ]; then
+            dlog "Starting Thermalcore Service with pid $pid"
+        else
+            dlog "Thermalcore service started but PID not found"
+        fi
+    else
+        pkill -9 -f sys.azenith-rianixiathermalcorev4 >/dev/null 2>&1
+        dlog "Stopped Thermalcore service"
+    fi
+}
+    
 FSTrim() {
 	for mount in /system /vendor /data /cache /metadata /odm /system_ext /product; do
 		if mountpoint -q "$mount"; then

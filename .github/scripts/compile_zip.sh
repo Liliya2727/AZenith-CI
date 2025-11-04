@@ -29,7 +29,7 @@ need_integrity=(
 # Version info
 version="$(cat version)"
 version_code="$(git rev-list HEAD --count)"
-release_code="$(git rev-list HEAD --count)-$(git rev-parse --short HEAD)-experimental"
+release_code="$(git rev-list HEAD --count)-$(git rev-parse --short HEAD)-release"
 sed -i "s/version=.*/version=$version ($release_code)/" mainfiles/module.prop
 sed -i "s/versionCode=.*/versionCode=$version_code/" mainfiles/module.prop
 
@@ -39,6 +39,7 @@ paste -sd '|' - <"$GITHUB_WORKSPACE/gamelist.txt" >"$GITHUB_WORKSPACE/mainfiles/
 # Copy module files
 cp -r ./libs mainfiles
 cp -r ./tweakfls/* mainfiles/system/bin
+cp -r ./thermalcore/* mainfiles/system/bin
 cp -r ./preloadbin/* mainfiles/system/bin
 cp LICENSE ./mainfiles
 
