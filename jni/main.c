@@ -104,11 +104,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Make sure only one instance is running
-    if (create_lock_file() != 0) {
-        fprintf(stderr, "\033[31mERROR:\033[0m Another instance of Daemon is already running!\n");
-        exit(EXIT_FAILURE);
-    }
 
     // Handle case when module modified by 3rd party
     is_kanged();
