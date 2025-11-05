@@ -38,8 +38,8 @@ paste -sd '|' - <"$GITHUB_WORKSPACE/gamelist.txt" >"$GITHUB_WORKSPACE/mainfiles/
 
 # Copy module files
 # Copy module files
-cp -r ./cargo/target/aarch64-linux-android/release/sys_azenithrs-service mainfiles/libs/arm64-v8a/
-cp -r ./cargo/target/armv7-linux-androideabi/release/sys_azenithrs-service mainfiles/libs/armeabi-v7a/
+cp -r ./cargo/target/aarch64-linux-android/release/sys-azenithnonr-service mainfiles/libs/arm64-v8a/
+cp -r ./cargo/target/armv7-linux-androideabi/release/sys-azenithnonr-service mainfiles/libs/armeabi-v7a/
 cp -r ./tweakfls/* mainfiles/system/bin
 cp -r ./thermalcore/* mainfiles/system/bin
 cp -r ./preloadbin/* mainfiles/system/bin
