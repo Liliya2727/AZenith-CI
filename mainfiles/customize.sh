@@ -77,11 +77,11 @@ case $ARCH in
 esac
 
 # Extract daemon
-ui_print "- Extracting sys.azenith-service for $ARCH_TMP"
-extract "$ZIPFILE" "libs/$ARCH_TMP/sys.azenith-service" "$TMPDIR"
+ui_print "- Extracting sys.azenithnonr-service for $ARCH_TMP"
+extract "$ZIPFILE" "libs/$ARCH_TMP/sys.azenithnonr-service" "$TMPDIR"
 cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
-ln -sf "$MODPATH/system/bin/sys.azenith-service" "$MODPATH/system/bin/sys.azenith-service_log"
-ln -sf "$MODPATH/system/bin/sys.azenith-service" "$MODPATH/system/bin/sys.azenith-profiler"
+ln -sf "$MODPATH/system/bin/sys.azenithnonr-service" "$MODPATH/system/bin/sys.azenithnonr-service_log"
+ln -sf "$MODPATH/system/bin/sys.azenithnonr-service" "$MODPATH/system/bin/sys.azenith-profiler"
 rm -rf "$TMPDIR/libs"
 ui_print "- Installing for Arch : $ARCH_TMP"
 
@@ -96,9 +96,9 @@ if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
 	for dir in $manager_paths; do
 		[ -d "$dir" ] && {
 			ui_print "- Creating symlink in $dir"
-			ln -sf "$BIN_PATH/sys.azenith-service" "$dir/sys.azenith-service"
-			ln -sf "$BIN_PATH/sys.azenith-service" "$dir/sys.azenith-service_log"
-			ln -sf "$BIN_PATH/sys.azenith-service" "$dir/sys.azenith-profiler"
+			ln -sf "$BIN_PATH/sys.azenithnonr-service" "$dir/sys.azenithnonr-service"
+			ln -sf "$BIN_PATH/sys.azenithnonr-service" "$dir/sys.azenithnonr-service_log"
+			ln -sf "$BIN_PATH/sys.azenithnonr-service" "$dir/sys.azenith-profiler"
 			ln -sf "$BIN_PATH/sys.azenith-profilesettings" "$dir/sys.azenith-profilesettings"
 			ln -sf "$BIN_PATH/sys.azenith-utilityconf" "$dir/sys.azenith-utilityconf"
 			ln -sf "$BIN_PATH/sys.azenith-preloadbin" "$dir/sys.azenith-preloadbin"
@@ -231,7 +231,7 @@ fi
 # Set Permissions
 ui_print "- Setting Permissions..."
 set_perm_recursive "$MODPATH/system/bin" 0 2000 0777 0777
-chmod +x "$MODPATH/system/bin/sys.azenith-service"
+chmod +x "$MODPATH/system/bin/sys.azenithnonr-service"
 chmod +x "$MODPATH/system/bin/sys.azenith-profilesettings"
 chmod +x "$MODPATH/system/bin/sys.azenith-utilityconf"
 chmod +x "$MODPATH/system/bin/sys.azenith-preloadbin"

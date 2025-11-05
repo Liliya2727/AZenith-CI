@@ -24,7 +24,7 @@ rm -rf /data/AZenith
 pm uninstall azenith.toast 2>/dev/null
 # Uninstaller Script
 manager_paths="$MODPATH/system/bin"
-binaries="sys.azenith-service sys.azenith-service_log \
+binaries="sys.azenithnonr-service sys.azenith-service_log \
           sys.azenith-profilesettings sys.azenith-utilityconf \
           sys.azenith-preloadbin sys.azenith-rianixiathermalcorev4"
 for dir in $manager_paths; do
