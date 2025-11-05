@@ -237,7 +237,7 @@ const checkServiceStatus = async () => {
   try {
     // Get PID immediately
     const { errno: pidErr, stdout: pidOut } = await executeCommand(
-      "/system/bin/toybox pidof sys.azenithnonr-service"
+      "/system/bin/toybox pidof sys-azenithnonr-service"
     );
 
     let status = "";
@@ -726,7 +726,7 @@ const startService = async () => {
     }
 
     let { stdout: pid } = await executeCommand(
-      "/system/bin/toybox pidof sys.azenithnonr-service"
+      "/system/bin/toybox pidof sys-azenithnonr-service"
     );
     if (!pid || pid.trim() === "") {
       const serviceDeadToast = getTranslation("toast.serviceDead");
@@ -741,7 +741,7 @@ const startService = async () => {
       "pkill -9 -f sys.azenith.rianixiathermalcorev4"
     );
     await executeCommand(
-      "pkill -9 -f sys.azenithnonr-service; su -c '/data/adb/modules/AZenith/system/bin/sys.azenithnonr-service > /dev/null 2>&1 & disown'"
+      "pkill -9 -f sys-azenithnonr-service; su -c '/data/adb/modules/AZenith/system/bin/sys-azenithnonr-service > /dev/null 2>&1 & disown'"
     );
 
     await checkServiceStatus();

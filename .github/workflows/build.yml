@@ -78,12 +78,12 @@ jobs:
           cargo ndk --target armv7-linux-androideabi build --release
 
           echo "Stripping binaries..."
-          $ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip target/aarch64-linux-android/release/sys.azenithnonr-service
-          $ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip target/armv7-linux-androideabi/release/sys.azenithnonr-service
+          $ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip target/aarch64-linux-android/release/sys-azenithnonr-service
+          $ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip target/armv7-linux-androideabi/release/sys-azenithnonr-service
        
           echo "Compressing with UPX..."
-          upx --best --lzma target/aarch64-linux-android/release/sys.azenithnonr-service
-          upx --best --lzma target/armv7-linux-androideabi/release/sys.azenithnonr-service
+          upx --best --lzma target/aarch64-linux-android/release/sys-azenithnonr-service
+          upx --best --lzma target/armv7-linux-androideabi/release/sys-azenithnonr-service
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.0.2
