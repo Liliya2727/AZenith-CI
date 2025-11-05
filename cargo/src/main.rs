@@ -13,7 +13,6 @@ use nix::sys::signal;
 use fs2::FileExt;
 use std::fs::File;
 use std::sync::atomic::{AtomicI32, Ordering};
-const LOCK_FILE: &str = "/sdcard/AZenith/.lock";
 const NOTIFY_TITLE: &str = "AZenith";
 const LOG_FILE: &str = "/sdcard/AZenith/debug/AZenith.log";
 const GAMELIST: &str = "/sdcard/AZenith/gamelist/gamelist.txt";
@@ -160,26 +159,6 @@ fn show_toast(message: &str) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-// Function Name      : .lock
-// Inputs             : none
-// Returns            : none
-// Description        : Checks if Another instance is running
-/////////////////////////////////////////////////////////////////////////////////////////
-fn acquire_lock() -> Option<File> {
-    let file = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .open(LOCK_FILE)
-        .ok()?;
-
-    if file.try_lock_exclusive().is_ok() {
-        Some(file)
-    } else {
-        None
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
 // Function Name      : handle_mlbb
 // Inputs             : gamestart - Game package name
 // Returns            : MLBBState (enum)
@@ -298,12 +277,6 @@ fn get_gamestart() -> Option<String> {
 // Description        : DAEMONIZE SERVICE
 /////////////////////////////////////////////////////////////////////////////////////////
 fn main() {
-
-
-    let _lock_file = acquire_lock().unwrap_or_else(|| {
-        eprintln!("\x1b[31mERROR:\x1b[0m Another instance of the daemon is already running!");
-        std::process::exit(1);
-    });
 
     // Initialize variables
     let mut gamestart: Option<String> = None;
