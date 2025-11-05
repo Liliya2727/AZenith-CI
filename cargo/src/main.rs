@@ -299,26 +299,11 @@ fn get_gamestart() -> Option<String> {
 /////////////////////////////////////////////////////////////////////////////////////////
 fn main() {
 
-    // Check program to run as root
-    unsafe {
-        if libc::getuid() != 0 {
-            eprintln!("\x1b[31mERROR:\x1b[0m Please run this program as root");
-            std::process::exit(1);
-        }
-    }
 
     let _lock_file = acquire_lock().unwrap_or_else(|| {
         eprintln!("\x1b[31mERROR:\x1b[0m Another instance of the daemon is already running!");
         std::process::exit(1);
     });
-
-    // Daemonize service
-    unsafe {
-        if libc::daemon(0, 0) != 0 {
-            log_zenith(LogLevel::Error, "Unable to daemonize service");
-            std::process::exit(1);
-        }
-    }
 
     // Initialize variables
     let mut gamestart: Option<String> = None;
