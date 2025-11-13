@@ -54,6 +54,7 @@ void log_zenith(LogLevel level, const char* message, ...) {
  *                      to a log file.
  ***********************************************************************************/
 void log_preload(LogLevel level, const char* message, ...) {
+    char debug_state[64] = {0};
     FILE *fp = fopen("/sdcard/AZenith/config/value/debugmode", "r");
     if (fp) {
         if (fgets(debug_state, sizeof(debug_state), fp)) {
