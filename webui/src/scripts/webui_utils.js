@@ -23,7 +23,7 @@ import { exec, toast } from "kernelsu";
 const moduleInterface = window.$azenith;
 const fileInterface = window.$FILE;
 const RESO_VALS = "/sdcard/AZenith/config/value/resosettings";
-const AXERONBINPATH = "/data/data/com.android.shell/AxManager/bin"
+const AXERONBINPATH = "/data/data/com.android.shell/AxManager/plugins/AetherZenith/system/bin"
 const MODULEPATH = "/data/data/com.android.shell/AxManager/plugins/AetherZenith"
 
 
@@ -118,7 +118,7 @@ let cachedSOCData = null;
 const fetchSOCDatabase = async () => {
   if (!cachedSOCData) {
     try {
-      cachedSOCData = await (await fetch(`${MODULEPATH}/webui.soclist.json`)).json();
+      cachedSOCData = await (await fetch(`${MODULEPATH}/webroot/webui.soclist.json`)).json();
     } catch {
       cachedSOCData = {};
     }
@@ -175,11 +175,6 @@ const checkCPUInfo = async () => {
   } catch {
     document.getElementById("cpuInfo").textContent = cached || "Error";
   }
-
-  showFPSGEDIfMediatek();
-  showMaliSchedIfMediatek();
-  showBypassIfMTK();
-  showThermalIfMTK();
 };
 
 const checkKernelVersion = async () => {

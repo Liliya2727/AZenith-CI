@@ -25,13 +25,13 @@
 #define NOTIFY_TITLE "AZenith"
 #define LOG_TAG "AZenith"
 
-#define LOG_FILE "/data/adb/.config/AZenith/debug/AZenith.log"
-#define LOG_FILE_PRELOAD "/data/adb/.config/AZenith/preload/AZenithPR.log"
-#define PROFILE_MODE "/data/adb/.config/AZenith/API/current_profile"
-#define GAME_INFO "/data/adb/.config/AZenith/API/gameinfo"
-#define GAMELIST "/data/adb/.config/AZenith/gamelist/gamelist.txt"
-#define MODULE_PROP "/data/adb/modules/AZenith/module.prop"
-#define MODULE_UPDATE "/data/adb/modules/AZenith/update"
+#define LOG_FILE "/sdcard/AZenith/debug/AZenith.log"
+#define LOG_FILE_PRELOAD "/sdcard/AZenith/preload/AZenithPR.log"
+#define PROFILE_MODE "/sdcard/AZenith/API/current_profile"
+#define GAME_INFO "/sdcard/AZenith/API/gameinfo"
+#define GAMELIST "/sdcard/AZenith/gamelist/gamelist.txt"
+#define MODULE_PROP "/data/data/com.android.shell/AxManager/plugins/AetherZenith/module.prop"
+#define MODULE_UPDATE "/data/data/com.android.shell/AxManager/plugins/AetherZenith/update"
 
 #define MY_PATH \
     "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/xbin:/data/data/com.termux/files/usr/bin:/data/data/com.android.shell/AxManager/bin"

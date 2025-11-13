@@ -22,4 +22,4 @@ while [ "$(getprop sys.boot_completed)" != "1" ]; do
 done
 
 # Run Daemon
-$AXERONBIN/sys.zenithnonr-service
+/data/data/com.android.shell/AxManager/plugins/AetherZenith/system/bin/sys.aetherzenith-service
