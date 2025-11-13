@@ -55,6 +55,7 @@ void run_profiler(const int profile) {
 char* get_gamestart(void) {
     char *pkg = get_visible_package();
     if (!pkg) return NULL;
+    FILE *gf = fopen(GAMELIST, "r");
     if (!gf) {
         free(pkg);
         return NULL;
