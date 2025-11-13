@@ -25,11 +25,11 @@
 #define NOTIFY_TITLE "AZenith"
 #define LOG_TAG "AZenith"
 
-#define LOG_FILE "/sdcard/AZenith/debug/AZenith.log"
-#define LOG_FILE_PRELOAD "/sdcard/AZenith/preload/AZenithPR.log"
-#define PROFILE_MODE "/sdcard/AZenith/API/current_profile"
-#define GAME_INFO "/sdcard/AZenith/API/gameinfo"
-#define GAMELIST "/sdcard/AZenith/gamelist/gamelist.txt"
+#define LOG_FILE "/sdcard/AZenith/config/debug/AZenith.log"
+#define LOG_FILE_PRELOAD "/sdcard/AZenith/config/preload/AZenithPR.log"
+#define PROFILE_MODE "/sdcard/AZenith/config/API/current_profile"
+#define GAME_INFO "/sdcard/AZenith/config/API/gameinfo"
+#define GAMELIST "/sdcard/AZenith/config/gamelist/gamelist.txt"
 #define MODULE_PROP "/data/data/com.android.shell/AxManager/plugins/AetherZenith/module.prop"
 #define MODULE_UPDATE "/data/data/com.android.shell/AxManager/plugins/AetherZenith/update"
 

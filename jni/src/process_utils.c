@@ -28,7 +28,7 @@
 pid_t pidof(const char* name) {
     if (!name || !name[0]) return 0;
 
-    FILE* fp = popen("dumpsys activity activities", "r");
+    FILE* fp = popen("/system/bin/dumpsys activity activities", "r");
     if (!fp) return 0;
 
     char line[4096];

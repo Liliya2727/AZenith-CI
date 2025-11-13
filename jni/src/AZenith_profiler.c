@@ -55,7 +55,10 @@ void run_profiler(const int profile) {
 char* get_gamestart(void) {
     char *pkg = get_visible_package();
     if (!pkg) return NULL;
-    FILE *gf = fopen(GAMELIST, "r");
+    if (!gf) {
+        free(pkg);
+        return NULL;
+    }
     fseek(gf, 0, SEEK_END);
     long size = ftell(gf);
     rewind(gf);
@@ -99,7 +102,7 @@ char* get_gamestart(void) {
 bool get_screenstate_normal(void) {
     static char fetch_failed = 0;
 
-    FILE *fp = popen("dumpsys power", "r");
+    FILE *fp = popen("/system/bin/dumpsys power", "r");
     if (!fp) {
         log_zenith(LOG_ERROR, "Failed to run dumpsys power");
         goto fetch_fail;
@@ -168,7 +171,7 @@ bool get_low_power_state_normal(void) {
         }
         pclose(fp);
     }
-    fp = popen("dumpsys power", "r");
+    fp = popen("/system/bin/dumpsys power", "r");
     if (fp) {
         char line[512];
         while (fgets(line, sizeof(line), fp)) {

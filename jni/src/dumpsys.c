@@ -29,7 +29,7 @@ char* get_visible_package(void) {
     if (!get_screenstate()) {
         return NULL;
     }
-    FILE *fp = popen("dumpsys window displays", "r");
+    FILE *fp = popen("/system/bin/dumpsys window displays", "r");
     if (!fp) {
         log_zenith(LOG_INFO, "Failed to run dumpsys window displays");
         return NULL;
