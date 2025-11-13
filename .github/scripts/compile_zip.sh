@@ -37,8 +37,7 @@ sed -i "s/versionCode=.*/versionCode=$version_code/" mainfiles/module.prop
 paste -sd '|' - <"$GITHUB_WORKSPACE/gamelist.txt" >"$GITHUB_WORKSPACE/mainfiles/gamelist.txt"
 
 # Copy module files
-cp -r ./cargo/target/aarch64-linux-android/release/sys-azenithnonr-service mainfiles/libs/arm64-v8a/
-cp -r ./cargo/target/armv7-linux-androideabi/release/sys-azenithnonr-service mainfiles/libs/armeabi-v7a/
+cp -r ./libs mainfiles
 cp -r ./tweakfls/* mainfiles/system/bin
 cp -r ./thermalcore/* mainfiles/system/bin
 cp -r ./preloadbin/* mainfiles/system/bin
