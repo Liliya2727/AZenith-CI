@@ -42,7 +42,6 @@ void log_zenith(LogLevel level, const char* message, ...) {
     // Write to file
     write2file(LOG_FILE, true, true, "%s %s %s: %s\n", timestamp, level_str[level], LOG_TAG, logMesg);
 
-    }
 }
 /***********************************************************************************
  * Function Name      : log_Preload
@@ -62,7 +61,6 @@ void log_preload(LogLevel level, const char* message, ...) {
         }
         fclose(fp);
     }
-
     // Only log if debugmode == "true"
     if (strcmp(debug_state, "true") == 0) {
         char* timestamp = timern();
