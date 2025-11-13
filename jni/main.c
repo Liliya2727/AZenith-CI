@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
     char ai_state[32] = {0};
     char prev_ai_state[32] = {0};
     char freqoffset[64] = {0};
+    char preload_active[64] = {0};
     if (strcmp(base_name, "sys.aetherzenith-log") == 0) {
         if (argc < 3) {
             fprintf(stderr, "Usage: sys.azenith-service_log <TAG> <LEVEL> <MESSAGE>\n");
@@ -188,7 +189,7 @@ int main(int argc, char* argv[]) {
         // Try to open the file
         FILE *fp = fopen("/sdcard/AZenith/config/value/AIenabled", "r");
         if (fp) {
-            if (fgets(ai_state, sizeof(freqoffset), fp)) {
+            if (fgets(ai_state, sizeof(ai_state), fp)) {
                 ai_state[strcspn(ai_state, "\r\n")] = 0;
             }
             fclose(fp);
@@ -253,8 +254,13 @@ int main(int argc, char* argv[]) {
             toast("Applying Performance Profile");
             set_priority(game_pid);            
             run_profiler(PERFORMANCE_PROFILE);
-            char preload_active[PROP_VALUE_MAX] = {0};
-            __system_property_get("persist.sys.azenithconf.APreload", preload_active);
+            FILE *fpp = fopen("/sdcard/AZenith/config/value/AIenabled", "r");
+            if (fpp) {
+                if (fgets(preload_active, sizeof(preload_active), fpl)) {
+                    preload_active[strcspn(preload_active, "\r\n")] = 0;
+                }
+                fclose(fpp);
+            } 
             if (strcmp(preload_active, "1") == 0) {
                 GamePreload(gamestart);
             }
