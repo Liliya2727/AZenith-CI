@@ -49,9 +49,9 @@ source "$TMPDIR/verify.sh"
 
 # Extract Module files
 ui_print "- Extracting system directory..."
-extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-profiles' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-conf' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-preload' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.aetherzenith-profiles' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.aetherzenith-conf' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.aetherzenith-preload' "$MODPATH"
 extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-thermalcore' "$MODPATH"
 ui_print "- Extracting service.sh..."
 extract "$ZIPFILE" service.sh "$MODPATH"
@@ -77,11 +77,11 @@ case $ARCH in
 esac
 
 # Extract daemon
-ui_print "- Extracting sys.aetherzenithnonr-service for $ARCH_TMP"
+ui_print "- Extracting sys.aetherzenith-service for $ARCH_TMP"
 extract "$ZIPFILE" "libs/$ARCH_TMP/sys-aetherzenith-service" "$TMPDIR"
 cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
-ln -sf "$MODPATH/system/bin/sys.aetheraetherzenith-service" "$MODPATH/system/bin/sys.aetheraetherzenith-log"
-ln -sf "$MODPATH/system/bin/sys.aetheraetherzenith-service" "$MODPATH/system/bin/aetherzenith"
+ln -sf "$MODPATH/system/bin/sys.aetherzenith-service" "$MODPATH/system/bin/sys.etherzenith-log"
+ln -sf "$MODPATH/system/bin/sys.aetherzenith-service" "$MODPATH/system/bin/aetherzenith"
 rm -rf "$TMPDIR/libs"
 ui_print "- Installing for Arch : $ARCH_TMP"
 
