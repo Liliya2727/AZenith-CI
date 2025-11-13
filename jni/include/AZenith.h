@@ -33,10 +33,8 @@
 #define MODULE_PROP "/data/adb/modules/AZenith/module.prop"
 #define MODULE_UPDATE "/data/adb/modules/AZenith/update"
 
-#define MY_PATH                                                                                                                    \
-    "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/" \
-    "xbin:/data/data/com.termux/files/usr/bin:/data/data/com.android.shell/AxManager/bin
-    "
+#define MY_PATH \
+    "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/xbin:/data/data/com.termux/files/usr/bin:/data/data/com.android.shell/AxManager/bin"
 
 #define IS_MLBB(gamestart)                                                                               \
     (strcmp(gamestart, "com.mobile.legends") == 0 || strcmp(gamestart, "com.mobilelegends.hwag") == 0 || \
