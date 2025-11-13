@@ -1,4 +1,4 @@
-name: AZenith
+name: Zenith
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ on:
     paths:
       - ".github/workflows/build.yml"
       - ".github/scripts/**"
-      - "cargo/**"
+      - "jni/**"
       - "tweakfls/**"
       - "mainfiles/**"
       - "preloadbin/**"
@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build Flashable ZIP
+    name: Build Flashable Zip
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,58 +35,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
       - name: NDK Setup
         uses: nttld/setup-ndk@v1.5.0
         with:
           ndk-version: r29
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Add ARCH Target
-        run: |
-          rustup target add \
-          aarch64-linux-android \
-          armv7-linux-androideabi \
-          i686-linux-android \
-          x86_64-linux-android 
-
-      - name: Install cargo-ndk
-        run: cargo install cargo-ndk
-
-      - name: Install UPX
-        run: sudo apt-get update && sudo apt-get install -y upx
-
-      - name: Build Rust Daemon
-        run: |
-          cd ./cargo
-          cargo ndk --target aarch64-linux-android build --release
-          cargo ndk --target armv7-linux-androideabi build --release
-
-          echo "Stripping binaries..."
-          $ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip target/aarch64-linux-android/release/sys-azenithnonr-service
-          $ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip target/armv7-linux-androideabi/release/sys-azenithnonr-service
-       
-          echo "Compressing with UPX..."
-          upx --best --lzma target/aarch64-linux-android/release/sys-azenithnonr-service
-          upx --best --lzma target/armv7-linux-androideabi/release/sys-azenithnonr-service
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.0.2
+
+      - name: Build AZenith JNI
+        run: ndk-build
 
       - name: Building WebRoots
         working-directory: ./webui
@@ -106,7 +64,7 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          TITLE: AZenithEunoia
+          TITLE: AetherZenith
         run: |
           if [ ! -z "${{ secrets.CHAT_ID }}" ] && [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
             export VERSION=$(git rev-list --count HEAD)
@@ -123,5 +81,5 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4.6.2
         with:
-          name: ${{ steps.compileZip.outputs.zipName }}
+          name: ${{ steps.compileZip.outputs.artifactName }}
           path: extracted/**

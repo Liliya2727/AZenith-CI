@@ -29,9 +29,9 @@ make_node() {
 
 # Displaybanner
 ui_print ""
-ui_print "              AZenith              "
+ui_print "              AetherZenith              "
 ui_print ""
-ui_print "- Installing AZenith..."
+ui_print "- Installing AetherZenith..."
 
 # Extract Module Directiories
 mkdir -p "$MODULE_CONFIG"
@@ -49,10 +49,10 @@ source "$TMPDIR/verify.sh"
 
 # Extract Module files
 ui_print "- Extracting system directory..."
-extract "$ZIPFILE" 'system/bin/sys.azenith-profilesettings' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/sys.azenith-utilityconf' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/sys.azenith-preloadbin' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/sys.azenith-rianixiathermalcorev4' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-profiles' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-conf' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-preload' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.aetheraetherzenith-thermalcore' "$MODPATH"
 ui_print "- Extracting service.sh..."
 extract "$ZIPFILE" service.sh "$MODPATH"
 ui_print "- Extracting module.prop..."
@@ -77,35 +77,13 @@ case $ARCH in
 esac
 
 # Extract daemon
-ui_print "- Extracting sys-azenithnonr-service for $ARCH_TMP"
-extract "$ZIPFILE" "libs/$ARCH_TMP/sys-azenithnonr-service" "$TMPDIR"
+ui_print "- Extracting sys.aetherzenithnonr-service for $ARCH_TMP"
+extract "$ZIPFILE" "libs/$ARCH_TMP/sys-aetherzenith-service" "$TMPDIR"
 cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
-ln -sf "$MODPATH/system/bin/sys-azenithnonr-service" "$MODPATH/system/bin/sys-azenithnonr-service_log"
-ln -sf "$MODPATH/system/bin/sys-azenithnonr-service" "$MODPATH/system/bin/sys.azenith-profiler"
+ln -sf "$MODPATH/system/bin/sys.aetheraetherzenith-service" "$MODPATH/system/bin/sys.aetheraetherzenith-log"
+ln -sf "$MODPATH/system/bin/sys.aetheraetherzenith-service" "$MODPATH/system/bin/aetherzenith"
 rm -rf "$TMPDIR/libs"
 ui_print "- Installing for Arch : $ARCH_TMP"
-
-# Use Symlink
-if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
-	# skip mount on APatch / KernelSU
-	touch "$MODPATH/skip_mount"
-	ui_print "- KSU/AP Detected, skipping module mount (skip_mount)"
-	# symlink ourselves on $PATH
-	manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
-	BIN_PATH="/data/adb/modules/AZenith/system/bin"
-	for dir in $manager_paths; do
-		[ -d "$dir" ] && {
-			ui_print "- Creating symlink in $dir"
-			ln -sf "$BIN_PATH/sys-azenithnonr-service" "$dir/sys-azenithnonr-service"
-			ln -sf "$BIN_PATH/sys-azenithnonr-service" "$dir/sys-azenithnonr-service_log"
-			ln -sf "$BIN_PATH/sys-azenithnonr-service" "$dir/sys.azenith-profiler"
-			ln -sf "$BIN_PATH/sys.azenith-profilesettings" "$dir/sys.azenith-profilesettings"
-			ln -sf "$BIN_PATH/sys.azenith-utilityconf" "$dir/sys.azenith-utilityconf"
-			ln -sf "$BIN_PATH/sys.azenith-preloadbin" "$dir/sys.azenith-preloadbin"
-            ln -sf "$BIN_PATH/sys.azenith-rianixiathermalcorev4" "$dir/sys.azenith-rianixiathermalcorev4"
-		}
-	done
-fi
 
 # Apply Tweaks Based on Chipset
 ui_print "- Checking device soc"
@@ -116,32 +94,32 @@ case "$(echo "$chipset" | tr '[:upper:]' '[:lower:]')" in
 *mt* | *MT*)
 	soc="MediaTek"
 	ui_print "- Applying Tweaks for $soc"
-	setprop persist.sys.azenithdebug.soctype 1
+	echo 1 > $VALUEDIR/soctype
 	;;
 *sm* | *qcom* | *SM* | *QCOM* | *Qualcomm* | *sdm* | *snapdragon*)
 	soc="Snapdragon"
 	ui_print "- Applying Tweaks for $soc"
-	setprop persist.sys.azenithdebug.soctype 2
+	echo 2 > $VALUEDIR/soctype
 	;;
 *exynos* | *Exynos* | *EXYNOS* | *universal* | *samsung* | *erd* | *s5e*)
 	soc="Exynos"
 	ui_print "- Applying Tweaks for $soc"
-	setprop persist.sys.azenithdebug.soctype 3
+	echo 3 > $VALUEDIR/soctype
 	;;
 *Unisoc* | *unisoc* | *ums*)
 	soc="Unisoc"
 	ui_print "- Applying Tweaks for $soc"
-	setprop persist.sys.azenithdebug.soctype 4
+	echo 4 > $VALUEDIR/soctype
 	;;
 *gs* | *Tensor* | *tensor*)
 	soc="Tensor"
 	ui_print "- Applying Tweaks for $soc"
-	setprop persist.sys.azenithdebug.soctype 5
+	echo 5 > $VALUEDIR/soctype
 	;;
 *)
 	soc="Unknown"
 	ui_print "- Applying Tweaks for $chipset"
-	setprop persist.sys.azenithdebug.soctype 0
+	echo 0 > $VALUEDIR/soctype
 	;;
 esac
 
@@ -231,10 +209,10 @@ fi
 # Set Permissions
 ui_print "- Setting Permissions..."
 set_perm_recursive "$MODPATH/system/bin" 0 2000 0777 0777
-chmod +x "$MODPATH/system/bin/sys-azenithnonr-service"
-chmod +x "$MODPATH/system/bin/sys.azenith-profilesettings"
-chmod +x "$MODPATH/system/bin/sys.azenith-utilityconf"
-chmod +x "$MODPATH/system/bin/sys.azenith-preloadbin"
-chmod +x "$MODPATH/system/bin/sys.azenith-rianixiathermalcorev4"
+chmod +x "$MODPATH/system/bin/sys.aetherzenith-service"
+chmod +x "$MODPATH/system/bin/sys.aetherzenith-profiles"
+chmod +x "$MODPATH/system/bin/sys.aetherzenith-conf"
+chmod +x "$MODPATH/system/bin/sys.aetherzenith-preload"
+chmod +x "$MODPATH/system/bin/sys.aetherzenith-thermalcore"
 
 ui_print "- Installation complete!"

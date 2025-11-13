@@ -22,7 +22,10 @@ import ResoBanner from "/webui.reso.avif";
 import { exec, toast } from "kernelsu";
 const moduleInterface = window.$azenith;
 const fileInterface = window.$FILE;
-const RESO_PROP = "persist.sys.azenithconf.resosettings";
+const RESO_VALS = "/sdcard/AZenith/config/value/resosettings";
+const AXERONBINPATH = "/data/data/com.android.shell/AxManager/bin"
+const MODULEPATH = "/data/data/com.android.shell/AxManager/plugins/AetherZenith"
+
 
 const executeCommand = async (cmd, cwd = null) => {
   try {
@@ -115,7 +118,7 @@ let cachedSOCData = null;
 const fetchSOCDatabase = async () => {
   if (!cachedSOCData) {
     try {
-      cachedSOCData = await (await fetch("webui.soclist.json")).json();
+      cachedSOCData = await (await fetch(`${MODULEPATH}/webui.soclist.json`)).json();
     } catch {
       cachedSOCData = {};
     }
@@ -237,7 +240,7 @@ const checkServiceStatus = async () => {
   try {
     // Get PID immediately
     const { errno: pidErr, stdout: pidOut } = await executeCommand(
-      "/system/bin/toybox pidof sys-azenithnonr-service"
+      "/system/bin/toybox pidof sys-aetherzenith-service"
     );
 
     let status = "";
@@ -283,66 +286,6 @@ const checkServiceStatus = async () => {
   }
 };
 
-const checkfpsged = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/fpsged"
-  );
-  0 === c && (document.getElementById("fpsged").checked = "1" === s.trim());
-};
-
-const setfpsged = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.fpsged 1"
-      : "setprop persist.sys.azenithconf.fpsged 0"
-  );
-};
-
-const showFPSGEDIfMediatek = () => {
-  const soc = (localStorage.getItem("soc_info") || "").toLowerCase();
-  const fpsgedDiv = document.getElementById("fpsged-container");
-  if (fpsgedDiv) {
-    fpsgedDiv.style.display = soc.includes("mediatek") ? "flex" : "none";
-  }
-};
-
-const checkDND = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/dnd"
-  );
-  0 === c && (document.getElementById("DoNoDis").checked = "1" === s.trim());
-};
-
-const setDND = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.dnd 1"
-      : "setprop persist.sys.azenithconf.dnd 0"
-  );
-};
-
-const checkBypassChargeStatus = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/bypasschg"
-  );
-  0 === c && (document.getElementById("Zepass").checked = "1" === s.trim());
-};
-
-const setBypassChargeStatus = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.bypasschg 1"
-      : "setprop persist.sys.azenithconf.bypasschg 0"
-  );
-};
-const showBypassIfMTK = () => {
-  const soc = (localStorage.getItem("soc_info") || "").toLowerCase();
-  const ZepassDiv = document.getElementById("Zepass-container");
-  if (ZepassDiv) {
-    ZepassDiv.style.display = soc.includes("mediatek") ? "flex" : "none";
-  }
-};
-
 const checkLiteModeStatus = async () => {
   let { errno: c, stdout: s } = await executeCommand(
     "cat /sdcard/AZenith/config/value/cpulimit"
@@ -353,33 +296,11 @@ const checkLiteModeStatus = async () => {
 const setLiteModeStatus = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.cpulimit 1"
-      : "setprop persist.sys.azenithconf.cpulimit 0"
+      ? "echo 1 > /sdcard/AZenith/config/value/cpulimit"
+      : "echo 0 > /sdcard/AZenith/config/value/cpulimit"
   );
 };
 
-const checkDThermal = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/DThermal"
-  );
-  0 === c && (document.getElementById("DThermal").checked = "1" === s.trim());
-};
-
-const setDThermal = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.DThermal 1"
-      : "setprop persist.sys.azenithconf.DThermal 0"
-  );
-};
-
-const showThermalIfMTK = () => {
-  const soc = (localStorage.getItem("soc_info") || "").toLowerCase();
-  const thermalDiv = document.getElementById("DThermal-container");
-  if (thermalDiv) {
-    thermalDiv.style.display = soc.includes("mediatek") ? "flex" : "none";
-  }
-};
 
 const checkSFL = async () => {
   let { errno: c, stdout: s } = await executeCommand(
@@ -391,22 +312,8 @@ const checkSFL = async () => {
 const setSFL = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.SFL 1"
-      : "setprop persist.sys.azenithconf.SFL 0"
-  );
-};
-const checkschedtunes = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/schedtunes"
-  );
-  0 === c && (document.getElementById("schedtunes").checked = "1" === s.trim());
-};
-
-const setschedtunes = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.schedtunes 1"
-      : "setprop persist.sys.azenithconf.schedtunes 0"
+      ? "echo 1 > /sdcard/AZenith/config/value/SFL"
+      : "echo 0 > /sdcard/AZenith/config/value/SFL"
   );
 };
 
@@ -420,87 +327,17 @@ const checkiosched = async () => {
 const setiosched = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.iosched 1"
-      : "setprop persist.sys.azenithconf.iosched 0"
+      ? "echo 1 /sdcard/AZenith/config/value/iosched"
+      : "echo 0 /sdcard/AZenith/config/value/iosched"
   );
 };
 
 const applyFSTRIM = async () => {
   await executeCommand(
-    "/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf FSTrim"
+    `${AXERONBINPATH}/sys.aetherzenith-conf FSTrim`
   );
   const fstrimToast = getTranslation("toast.fstrim");
   toast(fstrimToast);
-};
-
-const setDefaultCpuGovernor = async (c) => {
-  let s = "/data/adb/.config/AZenith",
-    r = `${s}/API/current_profile`;
-  await executeCommand(
-    `setprop persist.sys.azenith.custom_default_cpu_gov ${c}`
-  );
-  let { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
-  0 === d &&
-    "2" === l.trim() &&
-    (await executeCommand(
-      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsgov ${c}`
-    ));
-};
-
-const loadCpuGovernors = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors && cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"
-  );
-  if (0 === c) {
-    let r = s.trim().split(/\s+/),
-      d = document.getElementById("cpuGovernor");
-    d.innerHTML = "";
-    r.forEach((c) => {
-      let s = document.createElement("option");
-      s.value = c;
-      s.textContent = c;
-      d.appendChild(s);
-    });
-    let { errno: l, stdout: m } = await executeCommand(
-      `sh -c '[ -n "$(cat /sdcard/AZenith/config/value/custom_default_cpu_gov)" ] && cat /sdcard/AZenith/config/value/custom_default_cpu_gov || cat /sdcard/AZenith/config/value/default_cpu_gov'`
-    );
-    0 === l && (d.value = m.trim());
-  }
-};
-
-const setGovernorPowersave = async (c) => {
-  let s = "/data/adb/.config/AZenith",
-    r = `${s}/API/current_profile`;
-  await executeCommand(
-    `setprop persist.sys.azenith.custom_powersave_cpu_gov ${c}`
-  );
-  let { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
-  0 === d &&
-    "3" === l.trim() &&
-    (await executeCommand(
-      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsgov ${c}`
-    ));
-};
-
-const GovernorPowersave = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors && cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"
-  );
-  if (0 === c) {
-    let r = s.trim().split(/\s+/),
-      d = document.getElementById("GovernorPowersave");
-    d.innerHTML = "";
-    r.forEach((c) => {
-      let s = document.createElement("option");
-      s.value = c;
-      s.textContent = c;
-      d.appendChild(s);
-    });
-    let { errno: l, stdout: m } = await executeCommand(
-      `sh -c '[ -n "$(cat /sdcard/AZenith/config/value/custom_powersave_cpu_gov)" ] && cat /sdcard/AZenith/config/value/custom_powersave_cpu_gov'`
-    );
-    0 === l && (d.value = m.trim());
-  }
 };
 
 const hideGameListModal = () => {
@@ -633,82 +470,8 @@ const checklogger = async () => {
 const setlogger = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenith.debugmode true"
-      : "setprop persist.sys.azenith.debugmode false"
-  );
-};
-
-const setVsyncValue = async (c) => {
-  await executeCommand(`setprop persist.sys.azenithconf.vsync ${c}`);
-  await executeCommand(
-    `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf disablevsync ${c}`
-  );
-};
-
-const loadVsyncValue = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "getprop persist.sys.azenithdebug.vsynclist"
-  );
-  if (0 === c) {
-    let r = s.trim().split(/\s+/),
-      d = document.getElementById("disablevsync");
-    (d.innerHTML = ""),
-      r.forEach((c) => {
-        let s = document.createElement("option");
-        (s.value = c), (s.textContent = c), d.appendChild(s);
-      });
-    let { errno: l, stdout: m } = await executeCommand(
-      `sh -c '[ -n "$(cat /sdcard/AZenith/config/value/vsync)" ] && cat /sdcard/AZenith/config/value/vsync'`
-    );
-    0 === l && (d.value = m.trim());
-  }
-};
-
-const setCpuFreqOffsets = async (c) => {
-  let s = "/data/adb/.config/AZenith",
-    r = `${s}/API/current_profile`;
-  await executeCommand(`setprop persist.sys.azenithconf.freqoffset ${c}`);
-  let { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
-  if (d === 0) {
-    let profile = l.trim();
-    if (profile === "2" || profile === "3") {
-      await executeCommand(
-        `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsfreqs`
-      );
-    }
-  }
-};
-
-const loadCpuFreq = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "getprop persist.sys.azenithdebug.freqlist"
-  );
-  if (0 === c) {
-    let r = s.trim().split(/\s+/),
-      d = document.getElementById("cpuFreq");
-    (d.innerHTML = ""),
-      r.forEach((c) => {
-        let s = document.createElement("option");
-        (s.value = c), (s.textContent = c), d.appendChild(s);
-      });
-    let { errno: l, stdout: m } = await executeCommand(
-      `sh -c '[ -n "$(cat /sdcard/AZenith/config/value/freqoffset)" ] && cat /sdcard/AZenith/config/value/freqoffset'`
-    );
-    0 === l && (d.value = m.trim());
-  }
-};
-const checkKillLog = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/logd"
-  );
-  0 === c && (document.getElementById("logd").checked = "1" === s.trim());
-};
-
-const setKillLog = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.logd 1"
-      : "setprop persist.sys.azenithconf.logd 0"
+      ? "echo true > /sdcard/AZenith/config/value/debugmode"
+      : "echo false > /sdcard/AZenith/config/value/debugmode"
   );
 };
 
@@ -726,7 +489,7 @@ const startService = async () => {
     }
 
     let { stdout: pid } = await executeCommand(
-      "/system/bin/toybox pidof sys-azenithnonr-service"
+      "/system/bin/toybox pidof sys.aetherzenith-service"
     );
     if (!pid || pid.trim() === "") {
       const serviceDeadToast = getTranslation("toast.serviceDead");
@@ -738,10 +501,10 @@ const startService = async () => {
     toast(restartingDaemonToast);
     
     await executeCommand(
-      "pkill -9 -f sys.azenith.rianixiathermalcorev4"
+      "pkill -9 -f sys.azenith.thermalcore"
     );
     await executeCommand(
-      "pkill -9 -f sys-azenithnonr-service; su -c '/data/adb/modules/AZenith/system/bin/sys-azenithnonr-service > /dev/null 2>&1 & disown'"
+      "pkill -9 -f sys.aetherzenith-service; su -c '${AXERONBINPATH}/sys-azenithnonr-service > /dev/null 2>&1 & disown'"
     );
 
     await checkServiceStatus();
@@ -762,8 +525,8 @@ const checkGPreload = async () => {
 const setGPreloadStatus = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.APreload 1"
-      : "setprop persist.sys.azenithconf.APreload 0"
+      ? "echo 1 > /sdcard/AZenith/config/value/APreload"
+      : "echo 0 > /sdcard/AZenith/config/value/APreload"
   );
 };
 const checkRamBoost = async () => {
@@ -776,130 +539,11 @@ const checkRamBoost = async () => {
 const setRamBoostStatus = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.clearbg 1"
-      : "setprop persist.sys.azenithconf.clearbg 0"
+      ? "echo 1 > /sdcard/AZenith/config/value/clearbg"
+      : "echo 0 > /sdcard/AZenith/config/value/clearbg"
   );
 };
 
-const checkmalisched = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/malisched"
-  );
-  0 === c && (document.getElementById("malisched").checked = "1" === s.trim());
-};
-
-const setmalisched = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.malisched 1"
-      : "setprop persist.sys.azenithconf.malisched 0"
-  );
-};
-
-const showMaliSchedIfMediatek = () => {
-  const soc = (localStorage.getItem("soc_info") || "").toLowerCase();
-  const MaliSchedDiv = document.getElementById("malisched-container");
-  if (MaliSchedDiv) {
-    MaliSchedDiv.style.display = soc.includes("mediatek") ? "flex" : "none";
-  }
-};
-
-const showColorScheme = async () => {
-  const c = document.getElementById("schemeModal");
-  if (!c) return; // Modal element not found
-
-  const s = c.querySelector(".scheme-container");
-  if (!s) return; // Modal content not found
-
-  document.body.classList.add("modal-open");
-  c.classList.add("show");
-
-  const originalHeight = window.innerHeight;
-
-  const resizeHandler = () => {
-    if (!s) return;
-    window.innerHeight < originalHeight - 150
-      ? (s.style.transform = "translateY(-10%) scale(1)")
-      : (s.style.transform = "translateY(0) scale(1)");
-  };
-
-  window.addEventListener("resize", resizeHandler, { passive: true });
-  c._resizeHandler = resizeHandler;
-
-  resizeHandler();
-};
-
-const hidecolorscheme = () => {
-  const c = document.getElementById("schemeModal");
-  if (!c) return; // exit if modal not found
-
-  c.classList.remove("show");
-  document.body.classList.remove("modal-open");
-  const colorSchemeSavedToast = getTranslation("toast.colorSchemeSaved");
-  toast(colorSchemeSavedToast);
-
-  if (c._resizeHandler) {
-    window.removeEventListener("resize", c._resizeHandler);
-    delete c._resizeHandler;
-  }
-};
-
-const saveDisplaySettings = (c, s, r, d) => {
-  const cmd = `sh -c 'setprop persist.sys.azenithconf.schemeconfig "${c} ${s} ${r} ${d}"'`;
-  executeCommand(cmd);
-};
-
-const loadDisplaySettings = async () => {
-  try {
-    const c = await executeCommand(
-      `sh -c "cat /sdcard/AZenith/config/value/schemeconfig"`
-    );
-    const [s, r, d, l] = (
-      typeof c === "object" && c.stdout ? c.stdout.trim() : String(c).trim()
-    )
-      .split(/\s+/)
-      .map(Number);
-
-    if ([s, r, d, l].some(isNaN)) {
-      const invalidColorSchemeToast = getTranslation("toast.invalidColorScheme");
-      toast(invalidColorSchemeToast);
-      return { red: 1000, green: 1000, blue: 1000, saturation: 1000 };
-    }
-
-    return { red: s, green: r, blue: d, saturation: l };
-  } catch (m) {
-    console.log("Error reading display settings:", m);
-    const colorSchemeNotFoundToast = getTranslation("toast.colorSchemeNotFound");
-    toast(colorSchemeNotFoundToast);
-    return { red: 1000, green: 1000, blue: 1000, saturation: 1000 };
-  }
-};
-
-const setRGB = async (c, s, r) => {
-  await executeCommand(
-    `service call SurfaceFlinger 1015 i32 1 f ${c / 1000} f 0 f 0 f 0 f 0 f ${
-      s / 1000
-    } f 0 f 0 f 0 f 0 f ${r / 1000} f 0 f 0 f 0 f 0 f 1`
-  );
-};
-
-const setSaturation = async (c) => {
-  await executeCommand(`service call SurfaceFlinger 1022 f ${c / 1000}`);
-};
-
-const resetDisplaySettings = async () => {
-  await executeCommand(
-    "service call SurfaceFlinger 1015 i32 1 f 1 f 0 f 0 f 0 f 0 f 1 f 0 f 0 f 0 f 0 f 1 f 0 f 0 f 0 f 0 f 1"
-  );
-  await executeCommand("service call SurfaceFlinger 1022 f 1");
-  saveDisplaySettings(1000, 1000, 1000, 1000);
-  document.getElementById("red").value = 1000;
-  document.getElementById("green").value = 1000;
-  document.getElementById("blue").value = 1000;
-  document.getElementById("saturation").value = 1000;
-  const displayResetToast = getTranslation("toast.displayReset");
-  toast(displayResetToast);
-};
 const checkAI = async () => {
   let { errno: c, stdout: s } = await executeCommand(
     "cat /sdcard/AZenith/config/value/AIenabled"
@@ -910,8 +554,8 @@ const checkAI = async () => {
 const setAI = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.AIenabled 0"
-      : "setprop persist.sys.azenithconf.AIenabled 1"
+      ? "echo 0 > /sdcard/AZenith/config/value/AIenabled"
+      : "echo 1 > /sdcard/AZenith/config/value/AIenabled"
   );
   await executeCommand(
     c
@@ -929,7 +573,7 @@ const applyperformanceprofile = async () => {
     toast(alreadyPerformanceToast);
     return;
   }
-  executeCommand("su -c sys.azenith-profiler 1 >/dev/null 2>&1 &");
+  executeCommand("su -c aetherzenith 1 >/dev/null 2>&1 &");
 };
 
 const applybalancedprofile = async () => {
@@ -941,7 +585,7 @@ const applybalancedprofile = async () => {
     toast(alreadyBalancedToast);
     return;
   }
-  executeCommand("su -c sys.azenith-profiler 2 >/dev/null 2>&1 &");
+  executeCommand("su -c aetherzenith 2 >/dev/null 2>&1 &");
 };
 
 const applyecomode = async () => {
@@ -953,7 +597,7 @@ const applyecomode = async () => {
     toast(alreadyECOToast);
     return;
   }
-  executeCommand("su -c sys.azenith-profiler 3 >/dev/null 2>&1 &");
+  executeCommand("su -c aetherzenith 3 >/dev/null 2>&1 &");
 };
 
 const checkjit = async () => {
@@ -966,23 +610,8 @@ const checkjit = async () => {
 const setjit = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.justintime 1"
-      : "setprop persist.sys.azenithconf.justintime 0"
-  );
-};
-
-const checkdtrace = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "cat /sdcard/AZenith/config/value/disabletrace"
-  );
-  0 === c && (document.getElementById("trace").checked = "1" === s.trim());
-};
-
-const setdtrace = async (c) => {
-  await executeCommand(
-    c
-      ? "setprop persist.sys.azenithconf.disabletrace 1"
-      : "setprop persist.sys.azenithconf.disabletrace 0"
+      ? "echo 1 > /sdcard/AZenith/config/value/justintime"
+      : "echo 0 > /sdcard/AZenith/config/value/justintime"
   );
 };
 
@@ -996,205 +625,9 @@ const checktoast = async () => {
 const settoast = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.showtoast 1"
-      : "setprop persist.sys.azenithconf.showtoast 0"
+      ? "echo 1 > /sdcard/AZenith/config/value/showtoast"
+      : "echo 0 > /sdcard/AZenith/config/value/showtoast"
   );
-};
-
-const setIObalance = async (c) => {
-  let s = "/data/adb/.config/AZenith",
-    r = `${s}/API/current_profile`;
-  await executeCommand(
-    `setprop persist.sys.azenith.custom_default_balanced_IO ${c}`
-  );
-  let { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
-  0 === d &&
-    "2" === l.trim() &&
-    (await executeCommand(
-      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsIO ${c}`
-    ));
-};
-
-const loadIObalance = async () => {
-  // Candidate block devices
-  const blocks = ["mmcblk0", "mmcblk1", "sda", "sdb", "sdc"];
-  let validBlock = null;
-
-  // Find the first block that exists and has a scheduler file
-  for (const blk of blocks) {
-    const { errno } = await executeCommand(`test -e /sys/block/${blk}/queue/scheduler`);
-    if (errno === 0) {
-      validBlock = blk;
-      break;
-    }
-  }
-
-  if (!validBlock) {
-    console.warn("No valid block device with scheduler found");
-    return;
-  }
-
-  // Read scheduler list from detected block
-  const { errno: c, stdout: s } = await executeCommand(`cat /sys/block/${validBlock}/queue/scheduler`);
-  if (c !== 0) {
-    console.warn("Failed to read scheduler from", validBlock);
-    return;
-  }
-
-  // Populate select element
-  const select = document.getElementById("ioSchedulerBalanced");
-  if (!select) return;
-  select.innerHTML = "";
-
-  const schedulers = s.trim().split(/\s+/).map(sch => sch.replace(/[\[\]]/g, ""));
-  schedulers.forEach(sch => {
-    const opt = document.createElement("option");
-    opt.value = sch;
-    opt.textContent = sch;
-    select.appendChild(opt);
-  });
-
-  // Get currently active/custom scheduler property
-  const { errno: l, stdout: m } = await executeCommand(
-    `sh -c '[ -n "$(cat /sdcard/AZenith/config/value/custom_default_balanced_IO)" ] && cat /sdcard/AZenith/config/value/custom_default_balanced_IO || cat /sdcard/AZenith/config/value/default_balanced_IO'`
-  );
-
-  if (l === 0) {
-    const current = m.trim().replace(/[\[\]]/g, "");
-    select.value = current;
-  }
-
-  console.log(`Detected block device: ${validBlock}`);
-};
-
-const setIOperformance = async (c) => {
-  let s = "/data/adb/.config/AZenith",
-    r = `${s}/API/current_profile`;
-  await executeCommand(
-    `setprop persist.sys.azenith.custom_performance_IO ${c}`
-  );
-  let { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
-  0 === d &&
-    "1" === l.trim() &&
-    (await executeCommand(
-      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsIO ${c}`
-    ));
-};
-
-const loadIOperformance = async () => {
-  // Candidate block devices
-  const blocks = ["mmcblk0", "mmcblk1", "sda", "sdb", "sdc"];
-  let validBlock = null;
-
-  // Find the first block device that has a scheduler file
-  for (const blk of blocks) {
-    const { errno } = await executeCommand(`test -e /sys/block/${blk}/queue/scheduler`);
-    if (errno === 0) {
-      validBlock = blk;
-      break;
-    }
-  }
-
-  if (!validBlock) {
-    console.warn("No valid block device with scheduler found");
-    return;
-  }
-
-  // Read available schedulers
-  const { errno: c, stdout: s } = await executeCommand(`cat /sys/block/${validBlock}/queue/scheduler`);
-  if (c !== 0) {
-    console.warn(`Failed to read scheduler from /sys/block/${validBlock}`);
-    return;
-  }
-
-  // Populate <select> options
-  const select = document.getElementById("ioSchedulerPerformance");
-  if (!select) return;
-  select.innerHTML = "";
-
-  const schedulers = s.trim().split(/\s+/).map(x => x.replace(/[\[\]]/g, ""));
-  schedulers.forEach(sch => {
-    const opt = document.createElement("option");
-    opt.value = sch;
-    opt.textContent = sch;
-    select.appendChild(opt);
-  });
-
-  // Get current scheduler (custom performance property)
-  const { errno: l, stdout: m } = await executeCommand(
-    `sh -c '[ -n "$(cat /sdcard/AZenith/config/value/custom_performance_IO)" ] && cat /sdcard/AZenith/config/value/custom_performance_IO || echo ""'`
-  );
-
-  if (l === 0) {
-    const current = m.trim().replace(/[\[\]]/g, "");
-    if (current) select.value = current;
-  }
-
-  console.log(`Detected block device: ${validBlock}`);
-};
-
-const setIOpowersave = async (c) => {
-  const s = "/data/adb/.config/AZenith",
-    r = `${s}/API/current_profile`;
-  await executeCommand(`setprop persist.sys.azenith.custom_powersave_IO ${c}`);
-  const { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
-  if (d === 0 && l.trim() === "3") {
-    await executeCommand(
-      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsIO ${c}`
-    );
-  }
-};
-
-const loadIOpowersave = async () => {
-  // Candidate block devices
-  const blocks = ["mmcblk0", "mmcblk1", "sda", "sdb", "sdc"];
-  let validBlock = null;
-
-  // Find first block device that has a scheduler file
-  for (const blk of blocks) {
-    const { errno } = await executeCommand(`test -e /sys/block/${blk}/queue/scheduler`);
-    if (errno === 0) {
-      validBlock = blk;
-      break;
-    }
-  }
-
-  if (!validBlock) {
-    console.warn("No valid block device with scheduler found");
-    return;
-  }
-
-  // Read available schedulers
-  const { errno: c, stdout: s } = await executeCommand(`cat /sys/block/${validBlock}/queue/scheduler`);
-  if (c !== 0) {
-    console.warn(`Failed to read scheduler from /sys/block/${validBlock}`);
-    return;
-  }
-
-  // Populate dropdown
-  const select = document.getElementById("ioSchedulerPowersave");
-  if (!select) return;
-  select.innerHTML = "";
-
-  const schedulers = s.trim().split(/\s+/).map(x => x.replace(/[\[\]]/g, ""));
-  schedulers.forEach(sch => {
-    const opt = document.createElement("option");
-    opt.value = sch;
-    opt.textContent = sch;
-    select.appendChild(opt);
-  });
-
-  // Get current scheduler (custom powersave property)
-  const { errno: l, stdout: m } = await executeCommand(
-    `sh -c '[ -n "$(cat /sdcard/AZenith/config/value/custom_powersave_IO)" ] && cat /sdcard/AZenith/config/value/custom_powersave_IO || echo ""'`
-  );
-
-  if (l === 0) {
-    const current = m.trim().replace(/[\[\]]/g, "");
-    if (current) select.value = current;
-  }
-
-  console.log(`Detected block device for powersave: ${validBlock}`);
 };
 
 const showAdditionalSettings = async () => {
@@ -1262,21 +695,24 @@ const hideGamelistSettings = () => {
     delete c._resizeHandler;
   }
 };
-
-const hideSchemeSettings = () => {
-  const c = document.getElementById("schemeModal");
-  c.classList.remove("show");
-  document.body.classList.remove("modal-open");
-  if (c._resizeHandler) {
-    window.removeEventListener("resize", c._resizeHandler);
-    delete c._resizeHandler;
-  }
+const checkDND = async () => {
+  let { errno: c, stdout: s } = await executeCommand(
+    "cat /sdcard/AZenith/config/value/dnd"
+  );
+  0 === c && (document.getElementById("DoNoDis").checked = "1" === s.trim());
 };
 
+const setDND = async (c) => {
+  await executeCommand(
+    c
+      ? "echo 1 > /sdcard/AZenith/config/value/dnd"
+      : "echo 0 > /sdcard/AZenith/config/value/dnd"
+  );
+};
 const savelog = async () => {
   try {
     await executeCommand(
-      "/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf saveLog"
+      `${AXERONBINPATH}/sys.aetherzenith-conf saveLog`
     );
     const logSavedMsg = getTranslation("toast.logSaved");
     toast(logSavedMsg);
@@ -1287,142 +723,12 @@ const savelog = async () => {
   }
 };
 
-const currentColor = {
-  red: 1000,
-  green: 1000,
-  blue: 1000,
-  saturation: 1000,
-};
-
 const debounce = (fn, delay = 200) => {
   let timer;
   return (...args) => {
     clearTimeout(timer);
     timer = setTimeout(() => fn(...args), delay);
   };
-};
-
-const updateColorState = ({ red, green, blue, saturation }) => {
-  if (
-    red !== currentColor.red ||
-    green !== currentColor.green ||
-    blue !== currentColor.blue ||
-    saturation !== currentColor.saturation
-  ) {
-    currentColor.red = red;
-    currentColor.green = green;
-    currentColor.blue = blue;
-    currentColor.saturation = saturation;
-
-    saveDisplaySettings(red, green, blue, saturation);
-    setRGB(red, green, blue);
-    setSaturation(saturation);
-  }
-};
-
-const loadColorSchemeSettings = async () => {
-  const c = document.getElementById("red"),
-    s = document.getElementById("green"),
-    r = document.getElementById("blue"),
-    d = document.getElementById("saturation"),
-    l = document.getElementById("reset-btn"),
-    cv = document.getElementById("red-value"),
-    sv = document.getElementById("green-value"),
-    rv = document.getElementById("blue-value"),
-    dv = document.getElementById("saturation-value"),
-    m = await loadDisplaySettings();
-
-  // Update slider and number inputs
-  [c, s, r, d].forEach((el, i) => {
-    switch (i) {
-      case 0:
-        el.value = m.red;
-        cv.value = m.red;
-        break;
-      case 1:
-        el.value = m.green;
-        sv.value = m.green;
-        break;
-      case 2:
-        el.value = m.blue;
-        rv.value = m.blue;
-        break;
-      case 3:
-        el.value = m.saturation;
-        dv.value = m.saturation;
-        break;
-    }
-  });
-
-  currentColor.red = m.red;
-  currentColor.green = m.green;
-  currentColor.blue = m.blue;
-  currentColor.saturation = m.saturation;
-
-  await setRGB(m.red, m.green, m.blue);
-  await setSaturation(m.saturation);
-
-  const handleInputChange = debounce(() => {
-    cv.value = c.value;
-    sv.value = s.value;
-    rv.value = r.value;
-    dv.value = d.value;
-
-    updateColorState({
-      red: Number(c.value),
-      green: Number(s.value),
-      blue: Number(r.value),
-      saturation: Number(d.value),
-    });
-  }, 100);
-
-  [c, s, r, d].forEach((el) => el.addEventListener("input", handleInputChange));
-
-  const bindInput = (numberInput, slider, min, max) => {
-    numberInput.addEventListener("input", () => {
-      if (numberInput.value === "") return;
-      slider.value = numberInput.value;
-      handleInputChange();
-    });
-
-    const finalize = () => {
-      if (numberInput.value === "") numberInput.value = slider.value;
-      let v = Number(numberInput.value);
-      if (isNaN(v)) v = min;
-      if (v < min) v = min;
-      if (v > max) v = max;
-      numberInput.value = v;
-      slider.value = v;
-      handleInputChange();
-    };
-
-    numberInput.addEventListener("blur", finalize);
-    numberInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") numberInput.blur();
-    });
-  };
-
-  bindInput(cv, c, 0, 1000);
-  bindInput(sv, s, 0, 1000);
-  bindInput(rv, r, 0, 1000);
-  bindInput(dv, d, 0, 2000);
-
-  l.addEventListener("click", async () => {
-    c.value = s.value = r.value = d.value = 1000;
-    cv.value = sv.value = rv.value = dv.value = 1000;
-
-    await setRGB(1000, 1000, 1000);
-    await setSaturation(1000);
-
-    currentColor.red = 1000;
-    currentColor.green = 1000;
-    currentColor.blue = 1000;
-    currentColor.saturation = 1000;
-
-    saveDisplaySettings(1000, 1000, 1000, 1000);
-    const displayResetMsg = getTranslation("toast.displayReset");
-    toast(displayResetMsg);
-  });
 };
 
 const detectResolution = async () => {
@@ -1457,7 +763,7 @@ const detectResolution = async () => {
     selected: defaultRes,
   };
 
-  const { stdout: saved } = await executeCommand(`getprop ${RESO_PROP}`);
+  const { stdout: saved } = await executeCommand(`cat ${RESO_VALS}`);
   const savedRes = saved.trim();
 
   if (savedRes) {
@@ -1496,10 +802,10 @@ const applyResolution = async () => {
   const def = window._reso.default;
 
   if (selected === def) {
-    await executeCommand(`setprop ${RESO_PROP} ${selected}`);
+    await executeCommand(`echo ${selected} ${RESO_VALS}`);
     await executeCommand("wm size reset");
   } else {
-    await executeCommand(`setprop ${RESO_PROP} ${selected}`);
+    await executeCommand(`echo ${selected} ${RESO_VALS}`);
     await executeCommand(`wm size ${selected}`);
   }
 };
@@ -1624,8 +930,8 @@ const checkthermalcore = async () => {
 const setthermalcore = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.thermalcore 1 && /data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setthermalcore 1 &"
-      : "setprop persist.sys.azenithconf.thermalcore 0 && /data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setthermalcore 0 &"
+      ? "echo 1 > /sdcard/AZenith/config/value/thermalcore && ${AXERONBINPATH}/sys.aetherzenith-conf setthermalcore 1 &"
+      : "echo 0 > /sdcard/AZenith/config/value/thermalcore && ${AXERONBINPATH}/sys.aetherzenith-conf setthermalcore 0 &"
   );
 };
 
@@ -1669,9 +975,6 @@ const setupUIListeners = () => {
 
   // Toggle Switches
   document
-    .getElementById("fpsged")
-    ?.addEventListener("change", (e) => setfpsged(e.target.checked));
-  document
     .getElementById("jit")
     ?.addEventListener("change", (e) => setjit(e.target.checked));
   document
@@ -1680,9 +983,6 @@ const setupUIListeners = () => {
   document
     .getElementById("toast")
     ?.addEventListener("change", (e) => settoast(e.target.checked));
-  document
-    .getElementById("trace")
-    ?.addEventListener("change", (e) => setdtrace(e.target.checked));
   document
     .getElementById("GPreload")
     ?.addEventListener("change", (e) => setthermalcore(e.target.checked));
@@ -1693,14 +993,8 @@ const setupUIListeners = () => {
     .getElementById("SFL")
     ?.addEventListener("change", (e) => setSFL(e.target.checked));
   document
-    .getElementById("DThermal")
-    ?.addEventListener("change", (e) => setDThermal(e.target.checked));
-  document
     .getElementById("LiteMode")
     ?.addEventListener("change", (e) => setLiteModeStatus(e.target.checked));
-  document
-    .getElementById("schedtunes")
-    ?.addEventListener("change", (e) => setschedtunes(e.target.checked));
   document
     .getElementById("thermalcore")
     ?.addEventListener("change", (e) => setthermalcore(e.target.checked));
@@ -1711,42 +1005,8 @@ const setupUIListeners = () => {
     .getElementById("iosched")
     ?.addEventListener("change", (e) => setiosched(e.target.checked));
   document
-    .getElementById("malisched")
-    ?.addEventListener("change", (e) => setmalisched(e.target.checked));
-  document
     .getElementById("DoNoDis")
     ?.addEventListener("change", (e) => setDND(e.target.checked));
-  document
-    .getElementById("logd")
-    ?.addEventListener("change", (e) => setKillLog(e.target.checked));
-  document
-    .getElementById("Zepass")
-    ?.addEventListener("change", (e) =>
-      setBypassChargeStatus(e.target.checked)
-    );
-
-  // Select dropdowns
-  document
-    .getElementById("cpuGovernor")
-    ?.addEventListener("change", (e) => setDefaultCpuGovernor(e.target.value));
-  document
-    .getElementById("GovernorPowersave")
-    ?.addEventListener("change", (e) => setGovernorPowersave(e.target.value));
-  document
-    .getElementById("ioSchedulerBalanced")
-    ?.addEventListener("change", (e) => setIObalance(e.target.value));
-  document
-    .getElementById("ioSchedulerPerformance")
-    ?.addEventListener("change", (e) => setIOperformance(e.target.value));
-  document
-    .getElementById("ioSchedulerPowersave")
-    ?.addEventListener("change", (e) => setIOpowersave(e.target.value));
-  document
-    .getElementById("cpuFreq")
-    ?.addEventListener("change", (e) => setCpuFreqOffsets(e.target.value));
-  document
-    .getElementById("disablevsync")
-    ?.addEventListener("change", (e) => setVsyncValue(e.target.value));
 
   // Open settings
   document
@@ -1805,17 +1065,6 @@ const setupUIListeners = () => {
   document.querySelectorAll(".reso-option")?.forEach((btn) => {
     btn.addEventListener("click", () => selectResolution(btn));
   });
-
-  // Color scheme buttons
-  document
-    .getElementById("colorschemebutton")
-    ?.addEventListener("click", showColorScheme);
-  document
-    .getElementById("applybutton")
-    ?.addEventListener("click", hidecolorscheme);
-  document
-    .getElementById("close-scheme")
-    ?.addEventListener("click", hideSchemeSettings);
 
   // Gamelist modal buttons
   document
@@ -1922,22 +1171,14 @@ const heavyInit = async () => {
   await Promise.all(stage1.map((fn) => fn()));
 
   const quickChecks = [    
-    loadCpuGovernors,
-    loadCpuFreq,    
-    loadIObalance,
-    loadIOperformance,
-    loadIOpowersave,
-    GovernorPowersave,
+    checkCPUInfo,
+    checkKernelVersion,
+    getAndroidVersion,
+    checkLiteModeStatus,
   ];
   await Promise.all(quickChecks.map((fn) => fn()));
 
   const heavyAsync = [
-    checkCPUInfo,
-    checkKernelVersion,
-    getAndroidVersion,
-    checkfpsged,
-    checkLiteModeStatus,
-    checkDThermal,
     checkiosched,
     checkGPreload,
     loadColorSchemeSettings,
@@ -1945,16 +1186,11 @@ const heavyInit = async () => {
   await Promise.all(heavyAsync.map((fn) => fn()));
 
   const heavySequential = [
-    checkmalisched,
     checkAI,
     checkthermalcore,
     checkDND,
-    checkdtrace,
     checkjit,
     checktoast,
-    loadVsyncValue,
-    checkBypassChargeStatus,
-    checkschedtunes,
     checkSFL,
     checkKillLog,
     checklogger,
