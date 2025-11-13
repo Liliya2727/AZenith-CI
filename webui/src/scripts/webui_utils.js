@@ -1176,7 +1176,6 @@ const heavyInit = async () => {
   const heavyAsync = [
     checkiosched,
     checkGPreload,
-    loadColorSchemeSettings,
   ];
   await Promise.all(heavyAsync.map((fn) => fn()));
 
