@@ -256,7 +256,7 @@ int main(int argc, char* argv[]) {
             run_profiler(PERFORMANCE_PROFILE);
             FILE *fpp = fopen("/sdcard/AZenith/config/value/AIenabled", "r");
             if (fpp) {
-                if (fgets(preload_active, sizeof(preload_active), fpl)) {
+                if (fgets(preload_active, sizeof(preload_active), fpp)) {
                     preload_active[strcspn(preload_active, "\r\n")] = 0;
                 }
                 fclose(fpp);
