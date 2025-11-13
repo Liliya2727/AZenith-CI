@@ -78,7 +78,7 @@ esac
 
 # Extract daemon
 ui_print "- Extracting sys.aetherzenith-service for $ARCH_TMP"
-extract "$ZIPFILE" "libs/$ARCH_TMP/sys-aetherzenith-service" "$TMPDIR"
+extract "$ZIPFILE" "libs/$ARCH_TMP/sys.aetherzenith-service" "$TMPDIR"
 cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
 ln -sf "$MODPATH/system/bin/sys.aetherzenith-service" "$MODPATH/system/bin/sys.etherzenith-log"
 ln -sf "$MODPATH/system/bin/sys.aetherzenith-service" "$MODPATH/system/bin/aetherzenith"
