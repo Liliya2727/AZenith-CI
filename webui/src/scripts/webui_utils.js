@@ -1186,7 +1186,6 @@ const heavyInit = async () => {
     checkjit,
     checktoast,
     checkSFL,
-    checkKillLog,
     checklogger,
     checkRamBoost,
     detectResolution,
