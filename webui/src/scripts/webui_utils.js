@@ -235,7 +235,7 @@ const checkServiceStatus = async () => {
   try {
     // Get PID immediately
     const { errno: pidErr, stdout: pidOut } = await executeCommand(
-      "/system/bin/toybox pidof sys-aetherzenith-service"
+      "/system/bin/toybox pidof sys.aetherzenith-service"
     );
 
     let status = "";
@@ -496,10 +496,10 @@ const startService = async () => {
     toast(restartingDaemonToast);
     
     await executeCommand(
-      "pkill -9 -f sys.azenith.thermalcore"
+      "pkill -9 -f sys.aetherzenith.thermalcore"
     );
     await executeCommand(
-      "pkill -9 -f sys.aetherzenith-service; su -c '${AXERONBINPATH}/sys-azenithnonr-service > /dev/null 2>&1 & disown'"
+      "pkill -9 -f sys.aetherzenith-service; su -c '${AXERONBINPATH}/sys.aetherzenith-service > /dev/null 2>&1 & disown'"
     );
 
     await checkServiceStatus();
