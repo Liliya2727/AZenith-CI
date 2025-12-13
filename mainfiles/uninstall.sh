@@ -16,17 +16,35 @@
 # limitations under the License.
 #
 
+# Remove Persistent Properties
+props=$(getprop | grep "persist.sys.azenith" | awk -F'[][]' '{print $2}' | sed 's/:.*//')
+for prop in $props; do
+	setprop "$prop" ""
+	resetprop --delete "$prop"
+done
 
-# Uninstall module directories
-rm -rf /sdcard/AZenith
-rm -rf /data/AZenith
-# Uninstall toast apk
-pm uninstall azenith.toast 2>/dev/null
-# Uninstaller Script
-manager_paths="$MODPATH/system/bin"
-binaries="sys.aetherzenith-service sys.aetherzenith-log \
-          sys.aetherzenith-profiles sys.aetherzenith-conf \
-          sys.aetherzenith-preload sys.aetherzenith-thermalservice"
+# Remove AI Thermal Properties
+propsrn="\
+persist.sys.rianixia.learning_enabled \
+persist.sys.rianixia.thermalcore-bigdata.path "
+for prop in $propsrn; do
+	setprop "$prop" ""
+	resetprop --delete "$prop"
+done
+
+# Remove module directories
+rm -rf "/data/adb/.config/AZenith"
+rm -rf "/data/AZenith"
+rm -rf "/data/local/tmp/module.avatar.webp"
+
+# Remove toast apk
+pm uninstall --user 0 azenith.toast 2>/dev/null
+
+# Remove azenith binaries
+manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
+binaries="sys.azenith-service sys.azenith-service_log \
+          sys.azenith-profilesettings sys.azenith-utilityconf \
+          sys.azenith-preloadbin sys.azenith-rianixiathermalcorev4"
 for dir in $manager_paths; do
 	[ -d "$dir" ] || continue
 	for remove in $binaries; do

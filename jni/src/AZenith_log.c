@@ -18,7 +18,6 @@
 #include <android/log.h>
 #include <sys/system_properties.h>
 
-
 char* custom_log_tag = NULL;
 const char* level_str[] = {"D", "I", "W", "E", "F"};
 
@@ -42,6 +41,24 @@ void log_zenith(LogLevel level, const char* message, ...) {
     // Write to file
     write2file(LOG_FILE, true, true, "%s %s %s: %s\n", timestamp, level_str[level], LOG_TAG, logMesg);
 
+    // Also write to logcat
+    int android_log_level;
+    switch (level) {
+    case LOG_INFO:
+        android_log_level = ANDROID_LOG_INFO;
+        break;
+    case LOG_WARN:
+        android_log_level = ANDROID_LOG_WARN;
+        break;
+    case LOG_ERROR:
+        android_log_level = ANDROID_LOG_ERROR;
+        break;
+    default:
+        android_log_level = ANDROID_LOG_DEBUG;
+        break;
+    }
+
+    __android_log_print(android_log_level, LOG_TAG, "%s", logMesg);
 }
 /***********************************************************************************
  * Function Name      : log_Preload
@@ -53,26 +70,38 @@ void log_zenith(LogLevel level, const char* message, ...) {
  *                      to a log file.
  ***********************************************************************************/
 void log_preload(LogLevel level, const char* message, ...) {
-    char debug_state[64] = {0};
-    FILE *fp = fopen("/sdcard/AZenith/config/value/debugmode", "r");
-    if (fp) {
-        if (fgets(debug_state, sizeof(debug_state), fp)) {
-            debug_state[strcspn(debug_state, "\r\n")] = 0;  // remove newline
-        }
-        fclose(fp);
-    }
-    // Only log if debugmode == "true"
-    if (strcmp(debug_state, "true") == 0) {
-        char* timestamp = timern();
-        char logMesg[MAX_OUTPUT_LENGTH];
-        va_list args;
-        va_start(args, message);
-        vsnprintf(logMesg, sizeof(logMesg), message, args);
-        va_end(args);
+    char val[PROP_VALUE_MAX] = {0};
+    if (__system_property_get("persist.sys.azenith.debugmode", val) > 0) {
+        if (strcmp(val, "true") == 0) {
+            char* timestamp = timern();
+            char logMesg[MAX_OUTPUT_LENGTH];
+            va_list args;
+            va_start(args, message);
+            vsnprintf(logMesg, sizeof(logMesg), message, args);
+            va_end(args);
 
-        // Write to file (append)
-        write2file(LOG_FILE_PRELOAD, true, true, "%s %s %s: %s\n",
-                   timestamp, level_str[level], LOG_TAG, logMesg);
+            // Write to file
+            write2file(LOG_FILE_PRELOAD, true, true, "%s %s %s: %s\n", timestamp, level_str[level], LOG_TAG, logMesg);
+
+            // Also write to logcat
+            int android_log_level;
+            switch (level) {
+            case LOG_INFO:
+                android_log_level = ANDROID_LOG_INFO;
+                break;
+            case LOG_WARN:
+                android_log_level = ANDROID_LOG_WARN;
+                break;
+            case LOG_ERROR:
+                android_log_level = ANDROID_LOG_ERROR;
+                break;
+            default:
+                android_log_level = ANDROID_LOG_DEBUG;
+                break;
+            }
+
+            __android_log_print(android_log_level, LOG_TAG, "%s", logMesg);
+        }
     }
 }
 /***********************************************************************************
@@ -86,4 +115,17 @@ void log_preload(LogLevel level, const char* message, ...) {
 void external_log(LogLevel level, const char* tag, const char* message) {
     char* timestamp = timern();
     write2file(LOG_FILE, true, true, "%s %s %s: %s\n", timestamp, level_str[level], tag, message);
+}
+
+/***********************************************************************************
+ * Function Name      : external_log
+ * Inputs             : level - Log level (0-4)
+ *                      tag - Custom log tag
+ *                      message - Log message
+ * Returns            : None
+ * Description        : External logging interface for other applications
+ ***********************************************************************************/
+void external_vlog(LogLevel level, const char* tag, const char* message) {
+    char* timestamp = timern();
+    write2file(LOG_VFILE, true, true, "%s %s %s: %s\n", timestamp, level_str[level], tag, message);
 }

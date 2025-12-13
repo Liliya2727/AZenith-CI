@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := sys.aetherzenith-service
+LOCAL_MODULE := sys.azenith-service
 LOCAL_SRC_FILES := \
     main.c \
     src/cmd_utils.c \
@@ -12,6 +12,7 @@ LOCAL_SRC_FILES := \
     src/misc_utils.c \
     src/game_preload.c \
     src/dumpsys.c \
+    src/CLI.c \
     src/mlbb_handler.c
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/include

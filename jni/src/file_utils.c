@@ -71,3 +71,63 @@ int write2file(const char* filename, const bool append, const bool use_flock, co
     // Verify full content was written
     return (written == len) ? 0 : -1;
 }
+
+/***********************************************************************************
+ * Function Name      : check_running_state
+ * Inputs             : None
+ * Returns            : 1 if daemon is running
+ *                      0 if daemon is not running
+ * Description        : check if daemon is already running
+ ***********************************************************************************/
+int check_running_state(void) {
+    char state[64] = {0};
+
+    FILE* fp = popen("getprop persist.sys.azenith.state", "r");
+    if (!fp) {
+        perror("popen");
+        return -1;
+    }
+
+    if (fgets(state, sizeof(state), fp) != NULL) {
+        size_t len = strlen(state);
+        if (len > 0 && state[len - 1] == '\n')
+            state[len - 1] = '\0';
+
+        if (strcmp(state, "running") == 0) {
+            pclose(fp);
+            return 1;
+        }
+    }
+    pclose(fp);
+    return 0;
+}
+
+/***********************************************************************************
+ * Function Name      : is_file_empty
+ * Inputs             : /path/to/filename
+ * Returns            : 1 if file not found
+ *                      0 if file found
+ * Description        : check if file is present or not
+ ***********************************************************************************/
+int is_file_empty(const char *filename) {
+    FILE *file = fopen(filename, "rb");
+    if (!file) {
+        perror("fopen failed");
+        return -1;
+    }
+    
+    int ch = fgetc(file);
+    if (ch == EOF) {
+        if (feof(file)) {
+            fclose(file);
+            return 1;
+        } else {
+            perror("fgetc failed");
+            fclose(file);
+            return -1;
+        }
+    }
+    
+    fclose(file);
+    return 0;
+}

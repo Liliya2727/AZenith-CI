@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 Rem01Gaming
+ * Copyright (C) 2024-2025 Rem01Gaming x Zexshia
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,11 @@
  * Description        : Push a notification.
  ***********************************************************************************/
 void notify(const char* message) {
-    int exit = systemv("/system/bin/cmd notification post "
+    int exit = systemv("su -lp 2000 -c \"/system/bin/cmd notification post "
                        "-t '%s' "
                        "-i file:///data/local/tmp/module.avatar.webp "
                        "-I file:///data/local/tmp/module.avatar.webp "
-                       "'AZenith' '%s' >/dev/null",
+                       "'AZenith' '%s'\" >/dev/null",
                        NOTIFY_TITLE, message);
 
     if (exit != 0) [[clang::unlikely]] {
@@ -116,28 +116,22 @@ char* timern(void) {
  * Description        : Display a toast notification using bellavita.toast app.
  ***********************************************************************************/
 void toast(const char* message) {
-    char toast[32] = {0};
-    FILE *fp = fopen("/sdcard/AZenith/config/value/showtoast", "r");
-    if (fp) {
-        if (fgets(toast, sizeof(toast), fp)) {
-            toast[strcspn(toast, "\r\n")] = 0;
-        }
-        fclose(fp);
-    } 
-    if (strstr(toast, "1") != NULL) {
-        // Show toast
-        int exit = systemv("/system/bin/am start -a android.intent.action.MAIN "
-                           "-e toasttext '%s' -n azenith.toast/.MainActivity >/dev/null 2>&1",
-                           message);
+    char val[PROP_VALUE_MAX] = {0};
+    if (__system_property_get("persist.sys.azenithconf.showtoast", val) > 0) {
+        if (val[0] == '1') {
+            // Show toast
+            int exit = systemv("su -lp 2000 -c \"/system/bin/am start -a android.intent.action.MAIN "
+                               "-e toasttext '%s' -n azenith.toast/.MainActivity >/dev/null 2>&1\"",
+                               message);
 
-        if (exit != 0) [[clang::unlikely]] {
-            log_zenith(LOG_WARN, "Unable to show toast message: %s", message);
+            if (exit != 0) [[clang::unlikely]] {
+                log_zenith(LOG_WARN, "Unable to show toast message: %s", message);
+            }
+            sleep(2);
+            systemv("am force-stop azenith.toast");
         }
-    sleep(2);
-    systemv("am force-stop azenith.toast");
     }
 }
-
 
 /***********************************************************************************
  * Function Name      : is_kanged
@@ -146,7 +140,7 @@ void toast(const char* message) {
  * Description        : Checks if the module renamed/modified by 3rd party.
  ***********************************************************************************/
 void is_kanged(void) {
-    if (systemv("grep -q '^name=AetherZenith火$' %s", MODULE_PROP) != 0) [[clang::unlikely]] {
+    if (systemv("grep -q '^name=AZenith火$' %s", MODULE_PROP) != 0) [[clang::unlikely]] {
         goto doorprize;
     }
 
@@ -159,6 +153,60 @@ void is_kanged(void) {
 doorprize:
     log_zenith(LOG_FATAL, "Module modified by 3rd party, exiting.");
     notify("Trying to rename me?");
+    systemv("setprop persist.sys.azenith.service \"\"");
+    systemv("setprop persist.sys.azenith.state stopped");
+    exit(EXIT_FAILURE);
+}
+
+/***********************************************************************************
+ * Function Name      : check_module_version
+ * Inputs             : None
+ * Returns            : None
+ * Description        : Compares version inside module.prop with daemon version.
+ ***********************************************************************************/
+void check_module_version(void) {
+    char DAEMON_VERSION[MAX_LINE] = {0};
+    
+    snprintf(DAEMON_VERSION, sizeof(DAEMON_VERSION), "%s", MODULE_VERSION);
+
+    int ret = systemv(
+        "grep -q '^version=%s$' %s",
+        DAEMON_VERSION,
+        MODULE_PROP
+    );
+
+    if (ret != 0) [[clang::unlikely]] {
+        log_zenith(LOG_FATAL,
+                   "AZenith version mismatch with daemon version! please reinstall the module!");
+        notify("AZenith version mismatch, please reinstall!");
+        systemv("setprop persist.sys.azenith.service \"\"");
+        systemv("setprop persist.sys.azenith.state stopped");
+        exit(EXIT_FAILURE);
+    }
+}
+
+/***********************************************************************************
+ * Function Name      : checkstate
+ * Inputs             : None
+ * Returns            : None
+ * Description        : Exits if the module prop is "stopped" or not set
+ ***********************************************************************************/
+void checkstate(void) {
+    char state[64] = {0};
+    FILE* fp = popen("getprop persist.sys.azenith.state", "r");
+    if (fp) {
+        fgets(state, sizeof(state), fp);
+        pclose(fp);
+    }
+    state[strcspn(state, "\n")] = 0;
+    if (state[0] == '\0' || strcmp(state, "stopped") == 0) [[clang::unlikely]] {
+        goto killsvc;
+    }
+    return;
+killsvc:
+    log_zenith(LOG_FATAL, "Service killed by checkstate().");
+    systemv("setprop persist.sys.azenith.service \"\"");
+    systemv("setprop persist.sys.azenith.state stopped");
     exit(EXIT_FAILURE);
 }
 
@@ -185,23 +233,31 @@ bool return_false(void) {
 }
 
 /***********************************************************************************
+ * Function Name      : setspid
+ * Inputs             : None
+ * Returns            : Service PID
+ * Description        : Set Service PID Properties
+ ***********************************************************************************/
+void setspid(void) {
+    char cmd[128];
+    pid_t pid = getpid();
+
+    snprintf(cmd, sizeof(cmd), "setprop persist.sys.azenith.service %d", pid);
+    systemv(cmd);
+}
+
+/***********************************************************************************
  * Function Name      : runthermalcore
  * Inputs             : none
  * Returns            : None
  * Description        : run thermalcore service if enabled
  ***********************************************************************************/
 void runthermalcore(void) {
-    char thermalcore[32] = {0};
-    FILE *fp = fopen("/sdcard/AZenith/config/value/thermalcore", "r");
-    if (fp) {
-        if (fgets(thermalcore, sizeof(thermalcore), fp)) {
-            thermalcore[strcspn(thermalcore, "\r\n")] = 0;
-        }
-        fclose(fp);
-    } 
-    if (strstr(thermalcore, "1") != NULL) {
-        systemv("sys.aetherzenith-thermalcore &");
-        FILE *fp = popen("pidof sys.azenith-rianixiathermalcorev4", "r");
+    char thermalcore[PROP_VALUE_MAX] = {0};
+    __system_property_get("persist.sys.azenithconf.thermalcore", thermalcore);
+    if (strcmp(thermalcore, "1") == 0) {
+        systemv("sys.azenith-rianixiathermalcorev4 &");
+        FILE* fp = popen("pidof sys.azenith-rianixiathermalcorev4", "r");
         if (fp == NULL) {
             perror("pidof failed");
             log_zenith(LOG_INFO, "Failed to run Thermalcore service");

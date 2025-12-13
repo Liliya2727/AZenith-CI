@@ -21,5 +21,11 @@ while [ "$(getprop sys.boot_completed)" != "1" ]; do
 	sleep 40
 done
 
+# Refresh daemon state
+if [ -z "$(getprop persist.sys.azenith.state)" ] || { [ "$(getprop persist.sys.azenith.state)" = "running" ] && [ -z "$(/system/bin/toybox pidof sys.azenith-service)" ]; }; then
+    setprop persist.sys.azenith.state stopped
+    setprop persist.sys.azenith.service ""
+fi
+
 # Run Daemon
-/data/data/com.android.shell/AxManager/plugins/AetherZenith/system/bin/sys.aetherzenith-service
+sys.azenith-service --run

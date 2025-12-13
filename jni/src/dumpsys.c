@@ -18,64 +18,57 @@
 
 /************************************************************
  * Function Name   : get_visible_package
- *
- * Description       : Reads "dumpsys window displays" and extracts the
- *                      package name of the currently visible (foreground) app.
- *
- * Returns.          : Returns a malloc()'d string containing the package name,
- *                     or NULL if none is found. Caller must free().
+ * Description     : Reads "dumpsys window displays" and extracts the
+ *                   package name of the currently visible (foreground) app.
+ * Returns.        : Returns a malloc()'d string containing the package name,
+ *                   or NULL if none is found. Caller must free().
  ************************************************************/
 char* get_visible_package(void) {
-    if (!get_screenstate()) {
+    if (!get_screenstate())
         return NULL;
-    }
-    FILE *fp = popen("/system/bin/dumpsys window displays", "r");
+
+    FILE* fp = popen("dumpsys window displays", "r");
     if (!fp) {
         log_zenith(LOG_INFO, "Failed to run dumpsys window displays");
         return NULL;
     }
 
     char line[MAX_LINE];
-    char last_task_line[MAX_LINE] = {0};
     char pkg[MAX_PACKAGE] = {0};
-    bool in_task_section = false;
+    bool in_section = false;
+    bool task_visible = false;
+
     while (fgets(line, sizeof(line), fp)) {
         line[strcspn(line, "\n")] = 0;
-        if (!in_task_section && strstr(line, "Application tokens in top down Z order:")) {
-            in_task_section = true;
+
+        if (!in_section) {
+            if (strstr(line, "Application tokens in top down Z order:"))
+                in_section = true;
             continue;
         }
-        if (!in_task_section) continue;
-        if (strlen(line) == 0) break;
-        // Save last task line
+
         if (strstr(line, "* Task{") && strstr(line, "type=standard")) {
-            strcpy(last_task_line, line);
+            task_visible = strstr(line, "visible=true") != NULL;
             continue;
         }
-        // Look for activity under the last task
-        if (strstr(line, "* ActivityRecord{") && last_task_line[0] != '\0') {
-            bool visible = strstr(last_task_line, "visible=true") != NULL;
-            if (visible) {
-                // Extract package from ActivityRecord line
-                char *u0 = strstr(line, " u0 ");
-                if (u0) {
-                    u0 += 4; 
-                    char *slash = strchr(u0, '/');
-                    if (slash) {
-                        size_t len = slash - u0;
-                        if (len >= MAX_PACKAGE) len = MAX_PACKAGE - 1;
-                        memcpy(pkg, u0, len);
-                        pkg[len] = 0;
-                        break;
-                    }
+
+        if (task_visible && strstr(line, "* ActivityRecord{")) {
+            char* start = strstr(line, " u0 ");
+            if (start) {
+                start += 4;
+                char* slash = strchr(start, '/');
+                if (slash) {
+                    size_t len = slash - start;
+                    if (len >= MAX_PACKAGE) len = MAX_PACKAGE - 1;
+                    memcpy(pkg, start, len);
+                    pkg[len] = 0;
+                    break;
                 }
             }
-            last_task_line[0] = 0; // reset task line
+            task_visible = false;
         }
     }
+
     pclose(fp);
-    if (pkg[0] == '\0') {
-        return NULL;
-    }
-    return strdup(pkg); // caller must free
+    return pkg[0] ? strdup(pkg) : NULL;
 }

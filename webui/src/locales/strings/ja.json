@@ -1,14 +1,17 @@
 {
   "loading": {
-    "text": "初期化中..."
+    "text": "初期化中...",
+    "textgamelist": "アプリ一覧を取得中..."
   },
 
   "infoTab": {
     "title": "基本情報",
     "labels": {
       "currentProfile": "現在のプロファイル",
+      "moduleVersion": "AZenith バージョン",
       "chipset": "チップセット",
       "kernel": "カーネル",
+      "device": "デパイス",
       "androidVersion": "Android バージョン"
     },
     "buttons": {
@@ -16,8 +19,14 @@
     },
     "loading": "情報を取得中..."
   },
+  
+  "toolbar": {
+    "main": "メイン",
+    "gamelist": "リスト"
+  },
 
   "settingsMore": {
+    "title": "チューニング設定",
     "additional": {
       "title": "追加設定",
       "description": "体験を向上させるための追加設定です。"
@@ -197,7 +206,9 @@
     "buttons": {
       "save": "ログを保存",
       "edit": "ゲームリストを編集",
-      "restart": "デーモンを再初期化"
+      "restart": "デーモンを再初期化",
+      "saveconf": "プリセット設定を保存",
+      "loadconf": "プリセット設定を読み込み"
     }
   },
 
@@ -217,24 +228,17 @@
       "title": "彩度"
     },
     "buttons": {
-      "reset": "カラー設定をリセット",
+      "reset": "リセット",
       "apply": "適用"
     }
   },
 
-  "gamelist": {
-    "title": "ゲームリスト",
-    "description": "ここにリストされたアプリまたはゲームはゲームプロファイルを起動します。",
-    "buttons": {
-      "cancel": "キャンセル",
-      "save": "保存"
-    }
-  },
-
   "banner": {
+    "loader": "画像を処理しています...",
     "serviceStatus": "停止中💤",
     "servicePID": "サービスは停止しています",
-    "msg": "データが取得できません"
+    "msg": "データが取得できません",
+    "runninggame": "平和です！実行中のアプリはありません!"
   },
   
   "randomMessages": {
@@ -271,15 +275,25 @@
   },
 
   "serviceStatus": {
-    "initializing": "初期化中…\uD83C\uDF31",
-    "runningAuto": "実行中 - 自動モード\uD83C\uDF43",
-    "runningIdle": "実行中 - アイドルモード\uD83D\uDCAB",
+    "initializing": "初期化しています...\uD83C\uDF31",
+    "runningAuto": "稼働中 - 自動モード\uD83C\uDF43",
+    "runningIdle": "稼働中 - アイドルモード\uD83D\uDCAB",
     "unknownProfile": "不明なプロファイル",
-    "suspended": "停止中\uD83D\uDCA4",
-    "servicePID": "サービス PID: {0}"
+    "suspended": "一時停止中\uD83D\uDCA4",
+    "servicePID": "サービスPID: {0}",
+    "noApps": "平和です！実行中のアプリはありません！",
+    "active": "アクティブなアプリ: {0}",
+    "idleMode": "アイドルモード：実行中のアプリはありません！",
+    "activeIdle": "アイドルモード：実行中のアプリはありません！",
+    "error": "ゲーム状態の読み取りエラー"
   },
 
   "toast": {
+    "chngeimg": "しばらくお待ちください。画像は数秒後に更新されます",
+    "imgsuccess": "画像が正常に更新されました！",
+    "saveconf": "プリセットが正常に保存されました: {0}",
+    "loadconf": "プリセットがJSONから正常に読み込まれました",
+    "loadconffail": "設定の読み込みに失敗しました：JSON形式が無効です",
     "fstrim": "未使用ブロックをトリムしました",
     "showcantaccess": "現在のモードではアクセスできません",
     "savedPackages": "{0} 件のパッケージを保存しました",

@@ -1,14 +1,17 @@
 {
   "loading": {
-    "text": "Initializing..."
+    "text": "Initializing...",
+    "textgamelist": "Fetching Applist..."
   },
-
+  
   "infoTab": {
     "title": "Basic Information",
     "labels": {
       "currentProfile": "Current Profile",
+      "moduleVersion": "AZenith Version",
       "chipset": "Chipset",
       "kernel": "Kernel",
+      "device": "Device",
       "androidVersion": "Android Version"
     },
     "buttons": {
@@ -17,7 +20,13 @@
     "loading": "Getting info..."
   },
   
+  "toolbar": {
+    "main": "Main",
+    "gamelist": "GameList"
+  },
+  
   "settingsMore": {
+    "title": "Tweak Settings",
     "additional": {
       "title": "Additional Settings",
       "description": "Additional settings to enhance your experience."
@@ -44,7 +53,7 @@
     },
     "thermal": {
       "title": "AI Thermalcore Service",
-      "desc": "Intelligently manages system performance and temperature by learning device behavior to minimize overheating and maintain stability. (Turn off if you feel lag in performance profile)"
+      "desc": "Intelligently manages system performance and temperature by learning device behavior to minimize heating. (Turn off if you feel lag in performance profile)"
     },
     "litemode": {
       "title": "Lite Mode (Reboot to apply)",
@@ -80,6 +89,10 @@
     "schedtunes": {
       "title": "Sched Tunes",
       "desc": "Optimize CPU frequency scaling for all CPU clusters by adjusting up/down rate limits (for schedutil and schedhorizon)."
+    },
+    "walttunes": {
+      "title": "Walt Governor Tunes",
+      "desc": "Optimize WALT governor parameters for faster and smoother CPU scheduling (for WALT Governor)."
     },
     "sfl": {
       "title": "SurfaceFlinger Latency",
@@ -197,7 +210,9 @@
     "buttons": {
       "save": "Save Logs",
       "edit": "Edit Gamelist",
-      "restart": "Reinitialize Daemon"
+      "restart": "Reinitialize Daemon",
+      "saveconf": "Save Config Presets",
+      "loadconf": "Load Config Presets"
     }
   },
   
@@ -217,24 +232,17 @@
       "title": "Saturation"
     },
     "buttons": {
-      "reset": "Reset Color Settings",
+      "reset": "Reset",
       "apply": "Apply"
     }
   },
   
-  "gamelist": {
-    "title": "Game List",
-    "description": "Any apps and games listed here will trigger the Game Profile.",
-    "buttons": {
-      "cancel": "Cancel",
-      "save": "Save"
-    }
-  },
-  
   "banner": {
+    "loader": "Processing the image...",
     "serviceStatus": "Suspended💤",
     "servicePID": "Service is Stopped",
-    "msg": "No Data Acquired"
+    "msg": "No Data Acquired",
+    "runninggame": "Peaceful! no apps is Running!"
   },
 
   "randomMessages": {
@@ -276,10 +284,20 @@
     "runningIdle": "Running - Idle Mode\uD83D\uDCAB",
     "unknownProfile": "Unknown Profile",
     "suspended": "Suspended\uD83D\uDCA4",
-    "servicePID": "Service PID: {0}"
+    "servicePID": "Service PID: {0}",
+    "noApps": "Peaceful! No apps are running!",
+    "active": "Active app: {0}",
+    "idleMode": "Idle mode: no apps running!",
+    "activeIdle": "Idle mode: no apps running!",
+    "error": "Error reading game status"
   },
   
   "toast": {
+    "chngeimg": "Please wait, Image will update in a few seconds",
+    "imgsuccess": "Image updated successfully!",
+    "saveconf": "Presets successfully saved to: {0}",
+    "loadconf": "Presets successfully loaded from JSON",
+    "loadconffail": "Failed to load configuration: Invalid JSON format",
     "fstrim": "Trimmed Unused Blocks",
     "showcantaccess": "Can't access in current mode",
     "savedPackages": "Saved {0} packages",

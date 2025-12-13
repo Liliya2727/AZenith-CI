@@ -1,4 +1,4 @@
-name: Zenith
+name: AZenith
 
 on:
   pull_request:
@@ -34,6 +34,10 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
+      
+      - name: add module verify
+        id: verifyModule
+        run: bash .github/scripts/verify.sh
 
       - name: NDK Setup
         uses: nttld/setup-ndk@v1.5.0
@@ -64,7 +68,7 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          TITLE: AetherZenith
+          TITLE: AZenith
         run: |
           if [ ! -z "${{ secrets.CHAT_ID }}" ] && [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
             export VERSION=$(git rev-list --count HEAD)

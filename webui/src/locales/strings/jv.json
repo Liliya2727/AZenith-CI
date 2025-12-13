@@ -1,14 +1,17 @@
 {
   "loading": {
-    "text": "Nginitialisasi..."
+    "text": "Nginitialisasi...",
+    "textgamelist": "Nggawe dhaptar aplikasi..."
   },
 
   "infoTab": {
     "title": "Informasi Dhasar",
     "labels": {
       "currentProfile": "Profil Saiki",
+      "moduleVersion": "Versi AZenith",
       "chipset": "Chipset",
       "kernel": "Kernel",
+      "device": "Perangkat",
       "androidVersion": "Versi Android"
     },
     "buttons": {
@@ -17,7 +20,13 @@
     "loading": "Njupuk informasi..."
   },
   
+  "toolbar": {
+    "main": "Utama",
+    "gamelist": "Aplikasi"
+  },
+  
   "settingsMore": {
+    "title": "Pangaturan Tweak",
     "additional": {
       "title": "Pangaturan Tambahan",
       "description": "Pangaturan tambahan kanggo ningkataké pengalamanmu."
@@ -197,7 +206,9 @@
     "buttons": {
       "save": "Simpen Log",
       "edit": "Sunting Daftar Game",
-      "restart": "Mulihké Dæmon"
+      "restart": "Mulihké Dæmon",
+      "saveconf": "Simpen Pangaturan Preset",
+      "loadconf": "Muat Pangaturan Preset"
     }
   },
   
@@ -217,24 +228,17 @@
       "title": "Saturasi"
     },
     "buttons": {
-      "reset": "Balèkaké Setelan Warna",
+      "reset": "Balèkaké",
       "apply": "Terapaké"
     }
   },
   
-  "gamelist": {
-    "title": "Daftar Game",
-    "description": "Aplikasi utawa game ing kéné bakal ngaktifaké Profil Game.",
-    "buttons": {
-      "cancel": "Batal",
-      "save": "Simpen"
-    }
-  },
-  
   "banner": {
+    "loader": "Ngolah gambar...",
     "serviceStatus": "Ditangguhkan💤",
     "servicePID": "Layanan Mati",
-    "msg": "Data durung ana"
+    "msg": "Data durung ana",
+    "runninggame": "Ayem! Ora ana aplikasi sing mlaku!"
   },
   
   "randomMessages": {
@@ -276,13 +280,23 @@
     "runningIdle": "Mlaku - Mode Ngaso\uD83D\uDCAB",
     "unknownProfile": "Profil Ora Dikenal",
     "suspended": "Ditangguhkan\uD83D\uDCA4",
-    "servicePID": "PID Layanan: {0}"
+    "servicePID": "PID Layanan: {0}",
+    "noApps": "Ayem! Ora ana aplikasi sing mlaku!",
+    "active": "Aplikasi aktif: {0}",
+    "idleMode": "Mode idle: ora ana aplikasi sing mlaku!",
+    "activeIdle": "Mode idle: ora ana aplikasi sing mlaku!",
+    "error": "Kesalahan nalika maca status game"
   },
 
   "toast": {
-    "fstrim": "Blok sing ora digunakake wis dibersihake",
+    "chngeimg": "Enteni dhisik, gambare bakal nganyari sawetara detik maneh",
+    "imgsuccess": "Gambar wis kasil dianyari!",
+    "saveconf": "Preset kasil disimpen menyang: {0}",
+    "loadconf": "Preset kasil dimuat saka JSON",
+    "loadconffail": "Gagal memuat konfigurasi: Format JSON ora valid",
+    "fstrim": "Blok sing ora kepakai wis di-trim",
     "showcantaccess": "Ora bisa diakses ing mode saiki",
-    "savedPackages": "{0} paket wis disimpen",
+    "savedPackages": "{0} paket kasil disimpen",
     "cantRestart": "Ora bisa Restart, Daemon lagi inisialisasi",
     "serviceDead": "Layanan mati, mangga reboot!",
     "restartingDaemon": "Ngulang Daemon...",

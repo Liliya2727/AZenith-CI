@@ -38,7 +38,7 @@ void run_profiler(const int profile) {
     }
 
     write2file(PROFILE_MODE, false, false, "%d\n", profile);
-    (void)systemv("sys.aetherzenith-profiles %d", profile);
+    (void)systemv("sys.azenith-profilesettings %d", profile);
 }
 
 /***********************************************************************************
@@ -53,39 +53,35 @@ void run_profiler(const int profile) {
  * Note               : Caller is responsible for freeing the returned string.
  ***********************************************************************************/
 char* get_gamestart(void) {
-    char *pkg = get_visible_package();
-    if (!pkg) return NULL;
-    FILE *gf = fopen(GAMELIST, "r");
-    if (!gf) {
+    char* pkg = get_visible_package();
+    if (!pkg)
+        return NULL;
+
+    FILE* fp = fopen(GAMELIST, "r");
+    if (!fp) {
         free(pkg);
         return NULL;
     }
-    fseek(gf, 0, SEEK_END);
-    long size = ftell(gf);
-    rewind(gf);
-    if (size <= 0) {
-        fclose(gf);
+
+    char buf[32768];
+    size_t n = fread(buf, 1, sizeof(buf) - 1, fp);
+    fclose(fp);
+
+    if (n == 0) {
         free(pkg);
         return NULL;
     }
-    char *line = malloc(size + 1);
-    if (!line) {
-        fclose(gf);
-        free(pkg);
-        return NULL;
-    }
-    fread(line, 1, size, gf);
-    fclose(gf);
-    line[size] = '\0';
-    char *token = strtok(line, "|");
+
+    buf[n] = '\0';
+
+    char* token = strtok(buf, "|");
     while (token) {
         if (strcmp(token, pkg) == 0) {
-            free(line);
             return pkg;
         }
         token = strtok(NULL, "|");
     }
-    free(line);
+    
     free(pkg);
     return NULL;
 }
@@ -103,7 +99,7 @@ char* get_gamestart(void) {
 bool get_screenstate_normal(void) {
     static char fetch_failed = 0;
 
-    FILE *fp = popen("/system/bin/dumpsys power", "r");
+    FILE* fp = popen("dumpsys power", "r");
     if (!fp) {
         log_zenith(LOG_ERROR, "Failed to run dumpsys power");
         goto fetch_fail;
@@ -113,11 +109,12 @@ bool get_screenstate_normal(void) {
     bool found = false;
     bool is_awake = true;
     while (fgets(line, sizeof(line), fp)) {
-        char *p = strstr(line, "mWakefulness=");
+        char* p = strstr(line, "mWakefulness=");
         if (p) {
             p += strlen("mWakefulness=");
-            char *newline = strchr(p, '\n');
-            if (newline) *newline = 0;
+            char* newline = strchr(p, '\n');
+            if (newline)
+                *newline = 0;
 
             is_awake = (strcmp(p, "Awake") == 0 || strcmp(p, "true") == 0);
             found = true;
@@ -157,12 +154,13 @@ fetch_fail:
 bool get_low_power_state_normal(void) {
     static char fetch_failed = 0;
 
-    FILE *fp = popen("/system/bin/settings get global low_power", "r");
+    FILE* fp = popen("/system/bin/settings get global low_power", "r");
     if (fp) {
         char line[128];
         if (fgets(line, sizeof(line), fp)) {
-            char *p = line;
-            while (*p == ' ' || *p == '\t') p++;
+            char* p = line;
+            while (*p == ' ' || *p == '\t')
+                p++;
             for (int i = strlen(p) - 1; i >= 0 && (p[i] == '\n' || p[i] == '\r'); i--)
                 p[i] = 0;
 
@@ -172,16 +170,17 @@ bool get_low_power_state_normal(void) {
         }
         pclose(fp);
     }
-    fp = popen("/system/bin/dumpsys power", "r");
+    fp = popen("dumpsys power", "r");
     if (fp) {
         char line[512];
         while (fgets(line, sizeof(line), fp)) {
-            char *p = strstr(line, "mSettingBatterySaverEnabled=");
+            char* p = strstr(line, "mSettingBatterySaverEnabled=");
             if (p) {
                 p += strlen("mSettingBatterySaverEnabled=");
 
-                char *newline = strchr(p, '\n');
-                if (newline) *newline = 0;
+                char* newline = strchr(p, '\n');
+                if (newline)
+                    *newline = 0;
 
                 pclose(fp);
                 fetch_failed = 0;

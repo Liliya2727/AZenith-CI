@@ -29,7 +29,7 @@ need_integrity=(
 # Version info
 version="$(cat version)"
 version_code="$(git rev-list HEAD --count)"
-release_code="$(git rev-list HEAD --count)-$(git rev-parse --short HEAD)-release"
+release_code="$(git rev-list HEAD --count)-$(git rev-parse --short HEAD)-experimental"
 sed -i "s/version=.*/version=$version ($release_code)/" mainfiles/module.prop
 sed -i "s/versionCode=.*/versionCode=$version_code/" mainfiles/module.prop
 
@@ -47,8 +47,10 @@ cp LICENSE ./mainfiles
 find mainfiles/system/bin -maxdepth 1 -type f -name "*.sh" -exec sh -c 'mv -- "$0" "${0%.sh}"' {} \;
 
 # Parse version info to module prop
-zipName="AetherZenith-$version-$release_code.zip"
+zipName="AZenith-$version-$release_code.zip"
 echo "zipName=$zipName" >>"$GITHUB_OUTPUT"
+artifactName="${zipName%.zip}"
+echo "artifactName=$artifactName" >>"$GITHUB_OUTPUT"
 
 # Generate sha256sum for integrity checkup
 for file in "${need_integrity[@]}"; do

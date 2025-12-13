@@ -3,17 +3,18 @@
 
 #include <ctype.h>
 #include <dirent.h>
+#include <ftw.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#include <ftw.h>
-#include <sys/system_properties.h>
 #include <sys/syscall.h>
+#include <sys/system_properties.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+
 #define LOOP_INTERVAL_MS 700
 #define LOOP_INTERVAL_SEC 2
 #define MAX_DATA_LENGTH 1024
@@ -22,24 +23,28 @@
 #define MAX_PATH_LENGTH 256
 #define MAX_LINE 512
 #define MAX_PACKAGE 128
+
 #define NOTIFY_TITLE "AZenith"
 #define LOG_TAG "AZenith"
 
-#define LOG_FILE "/sdcard/AZenith/config/debug/AZenith.log"
-#define LOG_FILE_PRELOAD "/sdcard/AZenith/config/preload/AZenithPR.log"
-#define PROFILE_MODE "/sdcard/AZenith/config/API/current_profile"
-#define GAME_INFO "/sdcard/AZenith/config/API/gameinfo"
-#define GAMELIST "/sdcard/AZenith/config/gamelist/gamelist.txt"
-#define MODULE_PROP "/data/data/com.android.shell/AxManager/plugins/AetherZenith/module.prop"
-#define MODULE_UPDATE "/data/data/com.android.shell/AxManager/plugins/AetherZenith/update"
+#define LOG_FILE "/data/adb/.config/AZenith/debug/AZenith.log"
+#define LOG_VFILE "/data/adb/.config/AZenith/debug/AZenithVerbose.log"
+#define LOG_FILE_PRELOAD "/data/adb/.config/AZenith/preload/AZenithPR.log"
+#define PROFILE_MODE "/data/adb/.config/AZenith/API/current_profile"
+#define GAME_INFO "/data/adb/.config/AZenith/API/gameinfo"
+#define GAMELIST "/data/adb/.config/AZenith/gamelist/gamelist.txt"
+#define MODULE_PROP "/data/adb/modules/AZenith/module.prop"
+#define MODULE_UPDATE "/data/adb/modules/AZenith/update"
+#define MODULE_VERSION ".placeholder"
 
-#define MY_PATH \
-    "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/xbin:/data/data/com.termux/files/usr/bin:/data/data/com.android.shell/AxManager/bin"
+#define MY_PATH                                                                                                                    \
+    "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/" \
+    "xbin:/data/data/com.termux/files/usr/bin"
 
 #define IS_MLBB(gamestart)                                                                               \
     (strcmp(gamestart, "com.mobile.legends") == 0 || strcmp(gamestart, "com.mobilelegends.hwag") == 0 || \
      strcmp(gamestart, "com.mobiin.gp") == 0 || strcmp(gamestart, "com.mobilechess.gp") == 0)
-     
+
 #define IS_AWAKE(state) (strcmp(state, "Awake") == 0 || strcmp(state, "true") == 0)
 #define IS_LOW_POWER(state) (strcmp(state, "true") == 0 || strcmp(state, "1") == 0)
 
@@ -75,6 +80,12 @@ extern pid_t game_pid;
  * are in the wrong place.
  */
 
+// CLI
+void print_help();
+int handle_profile(int argc, char** argv);
+int handle_log(int argc, char** argv);
+int handle_verboselog(int argc, char** argv);
+
 // Misc Utilities
 extern void GamePreload(const char* package);
 void sighandler(const int signal);
@@ -82,10 +93,13 @@ char* trim_newline(char* string);
 void notify(const char* message);
 void toast(const char* message);
 void is_kanged(void);
+void checkstate(void);
 char* timern(void);
+void setspid(void);
 bool return_true(void);
 bool return_false(void);
 void runthermalcore(void);
+void check_module_version(void);
 
 // Shell and Command execution
 char* execute_command(const char* format, ...);
@@ -93,12 +107,15 @@ char* execute_direct(const char* path, const char* arg0, ...);
 int systemv(const char* format, ...);
 
 // Utilities
+int check_running_state(void);
 int write2file(const char* filename, const bool append, const bool use_flock, const char* data, ...);
+int is_file_empty(const char *filename);
 
 // system
 void log_preload(LogLevel level, const char* message, ...);
 void log_zenith(LogLevel level, const char* message, ...);
 void external_log(LogLevel level, const char* tag, const char* message);
+void external_vlog(LogLevel level, const char* tag, const char* message);
 
 // Utilities
 void set_priority(const pid_t pid);
