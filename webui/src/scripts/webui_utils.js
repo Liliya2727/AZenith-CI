@@ -1280,14 +1280,6 @@ const setiosched = async (c) => {
   );
 };
 
-const applyFSTRIM = async () => {
-  await executeCommand(
-    "/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf FSTrim"
-  );
-  const fstrimToast = getTranslation("toast.fstrim");
-  toast(fstrimToast);
-};
-
 const setDefaultCpuGovernor = async (c) => {
   let s = "/data/adb/.config/AZenith",
     r = `${s}/API/current_profile`;
@@ -1712,6 +1704,21 @@ const setdtrace = async (c) => {
     c
       ? "setprop persist.sys.azenithconf.disabletrace 1"
       : "setprop persist.sys.azenithconf.disabletrace 0"
+  );
+};
+
+const checkfstrim = async () => {
+  let { errno: c, stdout: s } = await executeCommand(
+    "getprop persist.sys.azenithconf.fstrim"
+  );
+  0 === c && (document.getElementById("FSTrim").checked = "1" === s.trim());
+};
+
+const setfstrim = async (c) => {
+  await executeCommand(
+    c
+      ? "setprop persist.sys.azenithconf.fstrim 1"
+      : "setprop persist.sys.azenithconf.fstrim 0"
   );
 };
 
@@ -2412,9 +2419,11 @@ const setupUIListeners = () => {
     .getElementById("applypowersave")
     ?.addEventListener("click", applyecomode);
   document.getElementById("savelogButton")?.addEventListener("click", savelog);
-  document.getElementById("FSTrim")?.addEventListener("click", applyFSTRIM);
 
   // Toggle Switches
+  document
+    .getElementById("FSTrim")
+    ?.addEventListener("change", (e) => setfstrim(e.target.checked));
   document
     .getElementById("fpsged")
     ?.addEventListener("change", (e) => setfpsged(e.target.checked));
@@ -2722,6 +2731,7 @@ const heavyInit = async () => {
     checkdtrace,
     checkjit,
     checktoast,
+    checkfstrim,
     loadVsyncValue,
     checkBypassChargeStatus,
     checkschedtunes,

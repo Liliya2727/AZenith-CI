@@ -92,22 +92,8 @@ zeshia() {
         [ "$lock" = "true" ] && chmod 444 "$path" 2>/dev/null
         return
     fi
-
-    local current
-    current="$(cat "$path" 2>/dev/null)"
-
-    if [ "$current" = "$value" ]; then
-        AZLog "Set /$pathname to $value"
-    else
-        echo "$value" >"$path" 2>/dev/null
-        current="$(cat "$path" 2>/dev/null)"
-
-        if [ "$current" = "$value" ]; then
-            AZLog "Set /$pathname to $value (after retry)"
-        else
-            AZLog "Failed to set /$pathname to $value"
-        fi
-    fi
+    
+    AZLog "Set /$pathname to $value"    
 
     [ "$lock" = "true" ] && chmod 444 "$path" 2>/dev/null
 }

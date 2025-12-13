@@ -336,18 +336,6 @@
                <button class="close-btn" id="close-preference">&times;</button>
                <h3 class="preference-title" data-lang="preference.title"></h3>
                <p class="preference-desc" data-lang="preference.description"></p>
-               <div class="flex items-center justify-between mb-3">
-                  <label class="cursor-pointer inline-flex items-center w-full">
-                     <div>
-                        <p class="text-sm text-white" data-lang="preference.schedtunes.title"></p>
-                        <small class="block text-gray-400 text-sss" data-lang="preference.schedtunes.desc"></small>
-                     </div>
-                     <div class="ml-auto">
-                        <input type="checkbox" id="schedtunes" class="peer sr-only" />
-                        <div class="toggle"></div>
-                     </div>
-                  </label>
-               </div>
                <div id="walt-container" class="flex items-center justify-between mb-3" style="display: none">
                   <label class="cursor-pointer inline-flex items-center w-full">
                      <div>
@@ -360,6 +348,18 @@
                      </div>
                   </label>
                </div>
+               <div class="flex items-center justify-between mb-3">
+                  <label class="cursor-pointer inline-flex items-center w-full">
+                     <div>
+                        <p class="text-sm text-white" data-lang="preference.schedtunes.title"></p>
+                        <small class="block text-gray-400 text-sss" data-lang="preference.schedtunes.desc"></small>
+                     </div>
+                     <div class="ml-auto">
+                        <input type="checkbox" id="schedtunes" class="peer sr-only" />
+                        <div class="toggle"></div>
+                     </div>
+                  </label>
+               </div>               
                <div class="flex items-center justify-between mb-3">
                   <label class="cursor-pointer inline-flex items-center w-full">
                      <div>
@@ -512,6 +512,18 @@
                   </label>
                </div>
                <div class="flex items-center justify-between mb-3">
+                  <label class="cursor-pointer inline-flex items-center w-full">
+                     <div>
+                        <p class="text-sm text-white" data-lang="settingsAddi.additional.fstrim.title"></p>
+                        <small class="block text-gray-400 text-sss" data-lang="settingsAddi.additional.fstrim.description"></small>
+                     </div>
+                     <div class="ml-auto">
+                        <input type="checkbox" id="FSTrim" class="peer sr-only" />
+                        <div class="toggle"></div>
+                     </div>
+                  </label>
+               </div>               
+               <div class="flex items-center justify-between mb-3">
                   <div>
                      <p class="text-sm text-white" data-lang="settingsAddi.additional.vsync.title"></p>
                      <small class="block text-gray-400 text-sss" data-lang="settingsAddi.additional.vsync.description"></small>
@@ -521,14 +533,7 @@
                      <option value="OFF" selected>OFF</option>
                   </select>
                   <svg class="svgKontlContainer" fill='currentColor' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>
-               </div>
-               <div class="flex items-center justify-between mb-3">
-                  <div>
-                     <p class="text-sm text-white" data-lang="settingsAddi.additional.fstrim.title"></p>
-                     <small class="block text-gray-400 text-sss" data-lang="settingsAddi.additional.fstrim.description"></small>
-                  </div>
-                  <button id="FSTrim" class="smallbutton" data-lang="settingsAddi.additional.fstrim.button"></button>
-               </div>
+               </div>               
                <div class="device-info-divider"></div>
                <div class="flex items-center justify-between mb-3">
                   <button id="customreso" class="bigbutton w-full" data-lang="settingsAddi.additional.customreso"></button>

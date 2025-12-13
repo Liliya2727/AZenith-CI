@@ -115,6 +115,7 @@ int main(int argc, char* argv[]) {
         __system_property_get("persist.sys.azenithconf.AIenabled", prev_ai_state);
 
         while (1) {
+            runtask();
             if (cur_mode == PERFORMANCE_PROFILE) {
                 usleep(LOOP_INTERVAL_MS * 1000);
             } else {

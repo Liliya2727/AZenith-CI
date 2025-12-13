@@ -25,6 +25,7 @@ CONFIGPATH="/data/adb/.config/AZenith"
 # Properties
 DEBUGMODE="$(getprop persist.sys.azenith.debugmode)"
 BYPASSPATH="$(getprop persist.sys.azenithconf.bypasspath)"
+FSTRIM_STATE="$(getprop persist.sys.azenithconf.fstrim)"
 
 # Bypass Charging Path
 MTK_BYPASS_CHARGER="/sys/devices/platform/charger/bypass_charger"
@@ -83,21 +84,7 @@ zeshia() {
         return
     fi
 
-    local current
-    current="$(cat "$path" 2>/dev/null)"
-
-    if [ "$current" = "$value" ]; then
-        AZLog "Set /$pathname to $value"
-    else
-        echo "$value" >"$path" 2>/dev/null
-        current="$(cat "$path" 2>/dev/null)"
-
-        if [ "$current" = "$value" ]; then
-            AZLog "Set /$pathname to $value (after retry)"
-        else
-            AZLog "Failed to set /$pathname to $value"
-        fi
-    fi
+    AZLog "Set /$pathname to $value"
 
     [ "$lock" = "true" ] && chmod 444 "$path" 2>/dev/null
 }
@@ -140,15 +127,17 @@ setthermalcore() {
 }
     
 FSTrim() {
-	for mount in /system /vendor /data /cache /metadata /odm /system_ext /product; do
-		if mountpoint -q "$mount"; then
-			fstrim -v "$mount"
-			AZLog "Trimmed: $mount"
-		else
-			AZLog "Skipped (not mounted): $mount"
-		fi
-	done
-	dlog "Trimmed unused blocks"
+    if [ "$FSTRIM_STATE" -eq 1 ]; then
+    	for mount in /system /vendor /data /cache /metadata /odm /system_ext /product; do
+    		if mountpoint -q "$mount"; then
+    			fstrim -v "$mount"
+    			AZLog "Trimmed: $mount"
+    		else
+    			AZLog "Skipped (not mounted): $mount"
+    		fi
+    	done
+    	dlog "Trimmed unused blocks"
+    fi
 }
 
 disablevsync() {
