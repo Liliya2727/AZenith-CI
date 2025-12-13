@@ -52,6 +52,7 @@ VSYNCVALUE="$(getprop persist.sys.azenithconf.vsync)"
 BYPASSPROPS="persist.sys.azenithconf.bypasspath"
 BYPASSPATH="$(getprop persist.sys.azenithconf.bypasspath)"
 WALT_STATE="$(getprop persist.sys.azenithconf.walttunes)"
+MALI_COMP="$(getprop sys.azenith.maligovsupport)"
 
 # Logging Functions
 AZLog() {
@@ -435,6 +436,14 @@ get_biggest_cluster() {
         fi
     done
     echo "$target"
+}
+
+setsGPUMali() {
+    MALI=/sys/devices/platform/soc/*.mali
+    MALI_GOV=$MALI/devfreq/*.mali/governor
+	chmod 644 $MALI_GOV
+	echo "$1" | tee $MALI_GOV
+	chmod 444 $MALI_GOV
 }
 
 ###############################################
@@ -1065,6 +1074,27 @@ performance_profile() {
 	else
 		setsIO "$default_iosched" && dlog "Applying I/O scheduler to : $default_iosched"
 	fi
+	
+	if [ "$MALI_COMP" -eq 1 ]; then
+    	# Load Default GPU Mali Gov
+    	load_default_gpumaligov() {
+    		if [ -n "$(getprop persist.sys.azenith.custom_default_gpumali_gov)" ]; then
+    			getprop persist.sys.azenith.custom_default_gpumali_gov
+    		elif [ -n "$(getprop persist.sys.azenith.default_gpumali_gov)" ]; then
+    			getprop persist.sys.azenith.default_gpumali_gov
+    		else
+    			echo "dummy"
+    		fi
+    	}
+    	# Apply Game GPU Mali Gov
+    	default_maligov=$(load_default_gpumaligov)
+    	if [ -n "$(getprop persist.sys.azenith.custom_performance_gpumali_gov)" ]; then
+    		game_maligov=$(getprop persist.sys.azenith.custom_performance_gpumali_gov)
+    		setsGPUMali "$game_maligov" && dlog "Applying GPU Mali Governor to : $game_maligov"
+    	else
+    		setsGPUMali "$default_maligov" && dlog "Applying GPU Mali Governor to : $default_maligov"
+    	fi
+    fi
 
 	# Set DND Mode
 	if [ "$DND_STATE" -eq 1 ]; then
@@ -1210,6 +1240,22 @@ balanced_profile() {
 	default_iosched=$(load_default_iosched)
 	setsIO "$default_iosched"
 	dlog "Applying I/O scheduler to : $default_iosched"
+	
+	if [ "$MALI_COMP" -eq 1 ]; then
+    	# Load Default GPU Mali Gov
+    	load_default_gpumaligov() {
+    		if [ -n "$(getprop persist.sys.azenith.custom_default_gpumali_gov)" ]; then
+    			getprop persist.sys.azenith.custom_default_gpumali_gov
+    		elif [ -n "$(getprop persist.sys.azenith.default_gpumali_gov)" ]; then
+    			getprop persist.sys.azenith.default_gpumali_gov
+    		else
+    			echo "dummy"
+    		fi
+    	}
+    	# Apply GPU Mali Gov
+    	default_maligov=$(load_default_gpumaligov)
+        setsGPUMali "$default_maligov" && dlog "Applying GPU Mali Governor to : $default_maligov"
+    fi
 		
 	# Disable DND
 	if [ "$DND_STATE" -eq 1 ]; then
@@ -1336,6 +1382,19 @@ eco_mode() {
 	powersave_iosched=$(load_powersave_iosched)
 	setsIO "$powersave_iosched"
 	dlog "Applying I/O scheduler to : $powersave_iosched"
+	if [ "$MALI_COMP" -eq 1 ]; then
+    	# Load Default GPU Mali Gov
+    	load_powersave_gpumaligov() {
+    		if [ -n "$(getprop persist.sys.azenith.custom_powersave_gpumali_gov)" ]; then
+    			getprop persist.sys.azenith.custom_powersave_gpumali_gov
+    		else
+    			echo "dummy"
+    		fi
+    	}
+    	# Apply GPU Mali Gov
+    	powersave_maligov=$(load_powersave_gpumaligov)
+        setsGPUMali "$powersave_maligov" && dlog "Applying GPU Mali Governor to : $powersave_maligov"
+    fi
 	
 	# Limit cpu freq
 	if [ -d /proc/ppm ]; then

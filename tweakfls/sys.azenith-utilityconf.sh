@@ -96,6 +96,15 @@ setsgov() {
 	chmod 444 /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 	dlog "Set current CPU Governor to $1"
 }
+   
+setsGPUMali() {
+    MALI=/sys/devices/platform/soc/*.mali
+    MALI_GOV=$MALI/devfreq/*.mali/governor
+	chmod 644 $MALI_GOV
+	echo "$1" | tee $MALI_GOV
+	chmod 444 $MALI_GOV
+	dlog "Set current GPU Mali Governor to $1"
+}
 
 setsIO() {
 	for block in sda sdb sdc mmcblk0 mmcblk1; do
