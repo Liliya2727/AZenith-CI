@@ -2,8 +2,7 @@ import { defineConfig } from "vite"
 import mkcert from "vite-plugin-mkcert";
 import tailwind from "tailwindcss";
 import autoprefixer from "autoprefixer";
-import { ViteMinifyPlugin } from 'vite-plugin-minify'
-
+import { ViteMinifyPlugin } from 'vite-plugin-minify';
 export default defineConfig({
   root: './src',
   plugins: [
