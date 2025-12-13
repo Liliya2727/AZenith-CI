@@ -15,7 +15,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define TASK_INTERVAL_SEC (12 * 60 * 60)
+#define TASK_INTERVAL_SEC (60)
 #define LOOP_INTERVAL_MS 700
 #define LOOP_INTERVAL_SEC 2
 #define MAX_DATA_LENGTH 1024
