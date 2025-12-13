@@ -61,6 +61,22 @@
     }
   },
   
+  "gpumali": {
+    "title": "GPU Mali Settings",
+    "default": {
+      "title": "Default GPU Governor",
+      "desc": "Governor that will be used on Normal profile"
+    },
+    "powersave": {
+      "title": "Powersave GPU Governor",
+      "desc": "Governor that will be used on Powersave profile"
+    },
+    "performance": {
+      "title": "Performance GPU Governor",
+      "desc": "Governor that will be used on Powersave profile"
+    }
+  },
+  
   "io": {
     "title": "I/O Scheduler Settings",
     "default": {

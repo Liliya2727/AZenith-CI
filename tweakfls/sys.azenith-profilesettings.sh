@@ -1449,6 +1449,37 @@ initialize() {
 	# Disable compaction_proactiveness
 	zeshia 0 /proc/sys/vm/compaction_proactiveness
 	zeshia 255 /proc/sys/kernel/sched_lib_mask_force
+	
+	MALI=/sys/devices/platform/soc/*.mali
+    MALI_GOV=$MALI/devfreq/*.mali/governor
+    
+    if ls $MALI_GOV >/dev/null 2>&1; then
+        setprop sys.azenith.maligovsupport "1"
+    
+        chmod 644 $MALI_GOV
+        defaultgpumali_gov=$(cat $MALI_GOV)
+        setprop persist.sys.azenith.default_gpumali_gov "$defaultgpumali_gov"
+    
+        dlog "Default GPU Mali governor detected: $defaultgpumali_gov"
+    
+        custom_gov=$(getprop persist.sys.azenith.custom_default_gpumali_gov)
+        [ -n "$custom_gov" ] && defaultgpumali_gov="$custom_gov"
+    
+        dlog "Using GPU Mali governor: $defaultgpumali_gov"
+    
+        chmod 644 $MALI_GOV
+        echo "$defaultgpumali_gov" | tee $MALI_GOV >/dev/null
+        chmod 444 $MALI_GOV
+    
+        [ -z "$(getprop persist.sys.azenith.custom_powersave_gpumali_gov)" ] \
+            && setprop persist.sys.azenith.custom_powersave_gpumali_gov "$defaultgpumali_gov"
+        [ -z "$(getprop persist.sys.azenith.custom_performance_gpumali_gov)" ] \
+            && setprop persist.sys.azenith.custom_performance_gpumali_gov "$defaultgpumali_gov"
+    
+        dlog "Parsing GPU Mali Governor complete"
+    else
+        setprop sys.azenith.maligovsupport "0"
+    fi
 
 	CPU="/sys/devices/system/cpu/cpu0/cpufreq"
 	chmod 644 "$CPU/scaling_governor"

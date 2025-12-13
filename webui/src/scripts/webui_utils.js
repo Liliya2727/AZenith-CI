@@ -66,6 +66,163 @@ const executeCommand = async (cmd, cwd = null) => {
 window.executeCommand = executeCommand;
 
 // Main Script
+const setGPUMaliDefault = async (c) => {
+  const s = "/data/adb/.config/AZenith",
+        r = `${s}/API/current_profile`;
+
+  await executeCommand(
+    `setprop persist.sys.azenith.custom_default_gpumali_gov ${c}`
+  );
+
+  const { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
+  if (d === 0 && l.trim() === "2") {
+    await executeCommand(
+      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsGPUMali ${c}`
+    );
+  }
+};
+
+const loadGPUMaliDefault = async () => {
+  const { errno: c, stdout: s } = await executeCommand(
+    "sh -c 'ls /sys/devices/platform/soc/*.mali/devfreq/*.mali/available_governors 2>/dev/null | head -n 1'"
+  );
+  if (c !== 0 || !s.trim()) return;
+
+  const path = s.trim();
+
+  const { errno: r, stdout: g } = await executeCommand(
+    `chmod 644 ${path} && cat ${path}`
+  );
+  if (r !== 0) return;
+
+  const select = document.getElementById("gpuMaliDefault");
+  if (!select) return;
+
+  select.innerHTML = "";
+  g.trim().split(/\s+/).forEach((gov) => {
+    const opt = document.createElement("option");
+    opt.value = gov;
+    opt.textContent = gov;
+    select.appendChild(opt);
+  });
+
+  const { errno: l, stdout: m } = await executeCommand(
+    `sh -c '[ -n "$(getprop persist.sys.azenith.custom_default_gpumali_gov)" ] && getprop persist.sys.azenith.custom_default_gpumali_gov || getprop persist.sys.azenith.default_gpumali_gov'`
+  );
+  if (l === 0 && m.trim()) select.value = m.trim();
+};
+
+const setGPUMaliPowersave = async (c) => {
+  const s = "/data/adb/.config/AZenith",
+        r = `${s}/API/current_profile`;
+
+  await executeCommand(
+    `setprop persist.sys.azenith.custom_powersave_gpumali_gov ${c}`
+  );
+
+  const { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
+  if (d === 0 && l.trim() === "3") {
+    await executeCommand(
+      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsGPUMali ${c}`
+    );
+  }
+};
+
+const loadGPUMaliPowersave = async () => {
+  const { errno: c, stdout: s } = await executeCommand(
+    "sh -c 'ls /sys/devices/platform/soc/*.mali/devfreq/*.mali/available_governors 2>/dev/null | head -n 1'"
+  );
+  if (c !== 0 || !s.trim()) return;
+
+  const path = s.trim();
+
+  const { errno: r, stdout: g } = await executeCommand(
+    `chmod 644 ${path} && cat ${path}`
+  );
+  if (r !== 0) return;
+
+  const select = document.getElementById("gpuMaliPowersave");
+  if (!select) return;
+
+  select.innerHTML = "";
+  g.trim().split(/\s+/).forEach((gov) => {
+    const opt = document.createElement("option");
+    opt.value = gov;
+    opt.textContent = gov;
+    select.appendChild(opt);
+  });
+
+  const { errno: l, stdout: m } = await executeCommand(
+    `sh -c '[ -n "$(getprop persist.sys.azenith.custom_powersave_gpumali_gov)" ] && getprop persist.sys.azenith.custom_powersave_gpumali_gov'`
+  );
+  if (l === 0 && m.trim()) select.value = m.trim();
+};
+
+const setGPUMaliPerformance = async (c) => {
+  const s = "/data/adb/.config/AZenith",
+        r = `${s}/API/current_profile`;
+
+  await executeCommand(
+    `setprop persist.sys.azenith.custom_performance_gpumali_gov ${c}`
+  );
+
+  const { errno: d, stdout: l } = await executeCommand(`cat ${r}`);
+  if (d === 0 && l.trim() === "1") {
+    await executeCommand(
+      `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setsGPUMali ${c}`
+    );
+  }
+};
+
+const loadGPUMaliPerformance = async () => {
+  const { errno: c, stdout: s } = await executeCommand(
+    "sh -c 'ls /sys/devices/platform/soc/*.mali/devfreq/*.mali/available_governors 2>/dev/null | head -n 1'"
+  );
+  if (c !== 0 || !s.trim()) return;
+
+  const path = s.trim();
+
+  const { errno: r, stdout: g } = await executeCommand(
+    `chmod 644 ${path} && cat ${path}`
+  );
+  if (r !== 0) return;
+
+  const select = document.getElementById("gpuMaliPerformance");
+  if (!select) return;
+
+  select.innerHTML = "";
+  g.trim().split(/\s+/).forEach((gov) => {
+    const opt = document.createElement("option");
+    opt.value = gov;
+    opt.textContent = gov;
+    select.appendChild(opt);
+  });
+
+  const { errno: l, stdout: m } = await executeCommand(
+    `sh -c '[ -n "$(getprop persist.sys.azenith.custom_performance_gpumali_gov)" ] && getprop persist.sys.azenith.custom_performance_gpumali_gov'`
+  );
+  if (l === 0 && m.trim()) select.value = m.trim();
+};
+
+const checkGPUMaliCompatibility = async () => {
+  const { stdout } = await executeCommand(
+    "getprop sys.azenith.maligovsupport"
+  );
+
+  const value = stdout.trim();
+  const maliCard = document.getElementById("maliCard");
+  if (!maliCard) return;
+
+  if (value === "1") {
+    maliCard.classList.remove("hidden");
+    await loadGPUMaliDefault();
+    await loadGPUMaliPowersave();
+    await loadGPUMaliPerformance();
+  } else {
+    maliCard.classList.add("hidden");
+  }
+};
+
 const checkModuleVersion = async () => {
   try {
     const { errno: c, stdout: s } = await executeCommand(
@@ -1468,7 +1625,7 @@ const startService = async () => {
       "pkill -9 -f sys.azenith.rianixiathermalcorev4"
     );
     await executeCommand(
-      "setprop persist.sys.azenith.state stopped && pkill -9 -f sys.azenith-service; su -c '/data/adb/modules/AZenith/system/bin/sys.azenith-service > /dev/null 2>&1 & disown'"
+      "setprop persist.sys.azenith.state stopped && pkill -9 -f sys.azenith-service; su -c '/data/adb/modules/AZenith/system/bin/sys.azenith-service -r > /dev/null 2>&1 & disown'"
     );
 
     await checkServiceStatus();
@@ -2506,6 +2663,17 @@ const setupUIListeners = () => {
   document
     .getElementById("disablevsync")
     ?.addEventListener("change", (e) => setVsyncValue(e.target.value));
+  
+  // Select GPU Gov  
+  document
+    .getElementById("gpuMaliDefault")
+    ?.addEventListener("change", (e) => setGPUMaliDefault(e.target.value));
+  document
+    .getElementById("gpuMaliPerformance")
+    ?.addEventListener("change", (e) => setGPUMaliPerformance(e.target.value));
+  document
+    .getElementById("gpuMaliPowersave")
+    ?.addEventListener("change", (e) => setGPUMaliPowersave(e.target.value));  
 
   // Open settings
   document
@@ -2697,7 +2865,8 @@ const heavyInit = async () => {
   ];
   await Promise.all(loops.map((fn) => fn()));
 
-  const quickChecks = [    
+  const quickChecks = [
+    checkGPUMaliCompatibility,
     loadCpuGovernors,
     loadCpuFreq,    
     loadIObalance,
