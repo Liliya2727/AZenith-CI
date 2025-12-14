@@ -237,10 +237,7 @@ const checkModuleVersion = async () => {
     if (el) el.textContent = moduleVersion;
 
     if (moduleVersion !== WEBUI_VERSION) {
-      console.error(
-        `[AZenith] WebUI blocked due to version mismatch: WebUI=${WEBUI_VERSION}, Module=${moduleVersion}`
-      );
-
+      
       const loadingText = document.getElementById("loading-text");
       const loadingScreen = document.getElementById("loading-screen");
 
@@ -412,7 +409,7 @@ const setActiveToolbar = (activeId) => {
 };
 
 const hidePanel = (panel) => {
-  panel.classList.add("kanjud");
+  panel.classList.add("showAnim");
   clearTimeout(panel.hideTimer);
   panel.hideTimer = setTimeout(() => {
     panel.classList.add("hidden");
@@ -423,7 +420,7 @@ const showPanel = (panel) => {
   clearTimeout(panel.hideTimer);
   panel.classList.remove("hidden");
   void panel.offsetWidth;
-  panel.classList.remove("kanjud");
+  panel.classList.remove("showAnim");
 };
 
 const showGameListMenu = async () => {
@@ -438,8 +435,8 @@ const showGameListMenu = async () => {
   hidePanel(main);
   showPanel(gameList);
   showPanel(search);
-  title.classList.add("kanjud");
-  avatar.classList.add("kanjud");
+  title.classList.add("showAnim");
+  avatar.classList.add("showAnim");
   setActiveToolbar("openGameList");
   requestAnimationFrame(() => {
     gameList.scrollTop = 0;
@@ -458,8 +455,8 @@ const showMainMenu = async () => {
   hidePanel(gameList);
   hidePanel(search);
   showPanel(main);
-  title.classList.remove("kanjud");
-  avatar.classList.remove("kanjud");
+  title.classList.remove("showAnim");
+  avatar.classList.remove("showAnim");
   setActiveToolbar("openMain");
   requestAnimationFrame(() => {
     main.scrollTop = 0;
