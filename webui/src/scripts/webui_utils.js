@@ -573,7 +573,7 @@ const loadAppList = async () => {
 
     for (const pkg of pkgList) {
       const card = document.createElement("div");
-      card.className = "appCard mt-211 mb-4 p-4 rounded-lg";
+      card.className = "common-card appCard bg-tonalSurface";
       card.dataset.pkg = pkg;
 
       const icon = document.createElement("img");
