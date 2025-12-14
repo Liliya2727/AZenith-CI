@@ -1,6 +1,10 @@
 @import url('https://mui.kernelsu.org/internal/insets.css');
 @import url('https://mui.kernelsu.org/internal/colors.css');
 
+:root {
+  --btn-size: 36px;
+}
+
 .sth,
 .sth2 {
   position: relative;
@@ -79,13 +83,12 @@
 #appList {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 1.5rem;
 }
 
 .appCard {
   align-items: center;
-  display: flex;
-  
+  display: flex;  
   position: relative;
   padding: 20rem;
   background-color:var(--tonalSurface, #12141b);
@@ -99,7 +102,7 @@
 }
 
 #appList {
-  margin-top: 2.2rem;
+  margin-top: 1.3rem;
   padding: .9rem;
   box-sizing: border-box; 
 }
@@ -726,7 +729,7 @@ input[type=checkbox]:checked + .toggle::after {
   display: inline-flex;
   align-items: center;
   font-weight: 650;
-  font-size: .55rem;
+  font-size: .6rem;
   line-height: 1;
 
   color: var(--onPrimaryContainer, #c0ebff);
@@ -750,7 +753,7 @@ input[type=checkbox]:checked + .toggle::after {
   display: inline-flex;
   align-items: center;
   font-weight: 550;
-  font-size: .55rem;
+  font-size: .6rem;
   line-height: 1;
 
   color: var(--onPrimaryContainer, #c0ebff);
@@ -788,7 +791,7 @@ input[type=checkbox]:checked + .toggle::after {
   display: inline-flex;
   align-items: center;
   font-weight: 550;
-  font-size: .55rem;
+  font-size: .6rem;
   line-height: 1;
 
   color: var(--onPrimaryContainer, #c0ebff);
@@ -1179,12 +1182,6 @@ body.modal-open {
     transform: scale(0.99);
 }
 
-#settingsButton:active,
-.langSect:active {
-  background: color-mix(in srgb, var(--surfaceContainerHigh, #1a1b22) 80%, white 10%);
-  transform: scale(.98);
-}
-
 #loading-screen,
 #loading-screen2,
 .overlay {
@@ -1324,16 +1321,17 @@ body.modal-open {
     margin-top: -1rem;
     margin-left: 0;
     margin-bottom: 0.3rem;
-    padding-top: calc(.9rem + var(--window-inset-top, 0px));
+    padding-top: calc(.7rem + var(--window-inset-top, 0px));
     padding-right: 1rem;
     padding-bottom: .7rem;
     padding-left: 1rem;
-    backdrop-filter: blur(15px)
+    backdrop-filter: blur(10px)
 }
 
 .search-box {
   position: absolute;
   width: 10rem;
+  height: var(--btn-size);
   top: 0rem;
   padding: 8px 8px 7px .8rem;
   background-color: color-mix(in srgb, var(--surfaceContainerHigh, #1a1b22) 45%, transparent);
@@ -1355,16 +1353,8 @@ body.modal-open {
     object-fit: cover;
     border: .5px solid rgba(255, 255, 255, .3);
     position: absolute;
-    left: 1px;
     filter: brightness(1);
     transition: transform .8s
-}
-
-#settingsButton,
-.langSect {
-    margin-top: 0;
-    background: rgba(255, 255, 255, .06);
-    position: absolute
 }
 
 .titleazenith {
@@ -1374,12 +1364,30 @@ body.modal-open {
     font-weight: 800
 }
 
+#settingsButton:active,
+.langSect:active {
+  background: color-mix(in srgb, var(--surfaceContainerHigh, #1a1b22) 80%, white 10%);
+  transform: scale(.98);
+}
+#settingsButton,
+.langSect {
+    margin-top: 0;
+    background: rgba(255, 255, 255, .06);
+    position: absolute
+}
+
 #settingsButton {
-  right: 1px;
-  margin-bottom: 60px;
-  border: 1px solid color-mix(in srgb, var(--outlineVariant, #d4d4d4) 35%, transparent);
+  position: absolute;
+  top: 1px;
+  right: 0px;
+  display: flex;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border-radius: 50%;
-  padding: 6px;
+  border: 1px solid color-mix(in srgb, var(--outlineVariant, #d4d4d4) 35%, transparent);
   background-color: color-mix(in srgb, var(--surfaceContainerHigh, #1a1b22) 45%, transparent);
   transition: .25s;
 }
@@ -1394,6 +1402,7 @@ body.modal-open {
   height: 22px;
   color: var(--onSurfaceVariant, #d2d2d6);
   opacity: .9;
+  display: block;
   transition: 
       transform .4s cubic-bezier(.34,1.56,.64,1),
       stroke .25s, 
@@ -1409,6 +1418,7 @@ body.modal-open {
 }
 
 .langSect {
+  height: var(--btn-size);
   width: 25%;
   appearance: none;
   background-color: color-mix(in srgb, var(--surfaceContainerHigh, #1a1b22) 45%, transparent);
@@ -1417,7 +1427,7 @@ body.modal-open {
   color: var(--onSurface, #e6e6e6);
   border-radius: 20px;
   padding: 10px 20px 10px 12px;
-  font-size: 8.5px;
+  font-size: 9.5px;
   font-family: Inter, Roboto, sans-serif;
   outline: 0;
 
