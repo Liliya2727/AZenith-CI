@@ -1379,9 +1379,8 @@ const setSFL = async (c) => {
   await executeCommand(
     c
       ? "setprop persist.sys.azenithconf.SFL 1"
-      : "setprop persist.sys.azenithconf.SFL 0 && setprop persist.sys.azenithconf.schedtunes 0"
+      : "setprop persist.sys.azenithconf.SFL 0"
   );
-  checkschedtunes();
 };
 const checkschedtunes = async () => {
   let { errno: c, stdout: s } = await executeCommand(
@@ -1393,11 +1392,10 @@ const checkschedtunes = async () => {
 const setschedtunes = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.schedtunes 1 && setprop persist.sys.azenithconf.walttunes 0 && persist.sys.azenithconf.SFL 1"
+      ? "setprop persist.sys.azenithconf.schedtunes 1 && setprop persist.sys.azenithconf.walttunes 0"
       : "setprop persist.sys.azenithconf.schedtunes 0"
   );
   checkwalt();
-  checkSFL();
 };
 
 const checkwalt = async () => {
@@ -1410,11 +1408,10 @@ const checkwalt = async () => {
 const setwalt = async (c) => {
   await executeCommand(
     c
-      ? "setprop persist.sys.azenithconf.walttunes 1 && setprop persist.sys.azenithconf.schedtunes 0 && setprop persist.sys.azenithconf.SFL 0"
+      ? "setprop persist.sys.azenithconf.walttunes 1 && setprop persist.sys.azenithconf.schedtunes 0"
       : "setprop persist.sys.azenithconf.walttunes 0"
   );
   checkschedtunes();
-  checkSFL
 };
 
 const showWaltIfSnapdragon = () => {
