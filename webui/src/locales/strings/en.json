@@ -103,16 +103,16 @@
     "title": "Preference Settings",
     "description": "Preference settings or addons that are applied on boot (requires reboot after changes).",
     "schedtunes": {
-      "title": "Sched Tunes",
-      "desc": "Optimize CPU frequency scaling for all CPU clusters by adjusting up/down rate limits (for schedutil and schedhorizon)."
+      "title": "Smooth Gaming",
+      "desc": ""
     },
     "walttunes": {
-      "title": "Walt Governor Tunes",
-      "desc": "Optimize WALT governor parameters for faster and smoother CPU scheduling (for WALT Governor)."
+      "title": "Battery backup",
+      "desc": ""
     },
     "sfl": {
-      "title": "SurfaceFlinger Latency",
-      "desc": "Tweak SurfaceFlinger to reduce screen latency and improve responsiveness."
+      "title": "Device overheating",
+      "desc": ""
     },
     "jit": {
       "title": "Just In Time",
