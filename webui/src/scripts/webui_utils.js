@@ -228,53 +228,41 @@ const checkModuleVersion = async () => {
   const loadingScreen = document.getElementById("loading-screen");
   const verEl = document.getElementById("moduleVer");
 
-  const showError = async (msg, code) => {
-    if (loadingText) loadingText.textContent = msg;
-    if (loadingScreen) loadingScreen.classList.remove("hidden");
-
-    await new Promise(r => setTimeout(r, 0));
-
-    throw new Error(code);
-  };
-
-  let errno, stdout;
+  let stdout = "";
 
   try {
-    ({ errno, stdout } = await executeCommand(
+    const res = await executeCommand(
       "/data/adb/modules/AZenith/system/bin/sys.azenith-service --version"
-    ));
-  } catch (e) {
-    await showError(
-      "Failed to communicate with AZenith daemon.\n\n" +
-      "Please make sure the service is installed and runnable.",
-      "exec_failed"
     );
+
+    stdout = (res?.stdout || "").trim();
+  } catch (_) {
   }
 
-  const version = (stdout || "").trim();
+  if (!stdout) {
+    if (loadingText)
+      loadingText.textContent =
+        "AZenith daemon is not running.\n\nRun:\n" +
+        "sys.azenith-service --run";
 
-  if (errno !== 0 || !version) {
-    await showError(
-      "AZenith daemon is not running.\n\nRun:\n" +
-      "sys.azenith-service --run",
-      "daemon_not_running"
-    );
-  }
+    if (loadingScreen)
+      loadingScreen.classList.remove("hidden");
 
-  if (!/^\d+\.\d+\.\d+/.test(version)) {
-    await showError(
-      "Invalid daemon version detected.\n\nPlease reinstall AZenith.",
-      "invalid_version"
-    );
+    return;
   }
 
   if (version !== WEBUI_VERSION) {
-    await showError(
-      "Version mismatch detected.\n\n" +
-      "WebUI version does not match daemon version.\n" +
-      "Please update or reinstall AZenith.",
-      "version_mismatch"
-    );
+    if (loadingText)
+      loadingText.textContent =
+        "Version mismatch detected.\n\n" +
+        `Daemon: ${version}\n` +
+        `WebUI: ${WEBUI_VERSION}\n\n` +
+        "Please update or reinstall AZenith.";
+
+    if (loadingScreen)
+      loadingScreen.classList.remove("hidden");
+
+    return;
   }
 
   if (verEl) verEl.textContent = version;
