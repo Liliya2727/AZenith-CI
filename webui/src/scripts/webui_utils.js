@@ -609,24 +609,9 @@ const loadAppList = async () => {
       const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 96));
       icons.forEach(i => i.icon && (iconMap[i.packageName] = i.icon));
     } catch {}
-    
-    if (typeof window.$packageManager !== "undefined") {
-      for (const pkg of pkgList) {
-        if (!iconMap[pkg] || iconMap[pkg].startsWith("ksu://icon")) {
-          try {
-          const iconStream = window.$packageManager.getApplicationIcon(pkg, 0, 0);
-            const buffer = await wrapInputStream(iconStream).then(r => r.arrayBuffer());
-            const uint8 = new Uint8Array(buffer);
-            let b64 = "";
-            for (let i = 0; i < uint8.length; i++) b64 += String.fromCharCode(uint8[i]);
-            iconMap[pkg] = "data:image/png;base64," + btoa(b64);
-          } catch {}
-        }
-      }
-    }
 
     container.innerHTML = pkgList.map(pkg => `
-      <div class="common-card appCard bg-tonalSurface" data-pkg="${pkg}">
+      <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
         <img class="appIcon lazy-icon" data-src="${iconMap[pkg]}" src="">
         <div class="meta">
           <div class="row">
@@ -644,9 +629,14 @@ const loadAppList = async () => {
 
     const cardCache = {};
 
-    container.querySelectorAll(".appCard").forEach(card => {
+    container.querySelectorAll(".appCard").forEach((card, i) => {
       const pkg = card.dataset.pkg;
       cardCache[pkg] = { card, label: labelMap[pkg], pkg };
+
+      // animate IN
+      clearTimeout(card.hideTimer);
+      card.classList.remove("hidden");
+      setTimeout(() => card.classList.remove("showAnim"), i * 12);
 
       const toggle = card.querySelector(".toggle2");
       toggle.onclick = async () => {
@@ -664,15 +654,15 @@ const loadAppList = async () => {
         searchInput.dispatchEvent(new Event("input"));
       };
     });
-    
-    const positions = new Map();
-    Object.values(cardCache).forEach(({ card }) => {
-      positions.set(card, card.getBoundingClientRect());
-    });
 
     const sortCards = () => {
       const set = new Set(gamelist);
       const cards = Object.values(cardCache);
+
+      const positions = new Map();
+      cards.forEach(c => {
+        positions.set(c.card, c.card.getBoundingClientRect());
+      });
 
       cards.forEach(c => {
         c.isOn = set.has(c.pkg);
@@ -684,50 +674,47 @@ const loadAppList = async () => {
       );
 
       cards.forEach(c => container.appendChild(c.card));
+
+      cards.forEach(c => {
+        const first = positions.get(c.card);
+        const last = c.card.getBoundingClientRect();
+        if (!first) return;
+
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+
+        c.card.style.transform = `translate(${dx}px, ${dy}px)`;
+        c.card.style.transition = "none";
+
+        requestAnimationFrame(() => {
+          c.card.style.transition = "";
+          c.card.style.transform = "";
+        });
+      });
     };
 
     sortCards();
 
-    Object.values(cardCache).forEach(({ card }) => {
-      const first = positions.get(card);
-      const last = card.getBoundingClientRect();
-      if (!first) return;
-    
-      const dx = first.left - last.left;
-      const dy = first.top - last.top;
-    
-      card.style.transform = `translate(${dx}px, ${dy}px)`;
-      card.style.transition = "none";
-    
-      requestAnimationFrame(() => {
-        card.style.transition = "";
-        card.style.transform = "";
-      });
-    });
-    
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          const img = e.target;
-          if (img.dataset.src && !img.loaded) {
-            img.src = img.dataset.src;
-            img.loaded = true;
-            img.classList.add("loaded");
-          }
-          observer.unobserve(img);
-        }
-      });
-    }, { rootMargin: "100px" });
-
-    container.querySelectorAll(".lazy-icon").forEach(img => observer.observe(img));
-
     searchInput.oninput = () => {
       const q = searchInput.value.toLowerCase();
+
       Object.values(cardCache).forEach(({ card, label, pkg }) => {
-        card.style.display =
-          label.toLowerCase().includes(q) || pkg.toLowerCase().includes(q)
-            ? ""
-            : "none";
+        const match =
+          label.toLowerCase().includes(q) ||
+          pkg.toLowerCase().includes(q);
+
+        if (match) {
+          clearTimeout(card.hideTimer);
+          card.classList.remove("hidden");
+          card.classList.add("showAnim");
+          requestAnimationFrame(() => card.classList.remove("showAnim"));
+        } else {
+          card.classList.add("showAnim");
+          clearTimeout(card.hideTimer);
+          card.hideTimer = setTimeout(() => {
+            card.classList.add("hidden");
+          }, 230);
+        }
       });
     };
 
