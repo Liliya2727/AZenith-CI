@@ -495,19 +495,19 @@ const showPanel = (panel) => {
 };
 
 const showCards = (container) => {
-  const cards = container.querySelectorAll(".appCard");
+  const cards = Array.from(container.querySelectorAll(".appCard"));
+
   cards.forEach(card => {
     clearTimeout(card.hideTimer);
+    card.classList.add("hidden");
     card.classList.add("showAnim");
-    card.classList.remove("hidden");
   });
 
-  cards.forEach(card => void card.offsetWidth);
-
-  requestAnimationFrame(() => {
-    cards.forEach((card, i) => {
-      setTimeout(() => card.classList.remove("showAnim"), i * 12); 
-    });
+  cards.forEach((card, i) => {
+    setTimeout(() => {
+      card.classList.remove("hidden");
+      requestAnimationFrame(() => card.classList.remove("showAnim"));
+    }, i * 40);
   });
 };
 
@@ -671,13 +671,8 @@ const loadAppList = async () => {
       appListLoaded = true;
     }
 
-    // Alphabetically sort cachedPkgList by label
-    const sortedPkgList = cachedPkgList.slice().sort((a, b) =>
-      cachedLabelMap[a].toLowerCase().localeCompare(cachedLabelMap[b].toLowerCase())
-    );
-
-    // Render & animate cards every time
-    container.innerHTML = sortedPkgList.map(pkg => `
+    // Render & animate cards EVERY TIME
+    container.innerHTML = cachedPkgList.map(pkg => `
       <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
         <img class="appIcon lazy-icon" data-src="${cachedIconMap[pkg]}" src="">
         <div class="meta">
@@ -698,10 +693,15 @@ const loadAppList = async () => {
     container.querySelectorAll(".appCard").forEach((card, i) => {
       const pkg = card.dataset.pkg;
       cardCache[pkg] = { card, label: cachedLabelMap[pkg], pkg };
-
+    
       clearTimeout(card.hideTimer);
-      card.classList.remove("hidden");
-      setTimeout(() => card.classList.remove("showAnim"), i * 25); // staggered 25ms per card
+      card.classList.add("hidden");
+      card.classList.add("showAnim");
+    
+      setTimeout(() => {
+        card.classList.remove("hidden");
+        requestAnimationFrame(() => card.classList.remove("showAnim"));
+      }, i * 40);
 
       const toggle = card.querySelector(".toggle2");
       toggle.onclick = async () => {
@@ -772,6 +772,7 @@ const loadAppList = async () => {
           clearTimeout(card.hideTimer);
           card.classList.remove("hidden");
           card.classList.add("showAnim");
+
           requestAnimationFrame(() => card.classList.remove("showAnim"));
         } else {
           card.classList.add("showAnim");
