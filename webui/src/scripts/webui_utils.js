@@ -496,10 +496,11 @@ const loadAppList = async () => {
 
   try {
     let gamelist = await readGameList();
+
     let pkgList = [];
     try {
       pkgList = JSON.parse(ksu.listUserPackages());
-    } catch (e) {      
+    } catch {
       const r = await exec("pm list packages -3");
       pkgList = (r.stdout || "")
         .split("\n")
@@ -512,129 +513,75 @@ const loadAppList = async () => {
       return;
     }
 
-    let labelMap = {};
-
+    const labelMap = {};
     try {
       const infoList = JSON.parse(ksu.getPackagesInfo(JSON.stringify(pkgList)));
-      for (const i of infoList) {
+      infoList.forEach(i => {
         labelMap[i.packageName] = i.appLabel || i.label || i.packageName;
-      }
+      });
     } catch {}
 
-    if (typeof window.$packageManager !== "undefined") {
+    if (window.$packageManager) {
       for (const pkg of pkgList) {
         if (!labelMap[pkg]) {
           try {
             const appInfo = await window.$packageManager.getApplicationInfo(pkg, 0, 0);
-            if (appInfo) {
-              labelMap[pkg] =
-                (typeof appInfo.getLabel === "function"
-                  ? appInfo.getLabel()
-                  : appInfo.label) ||
-                appInfo.appName ||
-                pkg;
-            }
+            labelMap[pkg] =
+              (appInfo?.getLabel?.() || appInfo?.label || appInfo?.appName || pkg);
           } catch {}
         }
       }
     }
 
-    pkgList.forEach(pkg => {
-      if (!labelMap[pkg]) labelMap[pkg] = pkg;
-    });
+    pkgList.forEach(p => labelMap[p] ||= p);
 
-    let iconMap = {};
-
-    for (const pkg of pkgList) {
-      iconMap[pkg] = `ksu://icon/${pkg}`;
-    }
+    const iconMap = {};
+    pkgList.forEach(p => (iconMap[p] = `ksu://icon/${p}`));
 
     try {
       const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 96));
-      for (const i of icons) {
-        if (i.icon) iconMap[i.packageName] = i.icon;
-      }
-    } catch {
-      
-    }
+      icons.forEach(i => i.icon && (iconMap[i.packageName] = i.icon));
+    } catch {}
 
-    if (typeof window.$packageManager !== "undefined") {
-      for (const pkg of pkgList) {
-        if (!iconMap[pkg] || iconMap[pkg].startsWith("ksu://icon")) {
-          try {
-          const iconStream = window.$packageManager.getApplicationIcon(pkg, 0, 0);
-            const buffer = await wrapInputStream(iconStream).then(r => r.arrayBuffer());
-            const uint8 = new Uint8Array(buffer);
-            let b64 = "";
-            for (let i = 0; i < uint8.length; i++) b64 += String.fromCharCode(uint8[i]);
-            iconMap[pkg] = "data:image/png;base64," + btoa(b64);
-          } catch {}
-        }
-      }
-    }
+    container.innerHTML = pkgList.map(pkg => `
+      <div class="common-card appCard bg-tonalSurface" data-pkg="${pkg}">
+        <img class="appIcon lazy-icon" data-src="${iconMap[pkg]}" src="">
+        <div class="meta">
+          <div class="row">
+            <div class="text-area">
+              <div class="app-label">${labelMap[pkg]}</div>
+              <div class="pkg-label">${pkg}</div>
+            </div>
+            <div class="toggle2 ${gamelist.includes(pkg) ? "active" : ""}"
+                 data-pkg="${pkg}"
+                 data-state="${gamelist.includes(pkg) ? "on" : "off"}"></div>
+          </div>
+        </div>
+      </div>
+    `).join("");
 
     const cardCache = {};
 
-    for (const pkg of pkgList) {
-      const card = document.createElement("div");
-      card.className = "common-card appCard bg-tonalSurface";
-      card.dataset.pkg = pkg;
+    container.querySelectorAll(".appCard").forEach(card => {
+      const pkg = card.dataset.pkg;
+      cardCache[pkg] = { card, label: labelMap[pkg], pkg };
 
-      const icon = document.createElement("img");
-      icon.className = "appIcon";
-      icon.dataset.src = iconMap[pkg];
-      icon.src = ""; 
-      icon.classList.add("lazy-icon");
-
-      const nameEl = document.createElement("div");
-      nameEl.className = "app-label";
-      nameEl.textContent = labelMap[pkg];
-
-      const pkgEl = document.createElement("div");
-      pkgEl.className = "pkg-label";
-      pkgEl.textContent = pkg;
-
-      const textArea = document.createElement("div");
-      textArea.className = "text-area";
-      textArea.appendChild(nameEl);
-      textArea.appendChild(pkgEl);
-
-      const toggle = document.createElement("div");
-      toggle.className = "toggle2";
-      toggle.dataset.pkg = pkg;
-      toggle.dataset.state = gamelist.includes(pkg) ? "on" : "off";
-      if (toggle.dataset.state === "on") toggle.classList.add("active");
-
+      const toggle = card.querySelector(".toggle2");
       toggle.onclick = async () => {
         toggle.classList.toggle("active");
-        const isOn = toggle.classList.contains("active");
-        toggle.dataset.state = isOn ? "on" : "off";
-        
-        if (isOn && !gamelist.includes(pkg)) gamelist.push(pkg);
-        if (!isOn) gamelist = gamelist.filter(p => p !== pkg);
-        
+        const on = toggle.classList.contains("active");
+
+        toggle.dataset.state = on ? "on" : "off";
+        if (on && !gamelist.includes(pkg)) gamelist.push(pkg);
+        if (!on) gamelist = gamelist.filter(p => p !== pkg);
+
         await writeGameList(gamelist);
         sortCards();
-        
+
         searchInput.value = "";
         searchInput.dispatchEvent(new Event("input"));
       };
-
-      const row = document.createElement("div");
-      row.className = "row";
-      row.appendChild(textArea);
-      row.appendChild(toggle);
-
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      meta.appendChild(row);
-
-      card.appendChild(icon);
-      card.appendChild(meta);
-
-      container.appendChild(card);
-      cardCache[pkg] = { card, label: labelMap[pkg], pkg };
-    }
+    });
 
     const sortCards = () => {
       const set = new Set(gamelist);
@@ -645,44 +592,43 @@ const loadAppList = async () => {
         c.sortKey = c.label.toLowerCase();
       });
 
-      cards.sort((a, b) => {
-        if (a.isOn !== b.isOn) return a.isOn ? -1 : 1;
-        return a.sortKey.localeCompare(b.sortKey);
-      });
+      cards.sort((a, b) =>
+        a.isOn !== b.isOn ? (a.isOn ? -1 : 1) : a.sortKey.localeCompare(b.sortKey)
+      );
 
       cards.forEach(c => container.appendChild(c.card));
     };
 
     sortCards();
-    
+
     const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const img = e.target;
           if (img.dataset.src && !img.loaded) {
             img.src = img.dataset.src;
             img.loaded = true;
-            img.classList.add("loaded"); // trigger animation
+            img.classList.add("loaded");
           }
           observer.unobserve(img);
         }
       });
     }, { rootMargin: "100px" });
-    
-    Object.values(cardCache).forEach(({ card }) => {
-      const img = card.querySelector(".lazy-icon");
-      observer.observe(img);
-    });
 
-    searchInput.addEventListener("input", () => {
+    container.querySelectorAll(".lazy-icon").forEach(img => observer.observe(img));
+
+    searchInput.oninput = () => {
       const q = searchInput.value.toLowerCase();
       Object.values(cardCache).forEach(({ card, label, pkg }) => {
-        card.style.display = label.toLowerCase().includes(q) || pkg.toLowerCase().includes(q) ? "" : "none";
+        card.style.display =
+          label.toLowerCase().includes(q) || pkg.toLowerCase().includes(q)
+            ? ""
+            : "none";
       });
-    });
+    };
 
-  } catch (err) {
-    console.error("Failed to load apps:", err);
+  } catch (e) {
+    console.error(e);
     container.textContent = "Error loading apps";
   } finally {
     loader2?.classList.add("hidden");

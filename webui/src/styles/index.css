@@ -44,7 +44,7 @@
         transform 0.2s ease;
 }
 
-.fade-anim.showAnim {
+.showAnim {
     opacity: 0;
     transform: scale(0.95);
     pointer-events: none;
