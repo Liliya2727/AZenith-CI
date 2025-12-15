@@ -223,6 +223,43 @@ const checkGPUMaliCompatibility = async () => {
   }
 };
 
+const checkWebUISupport = async () => {
+  const loadingText = document.getElementById("loading-text");
+  const loadingScreen = document.getElementById("loading-screen");
+
+  try {
+    if (typeof ksu !== "undefined" && typeof ksu.getPackagesInfo === "function") {
+      const res = ksu.getPackagesInfo(JSON.stringify(["android"]));
+      const list = JSON.parse(res || "[]");
+
+      if (Array.isArray(list) && list.length > 0) {
+        return;
+      }
+    }
+  } catch (_) {}
+
+  try {
+    if (typeof window.$packageManager !== "undefined") {
+      const apps = await window.$packageManager.getApplicationsInfo(0, 0);
+      if (apps && apps.length > 0) {
+        return;
+      }
+    }
+  } catch (_) {}
+
+  if (loadingText) {
+    loadingText.textContent =
+      "⚠ WebUI is not supported in this app\n\n" +
+      "Try using WebuiX apk or MMRL apk";
+  }
+
+  if (loadingScreen) {
+    loadingScreen.classList.remove("hidden");
+  }
+
+  throw new Error("WebUI not supported");
+};
+
 const checkServiceRunning = async () => {
   const loadingText = document.getElementById("loading-text");
   const loadingScreen = document.getElementById("loading-screen");
@@ -572,6 +609,21 @@ const loadAppList = async () => {
       const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 96));
       icons.forEach(i => i.icon && (iconMap[i.packageName] = i.icon));
     } catch {}
+    
+    if (typeof window.$packageManager !== "undefined") {
+      for (const pkg of pkgList) {
+        if (!iconMap[pkg] || iconMap[pkg].startsWith("ksu://icon")) {
+          try {
+          const iconStream = window.$packageManager.getApplicationIcon(pkg, 0, 0);
+            const buffer = await wrapInputStream(iconStream).then(r => r.arrayBuffer());
+            const uint8 = new Uint8Array(buffer);
+            let b64 = "";
+            for (let i = 0; i < uint8.length; i++) b64 += String.fromCharCode(uint8[i]);
+            iconMap[pkg] = "data:image/png;base64," + btoa(b64);
+          } catch {}
+        }
+      }
+    }
 
     container.innerHTML = pkgList.map(pkg => `
       <div class="common-card appCard bg-tonalSurface" data-pkg="${pkg}">
@@ -2842,6 +2894,7 @@ const heavyInit = async () => {
   ];
   await Promise.all(loops.map((fn) => fn()));
   
+  await checkWebUISupport();
   await checkServiceRunning();
   await checkModuleVersion();
 
