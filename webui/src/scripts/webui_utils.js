@@ -2798,13 +2798,15 @@ const heavyInit = async () => {
   const loader = document.getElementById("loading-screen");
   if (loader) loader.classList.remove("hidden");
   document.body.classList.add("no-scroll");
+  
+  const ok = await checkModuleVersion();
+  if (!ok) return;
 
   const loops = [
     checkProfile, 
     checkServiceStatus, 
     showRandomMessage, 
     updateGameStatus,
-    checkModuleVersion,
   ];
   await Promise.all(loops.map((fn) => fn()));
 
