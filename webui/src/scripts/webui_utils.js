@@ -228,33 +228,53 @@ const checkModuleVersion = async () => {
   const loadingScreen = document.getElementById("loading-screen");
   const verEl = document.getElementById("moduleVer");
 
-  const { errno, stdout } = await executeCommand(
-    "/data/adb/modules/AZenith/system/bin/sys.azenith-service --version"
-  );
+  const showError = async (msg, code) => {
+    if (loadingText) loadingText.textContent = msg;
+    if (loadingScreen) loadingScreen.classList.remove("hidden");
+
+    await new Promise(r => setTimeout(r, 0));
+
+    throw new Error(code);
+  };
+
+  let errno, stdout;
+
+  try {
+    ({ errno, stdout } = await executeCommand(
+      "/data/adb/modules/AZenith/system/bin/sys.azenith-service --version"
+    ));
+  } catch (e) {
+    await showError(
+      "Failed to communicate with AZenith daemon.\n\n" +
+      "Please make sure the service is installed and runnable.",
+      "exec_failed"
+    );
+  }
 
   const version = (stdout || "").trim();
-  
+
   if (errno !== 0 || !version) {
-    loadingText.textContent =
-      "AZenith daemon is not running.\n\nRun: sys.azenith-service --run";
-    loadingScreen.classList.remove("hidden");
-    throw new Error("daemon_not_running");
+    await showError(
+      "AZenith daemon is not running.\n\nRun:\n" +
+      "sys.azenith-service --run",
+      "daemon_not_running"
+    );
   }
 
   if (!/^\d+\.\d+\.\d+/.test(version)) {
-    loadingText.textContent =
-      "Invalid daemon version detected.\n\nPlease reinstall AZenith.";
-    loadingScreen.classList.remove("hidden");
-    throw new Error("invalid_version");
+    await showError(
+      "Invalid daemon version detected.\n\nPlease reinstall AZenith.",
+      "invalid_version"
+    );
   }
 
   if (version !== WEBUI_VERSION) {
-    loadingText.textContent =
+    await showError(
       "Version mismatch detected.\n\n" +
       "WebUI version does not match daemon version.\n" +
-      "Please update or reinstall AZenith.";
-    loadingScreen.classList.remove("hidden");
-    throw new Error("version_mismatch");
+      "Please update or reinstall AZenith.",
+      "version_mismatch"
+    );
   }
 
   if (verEl) verEl.textContent = version;
