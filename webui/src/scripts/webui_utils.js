@@ -588,7 +588,6 @@ const writeGameList = async (list) => {
   await executeCommand(`sync`);
 };
 
-let appListLoaded = false;
 let cachedPkgList = [];
 let cachedLabelMap = {};
 let cachedIconMap = {};
