@@ -224,35 +224,35 @@ const checkGPUMaliCompatibility = async () => {
 };
 
 const checkServiceRunning = async () => {
+  const loadingText = document.getElementById("loading-text");
+  const loadingScreen = document.getElementById("loading-screen");
+
   try {
-    const { stdout: s } = await executeCommand(
+    const { errno, stdout } = await executeCommand(
       "/system/bin/pidof sys.azenith-service"
     );
 
-    const pid = (s || "").trim();
+    const pid = (stdout || "").trim();
 
-    if (!pid) {
-      const loadingText = document.getElementById("loading-text");
-      const loadingScreen = document.getElementById("loading-screen");
-
+    if (errno !== 0 || !pid) {
       if (loadingText) {
         loadingText.textContent =
           "AZenith daemon is not running.\n\n" +
-          "please reboot your device or Run:\n" +
-          "sys.azenith-service --run in terminal";
+          "Run:\n" +
+          "sys.azenith-service --run";
       }
 
       if (loadingScreen) {
         loadingScreen.classList.remove("hidden");
       }
 
-      throw new Error("AZenith daemon not running — stopping initialization.");
+      throw new Error("AZenith daemon not running");
     }
 
     return;
 
   } catch (err) {
-    console.error("Failed to check service status:", err);
+    console.error("Service check failed:", err);
     throw err;
   }
 };
@@ -2832,9 +2832,7 @@ const heavyInit = async () => {
 
   const loader = document.getElementById("loading-screen");
   if (loader) loader.classList.remove("hidden");
-  document.body.classList.add("no-scroll");
-  await checkServiceRunning();
-  await checkModuleVersion();
+  document.body.classList.add("no-scroll");  
 
   const loops = [
     checkProfile, 
@@ -2843,6 +2841,9 @@ const heavyInit = async () => {
     updateGameStatus,    
   ];
   await Promise.all(loops.map((fn) => fn()));
+  
+  await checkServiceRunning();
+  await checkModuleVersion();
 
   const quickChecks = [
     checkGPUMaliCompatibility,
