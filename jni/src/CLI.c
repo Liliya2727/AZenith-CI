@@ -232,3 +232,13 @@ int handle_verboselog(int argc, char** argv) {
     external_vlog(level, tag, message);
     return 0;
 }
+
+/***********************************************************************************
+ * Function Name      : printversion
+ * Inputs             : None
+ * Returns            : None
+ * Description        : Show current AZenith daemon version
+ ***********************************************************************************/
+void printversion() {
+    printf("%s",MODULE_VERSION);
+}

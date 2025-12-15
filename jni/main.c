@@ -35,11 +35,16 @@ int main(int argc, char* argv[]) {
         print_help();
         return 0;
     }
+    
+    if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-V")) {
+        printversion();
+        return 0;
+    }
 
     if (!strcmp(argv[1], "--profile") || !strcmp(argv[1], "-p")) {
         return handle_profile(argc, argv);
     }
-
+    
     if (!strcmp(argv[1], "--log") || !strcmp(argv[1], "-l")) {
         return handle_log(argc, argv);
     }
