@@ -133,50 +133,6 @@
    
 }
 
-
-.toggle2 {
-    position: absolute;
-    right: 5%;
-    width: 2.9rem;
-    height: 1.5rem;
-    background-color:var(--surfaceContainer, #090b11);
-    border: 1px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
-    border-radius: 9999px;
-    cursor: pointer;
-    transition: background-color .25s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
-}
-
-.toggle2::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: .15rem;
-    transform: translateY(-50%);
-    width: .95rem;
-    height: .95rem;
-    background-color:var(--outlineVariant, #151920);
-    border: 1px solid var(--outlineVariant, #1a1a1a);
-    border-radius: 9999px;
-    transition: transform .35s cubic-bezier(.34,1.56,.64,1), background-color .25s ease, border-color .25s ease;
-}
-
-
-.toggle2.active {
-    background: linear-gradient(
-        135deg,
-        var(--primary, #4853a0),
-        var(--onPrimaryContainer, #7c86c0)
-    );
-    border-color: var(--onPrimaryContainer, #a6b3ff);
-    transform: scale(1);
-}
-
-.toggle2.active::after {
-    transform: translate(1.5rem, -50%) scale(1.15);
-    background-color: var(--onPrimary, #e6e9ff);
-    border: 2px solid var(--onPrimary, #b5beff);
-}
-
 #bottomToolbar {
   position: fixed;
   bottom: calc(1.7rem + var(--window-inset-bottom, 0px));
@@ -629,10 +585,24 @@ button {
     pointer-events: none
 }
 
+input[type=checkbox] {
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    visibility: hidden;
+    margin: 0;
+    padding: 0
+}
+
 .toggle {
     position: relative;
-    width: 2.9rem;
-    height: 1.45rem;
+    width: 3rem;
+    height: 1.5rem;
     background-color: var(--surfaceContainer, #090b11);
     border: 1px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
     border-radius: 9999px;
@@ -645,10 +615,10 @@ button {
     content: "";
     position: absolute;
     top: 50%;
-    left: .18rem;
+    left: .3rem;
     transform: translateY(-50%);
-    width: .95rem;
-    height: .95rem;
+    width: .8rem;
+    height: .8rem;
     background-color: var(--outlineVariant, #151920);
     border: 1px solid var(--outlineVariant, #20242c);
     border-radius: 9999px;
@@ -664,11 +634,54 @@ input[type=checkbox]:checked + .toggle {
         var(--onPrimaryContainer, #7c86c0)
     );
     border-color: var(--onPrimaryContainer, #a6b3ff);
-    transform: scale(1);
+    transform: scale(1.04);
 }
 
 input[type=checkbox]:checked + .toggle::after {
-    transform: translate(1.5rem, -50%) scale(1.15);
+    transform: translate(1.5rem, -50%) scale(1.45);
+    background-color: var(--onPrimary, #e6e9ff);
+    border: 2px solid var(--onPrimary, #b5beff);
+}
+
+.toggle2 {
+    position: absolute;
+    right: 5%;
+    width: 3rem;
+    height: 1.5rem;
+    background-color:var(--surfaceContainer, #090b11);
+    border: 1px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background-color .25s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+
+.toggle2::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: .3rem;
+    transform: translateY(-50%);
+    width: .8rem;
+    height: .8rem;
+    background-color:var(--outlineVariant, #151920);
+    border: 1px solid var(--outlineVariant, #1a1a1a);
+    border-radius: 9999px;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), background-color .25s ease, border-color .25s ease;
+}
+
+
+.toggle2.active {
+    background: linear-gradient(
+        135deg,
+        var(--primary, #4853a0),
+        var(--onPrimaryContainer, #7c86c0)
+    );
+    border-color: var(--onPrimaryContainer, #a6b3ff);
+    transform: scale(1.04);
+}
+
+.toggle2.active::after {
+    transform: translate(1.5rem, -50%) scale(1.45);
     background-color: var(--onPrimary, #e6e9ff);
     border: 2px solid var(--onPrimary, #b5beff);
 }
@@ -724,8 +737,8 @@ input[type=checkbox]:checked + .toggle::after {
 
 .overlay-text {
   position: absolute;
-  top: 6%;
-  right: 4%;
+  bottom: 32%;
+  left: 4%;
   display: inline-flex;
   align-items: center;
   font-weight: 650;
@@ -748,8 +761,8 @@ input[type=checkbox]:checked + .toggle::after {
 
 .overlay-textcppt {
   position: absolute;
-  top: 20%;
-  left: 4%;
+  bottom: 18%;
+  right: 4%;
   display: inline-flex;
   align-items: center;
   font-weight: 550;
@@ -786,7 +799,7 @@ input[type=checkbox]:checked + .toggle::after {
 
 .overlay-textcppt2 {
   position: absolute;
-  top: 6%;
+  bottom: 18%;
   left: 4%;
   display: inline-flex;
   align-items: center;
@@ -1379,7 +1392,7 @@ body.modal-open {
 #settingsButton {
   position: absolute;
   top: 1px;
-  right: 0px;
+  right: 1px;
   display: flex;
   width: var(--btn-size);
   height: var(--btn-size);
@@ -1418,6 +1431,7 @@ body.modal-open {
 }
 
 .langSect {
+  position: absolute;
   height: var(--btn-size);
   width: 25%;
   appearance: none;

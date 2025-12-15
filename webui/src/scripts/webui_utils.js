@@ -226,7 +226,7 @@ const checkGPUMaliCompatibility = async () => {
 const checkModuleVersion = async () => {
   try {
     const { errno: c, stdout: s } = await executeCommand(
-      "grep \"version=\" /data/adb/modules/AZenith/module.prop | awk -F'=' '{print $2}'"
+      "/data/adb/modules/AZenith/system/bin/sys.azenith-service --version"
     );
 
     if (c !== 0) return;
@@ -245,7 +245,7 @@ const checkModuleVersion = async () => {
         loadingText.textContent =
           `⚠ Version mismatch detected.\n` +
           `WebUI version doesn't match with\n` +
-          `current Module version: ${moduleVersion}\n` +
+          `current Daemon version\n` +
           `Please update or reinstall to continue.`;
       }
 
@@ -432,6 +432,8 @@ const showGameListMenu = async () => {
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
+  const applist = document.getElementById("appList");
+  showPanel(applist);
   hidePanel(main);
   showPanel(gameList);
   showPanel(search);
@@ -452,6 +454,8 @@ const showMainMenu = async () => {
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
+  const applist = document.getElementById("appList");
+  hidePanel(applist);
   hidePanel(gameList);
   hidePanel(search);
   showPanel(main);
