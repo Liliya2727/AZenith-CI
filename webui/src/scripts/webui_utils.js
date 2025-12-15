@@ -428,12 +428,10 @@ const showGameListMenu = async () => {
   currentScreen = "gamelist";
   loadAppList();
   const main = document.getElementById("mainMenu");
-  const gameList = document.getElementById("gameListMenu");
+  const gameList = document.getElementById("appList");
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
-  const applist = document.getElementById("app-container");
-  showPanel(applist);
   hidePanel(main);
   showPanel(gameList);
   showPanel(search);
@@ -450,12 +448,10 @@ const showMainMenu = async () => {
   if (currentScreen === "main") return;
   currentScreen = "main";
   const main = document.getElementById("mainMenu");
-  const gameList = document.getElementById("gameListMenu");
+  const gameList = document.getElementById("appList");
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
-  const applist = document.getElementById("app-container");
-  hidePanel(applist);
   hidePanel(gameList);
   hidePanel(search);
   showPanel(main);
@@ -544,7 +540,7 @@ const loadAppList = async () => {
     } catch {}
 
     container.innerHTML = pkgList.map(pkg => `
-      <div id="app-container" class="fade-anim showAnim common-card appCard bg-tonalSurface" data-pkg="${pkg}">
+      <div class="fade-anim showAnim common-card appCard bg-tonalSurface" data-pkg="${pkg}">
         <img class="appIcon lazy-icon" data-src="${iconMap[pkg]}" src="">
         <div class="meta">
           <div class="row">
