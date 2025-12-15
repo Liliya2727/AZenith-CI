@@ -240,8 +240,8 @@ const checkWebUISupport = async () => {
 
   try {
     if (typeof window.$packageManager !== "undefined") {
-      const apps = await window.$packageManager.getApplicationInfo("android", 0, 0);
-      if (apps && apps.length > 0) {
+      const app = await window.$packageManager.getApplicationInfo("android",0,0);
+      if (app) {
         return;
       }
     }
