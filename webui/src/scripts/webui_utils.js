@@ -426,7 +426,6 @@ const showPanel = (panel) => {
 const showGameListMenu = async () => {
   if (currentScreen === "gamelist") return;
   currentScreen = "gamelist";
-  loadAppList();
   const main = document.getElementById("mainMenu");
   const gameList = document.getElementById("appList");
   const search = document.getElementById("searchInput");
@@ -439,6 +438,7 @@ const showGameListMenu = async () => {
   avatar.classList.add("showAnim");
   setActiveToolbar("openGameList");
   requestAnimationFrame(() => {
+    loadAppList();
     gameList.scrollTop = 0;
     document.documentElement.scrollTop = 0;
   });
@@ -540,7 +540,7 @@ const loadAppList = async () => {
     } catch {}
 
     container.innerHTML = pkgList.map(pkg => `
-      <div class="fade-anim showAnim common-card appCard bg-tonalSurface" data-pkg="${pkg}">
+      <div class="common-card appCard bg-tonalSurface" data-pkg="${pkg}">
         <img class="appIcon lazy-icon" data-src="${iconMap[pkg]}" src="">
         <div class="meta">
           <div class="row">
