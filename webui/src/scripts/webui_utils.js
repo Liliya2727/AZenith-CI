@@ -460,6 +460,7 @@ const showPanel = (panel) => {
 const showGameListMenu = async () => {
   if (currentScreen === "gamelist") return;
   currentScreen = "gamelist";
+  loadAppList();
   const main = document.getElementById("mainMenu");
   const gameList = document.getElementById("gameListMenu");
   const search = document.getElementById("searchInput");
@@ -471,8 +472,7 @@ const showGameListMenu = async () => {
   title.classList.add("showAnim");
   avatar.classList.add("showAnim");
   setActiveToolbar("openGameList");
-  requestAnimationFrame(() => {
-    loadAppList();
+  requestAnimationFrame(() => {    
     gameList.scrollTop = 0;
     document.documentElement.scrollTop = 0;
   });

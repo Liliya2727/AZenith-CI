@@ -44,7 +44,7 @@
         transform 0.2s ease;
 }
 
-.showAnim {
+.fade-anim.showAnim {
     opacity: 0;
     transform: scale(0.95);
     pointer-events: none;
@@ -470,6 +470,9 @@ button {
     background-color:var(--surface, #0d0f15);
     padding-bottom: calc(5rem + var(--window-inset-bottom, 0px));
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     line-height: inherit;
     user-select: none
 }
@@ -737,32 +740,20 @@ input[type=checkbox]:checked + .toggle::after {
 
 .overlay-text {
   position: absolute;
-  bottom: 32%;
-  left: 4%;
+  top: 25%;
+  left: 6%;
   display: inline-flex;
   align-items: center;
   font-weight: 650;
-  font-size: .6rem;
+  font-size: 1.5rem;
   line-height: 1;
-
   color: var(--onPrimaryContainer, #c0ebff);
-
-  background: color-mix(
-    in srgb,
-    var(--surfaceContainer, #003548) 45%,
-    transparent
-  );
-  border: .3px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
-  padding: 6px 10px;          /* pill spacing */
-  border-radius: 999px;       /* full pill */
-  
-  white-space: nowrap;
 }
 
 .overlay-textcppt {
   position: absolute;
-  bottom: 18%;
-  right: 4%;
+  bottom: 32%;
+  left: 4%;
   display: inline-flex;
   align-items: center;
   font-weight: 550;
@@ -799,7 +790,7 @@ input[type=checkbox]:checked + .toggle::after {
 
 .overlay-textcppt2 {
   position: absolute;
-  bottom: 18%;
+  bottom: 47%;
   left: 4%;
   display: inline-flex;
   align-items: center;
