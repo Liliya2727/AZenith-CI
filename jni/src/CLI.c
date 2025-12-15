@@ -52,6 +52,8 @@ void print_help() {
         "     -vl, --verboselog <TAG> <LEVEL> <MSG>\n"
         "                    Write a verbose log message via AZenith logging service\n"
         "\n"
+        "     -V, --version  Show AZenith current version\n"
+        "\n"
         "     -h, --help     Display this help message and exit\n"
         "\n"
         "Examples:\n"

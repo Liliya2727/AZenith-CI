@@ -238,7 +238,7 @@ const checkServiceRunning = async () => {
       if (loadingText) {
         loadingText.textContent =
           "AZenith daemon is not running.\n\n" +
-          "Run:\n" +
+          "Please reboot your device or Run:\n" +
           "sys.azenith-service --run";
       }
 
