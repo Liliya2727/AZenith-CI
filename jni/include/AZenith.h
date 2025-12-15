@@ -84,6 +84,7 @@ extern pid_t game_pid;
 // CLI
 void print_help();
 void printversion();
+int require_daemon_running(void);
 int handle_profile(int argc, char** argv);
 int handle_log(int argc, char** argv);
 int handle_verboselog(int argc, char** argv);

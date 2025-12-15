@@ -242,3 +242,22 @@ int handle_verboselog(int argc, char** argv) {
 void printversion() {
     printf("%s",MODULE_VERSION);
 }
+
+/***********************************************************************************
+ * Function Name      : require_daemon_running
+ * Inputs             : None
+ * Returns            : None
+ * Description        : block CLI execution if daemon is not running
+ ***********************************************************************************/
+int require_daemon_running(void) {
+    int ret = system("/system/bin/pidof sys.azenith-service > /dev/null 2>&1");
+
+    if (ret != 0) {
+        fprintf(stderr,
+            "\033[31mERROR:\033[0m AZenith daemon is not running.\n"
+            "Run: azenith --run\n"
+        );
+        return 0;
+    }
+    return 1;
+}
