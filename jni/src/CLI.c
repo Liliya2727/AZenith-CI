@@ -250,12 +250,10 @@ void printversion() {
  * Description        : block CLI execution if daemon is not running
  ***********************************************************************************/
 int require_daemon_running(void) {
-    int ret = system("/system/bin/pidof sys.azenith-service > /dev/null 2>&1");
-
-    if (ret != 0) {
+    if (!check_running_state()) {
         fprintf(stderr,
             "\033[31mERROR:\033[0m AZenith daemon is not running.\n"
-            "Run: azenith --run\n"
+            "Run: sys.azenith-service --run\n"
         );
         return 0;
     }
