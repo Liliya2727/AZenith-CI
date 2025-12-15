@@ -664,6 +664,11 @@ const loadAppList = async () => {
         searchInput.dispatchEvent(new Event("input"));
       };
     });
+    
+    const positions = new Map();
+    Object.values(cardCache).forEach(({ card }) => {
+      positions.set(card, card.getBoundingClientRect());
+    });
 
     const sortCards = () => {
       const set = new Set(gamelist);
@@ -683,6 +688,23 @@ const loadAppList = async () => {
 
     sortCards();
 
+    Object.values(cardCache).forEach(({ card }) => {
+      const first = positions.get(card);
+      const last = card.getBoundingClientRect();
+      if (!first) return;
+    
+      const dx = first.left - last.left;
+      const dy = first.top - last.top;
+    
+      card.style.transform = `translate(${dx}px, ${dy}px)`;
+      card.style.transition = "none";
+    
+      requestAnimationFrame(() => {
+        card.style.transition = "";
+        card.style.transform = "";
+      });
+    });
+    
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
