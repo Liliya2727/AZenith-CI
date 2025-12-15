@@ -223,7 +223,7 @@ const checkGPUMaliCompatibility = async () => {
   }
 };
 
-const checkServiceStatus = async () => {
+const checkService = async () => {
   const loadingText = document.getElementById("loading-text");
   const loadingScreen = document.getElementById("loading-screen");
 
@@ -2829,7 +2829,7 @@ const heavyInit = async () => {
   if (loader) loader.classList.remove("hidden");
   document.body.classList.add("no-scroll");
   
-  const ok = await checkServiceStatus();
+  const ok = await checkService();
   if (!ok) return;
 
   const loops = [
