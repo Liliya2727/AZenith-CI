@@ -671,58 +671,43 @@ const loadAppList = async () => {
       appListLoaded = true;
     }
 
-    // Render & animate cards EVERY TIME
-    container.innerHTML = cachedPkgList.map(pkg => `
-      <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
-        <img class="appIcon lazy-icon" data-src="${cachedIconMap[pkg]}" src="">
-        <div class="meta">
-          <div class="row">
-            <div class="text-area">
-              <div class="app-label">${cachedLabelMap[pkg]}</div>
-              <div class="pkg-label">${pkg}</div>
+    container.innerHTML = cachedPkgList
+      .slice()
+      .sort((a, b) => cachedLabelMap[a].toLowerCase().localeCompare(cachedLabelMap[b].toLowerCase()))
+      .map(pkg => `
+        <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
+          <img class="appIcon lazy-icon" data-src="${cachedIconMap[pkg]}" src="">
+          <div class="meta">
+            <div class="row">
+              <div class="text-area">
+                <div class="app-label">${cachedLabelMap[pkg]}</div>
+                <div class="pkg-label">${pkg}</div>
+              </div>
+              <div class="toggle2 ${gamelist.includes(pkg) ? "active" : ""}"
+                   data-pkg="${pkg}"
+                   data-state="${gamelist.includes(pkg) ? "on" : "off"}"></div>
             </div>
-            <div class="toggle2 ${gamelist.includes(pkg) ? "active" : ""}"
-                 data-pkg="${pkg}"
-                 data-state="${gamelist.includes(pkg) ? "on" : "off"}"></div>
           </div>
         </div>
-      </div>
-    `).join("");
+      `).join("");
 
     const cardCache = {};
-    container.querySelectorAll(".appCard").forEach((card, i) => {
+    container.querySelectorAll(".appCard").forEach(card => {
       const pkg = card.dataset.pkg;
       cardCache[pkg] = { card, label: cachedLabelMap[pkg], pkg };
-    
-      clearTimeout(card.hideTimer);
+
       card.classList.add("hidden");
-      card.classList.add("showAnim");
-    
-      setTimeout(() => {
-        card.classList.remove("hidden");
-        requestAnimationFrame(() => card.classList.remove("showAnim"));
-      }, i * 40);
-
-      const toggle = card.querySelector(".toggle2");
-      toggle.onclick = async () => {
-        toggle.classList.toggle("active");
-        const on = toggle.classList.contains("active");
-
-        toggle.dataset.state = on ? "on" : "off";
-        if (on && !gamelist.includes(pkg)) gamelist.push(pkg);
-        if (!on) gamelist = gamelist.filter(p => p !== pkg);
-
-        const card = cardCache[pkg].card;
-        card.classList.add("showAnim");
-        setTimeout(() => card.classList.remove("showAnim"), 120);
-
-        await writeGameList(gamelist);
-        sortCards();
-
-        searchInput.value = "";
-        searchInput.dispatchEvent(new Event("input"));
-      };
     });
+
+    const cards = Object.values(cardCache).map(c => c.card);
+    requestAnimationFrame(() => {
+      cards.forEach((card, i) => {
+        setTimeout(() => {
+          card.classList.remove("hidden");
+          card.classList.add("showAnim");
+          requestAnimationFrame(() => card.classList.remove("showAnim"));
+        }, i * 40); 
+      });
 
     const sortCards = () => {
       const set = new Set(gamelist);

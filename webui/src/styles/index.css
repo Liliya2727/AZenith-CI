@@ -92,12 +92,6 @@
   position: relative;
   padding: 20rem;
   background-color:var(--tonalSurface, #12141b);
-  transition:
-    transform 0.25s ease,
-    opacity 0.25s ease;
-}
-
-.appCard {
   opacity: 1;
   transform: scale(1);
   transition:
