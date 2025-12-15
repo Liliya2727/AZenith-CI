@@ -223,52 +223,36 @@ const checkGPUMaliCompatibility = async () => {
   }
 };
 
-const checkService = async () => {
+const checkServiceRunning = async () => {
   try {
-    const { stdout } = await executeCommand(
+    const { stdout: s } = await executeCommand(
       "/system/bin/pidof sys.azenith-service"
     );
 
-    const pid = (stdout || "").trim();
+    const pid = (s || "").trim();
 
-    if (pid) return true;
-
-    const loadingText = document.getElementById("loading-text");
-    const loadingScreen = document.getElementById("loading-screen");
-
-    if (loadingText) {
-      loadingText.textContent =
-        "AZenith daemon is not running.\n\n" +
-        "Please reboot your devices.\n";
-    }
-
-    if (loadingScreen) {
-      loadingScreen.classList.remove("hidden");
-    }
-
-    await new Promise(r => setTimeout(r, 0));
-
-    throw new Error("AZenith daemon not running");
-
-  } catch (err) {
-  
-    if (err.message !== "AZenith daemon not running") {
+    if (!pid) {
       const loadingText = document.getElementById("loading-text");
       const loadingScreen = document.getElementById("loading-screen");
 
       if (loadingText) {
         loadingText.textContent =
-          "Failed to check AZenith daemon status.\n\n" +
-          "Please make sure the service is installed and runnable.";
+          "AZenith daemon is not running.\n\n" +
+          "please reboot your device or Run:\n" +
+          "sys.azenith-service --run in terminal";
       }
 
       if (loadingScreen) {
         loadingScreen.classList.remove("hidden");
       }
 
-      await new Promise(r => setTimeout(r, 0));
+      throw new Error("AZenith daemon not running — stopping initialization.");
     }
 
+    return;
+
+  } catch (err) {
+    console.error("Failed to check service status:", err);
     throw err;
   }
 };
@@ -2849,14 +2833,14 @@ const heavyInit = async () => {
   const loader = document.getElementById("loading-screen");
   if (loader) loader.classList.remove("hidden");
   document.body.classList.add("no-scroll");
+  await checkServiceRunning();
+  await checkModuleVersion();
 
   const loops = [
     checkProfile, 
     checkServiceStatus, 
     showRandomMessage, 
-    updateGameStatus,
-    checkService,
-    checkModuleVersion,
+    updateGameStatus,    
   ];
   await Promise.all(loops.map((fn) => fn()));
 
