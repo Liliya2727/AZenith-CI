@@ -494,21 +494,54 @@ const showPanel = (panel) => {
   panel.classList.remove("showAnim");
 };
 
+const showCards = (container) => {
+  const cards = container.querySelectorAll(".appCard");
+  cards.forEach(card => {
+    clearTimeout(card.hideTimer);
+    card.classList.add("showAnim");
+    card.classList.remove("hidden");
+  });
+
+  cards.forEach(card => void card.offsetWidth);
+
+  requestAnimationFrame(() => {
+    cards.forEach((card, i) => {
+      setTimeout(() => card.classList.remove("showAnim"), i * 12); 
+    });
+  });
+};
+
+const hideCards = (container) => {
+  const cards = container.querySelectorAll(".appCard");
+  cards.forEach(card => {
+    card.classList.add("showAnim"); 
+    clearTimeout(card.hideTimer);
+    card.hideTimer = setTimeout(() => card.classList.add("hidden"), 230);
+  });
+};
+
 const showGameListMenu = async () => {
   if (currentScreen === "gamelist") return;
   currentScreen = "gamelist";
-  loadAppList();
+  loadAppList(); 
+
   const main = document.getElementById("mainMenu");
   const gameList = document.getElementById("gameListMenu");
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
+
   hidePanel(main);
   showPanel(gameList);
   showPanel(search);
+
   title.classList.add("showAnim");
   avatar.classList.add("showAnim");
+
+  showCards(gameList);
+
   setActiveToolbar("openGameList");
+
   requestAnimationFrame(() => {    
     gameList.scrollTop = 0;
     document.documentElement.scrollTop = 0;
@@ -518,17 +551,23 @@ const showGameListMenu = async () => {
 const showMainMenu = async () => {
   if (currentScreen === "main") return;
   currentScreen = "main";
+
   const main = document.getElementById("mainMenu");
   const gameList = document.getElementById("gameListMenu");
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
+
+  hideCards(gameList);
   hidePanel(gameList);
   hidePanel(search);
+
   showPanel(main);
   title.classList.remove("showAnim");
   avatar.classList.remove("showAnim");
+
   setActiveToolbar("openMain");
+
   requestAnimationFrame(() => {
     main.scrollTop = 0;
     document.documentElement.scrollTop = 0;
@@ -549,10 +588,12 @@ const writeGameList = async (list) => {
   await executeCommand(`sync`);
 };
 
-const loadAppList = async () => {
-  if (appListLoaded) return;
-  appListLoaded = true;
+let appListLoaded = false;
+let cachedPkgList = [];
+let cachedLabelMap = {};
+let cachedIconMap = {};
 
+const loadAppList = async () => {
   const container = document.getElementById("appList");
   const searchInput = document.getElementById("searchInput");
   if (!container || !searchInput) return;
@@ -564,59 +605,81 @@ const loadAppList = async () => {
   try {
     let gamelist = await readGameList();
 
-    let pkgList = [];
-    try {
-      pkgList = JSON.parse(ksu.listUserPackages());
-    } catch {
-      const r = await exec("pm list packages -3");
-      pkgList = (r.stdout || "")
-        .split("\n")
-        .map(x => x.replace("package:", "").trim())
-        .filter(Boolean);
-    }
+    if (!appListLoaded) {
+      let pkgList = [];
+      try {
+        pkgList = JSON.parse(ksu.listUserPackages());
+      } catch {
+        const r = await exec("pm list packages -3");
+        pkgList = (r.stdout || "")
+          .split("\n")
+          .map(x => x.replace("package:", "").trim())
+          .filter(Boolean);
+      }
 
-    if (!pkgList.length) {
-      container.textContent = "No apps found.";
-      return;
-    }
+      if (!pkgList.length) {
+        container.textContent = "No apps found.";
+        return;
+      }
 
-    const labelMap = {};
-    try {
-      const infoList = JSON.parse(ksu.getPackagesInfo(JSON.stringify(pkgList)));
-      infoList.forEach(i => {
-        labelMap[i.packageName] = i.appLabel || i.label || i.packageName;
-      });
-    } catch {}
+      const labelMap = {};
+      try {
+        const infoList = JSON.parse(ksu.getPackagesInfo(JSON.stringify(pkgList)));
+        infoList.forEach(i => {
+          labelMap[i.packageName] = i.appLabel || i.label || i.packageName;
+        });
+      } catch {}
 
-    if (window.$packageManager) {
-      for (const pkg of pkgList) {
-        if (!labelMap[pkg]) {
-          try {
-            const appInfo = await window.$packageManager.getApplicationInfo(pkg, 0, 0);
-            labelMap[pkg] =
-              (appInfo?.getLabel?.() || appInfo?.label || appInfo?.appName || pkg);
-          } catch {}
+      if (window.$packageManager) {
+        for (const pkg of pkgList) {
+          if (!labelMap[pkg]) {
+            try {
+              const appInfo = await window.$packageManager.getApplicationInfo(pkg, 0, 0);
+              labelMap[pkg] = (appInfo?.getLabel?.() || appInfo?.label || appInfo?.appName || pkg);
+            } catch {}
+          }
         }
       }
+
+      pkgList.forEach(p => labelMap[p] ||= p);
+
+      const iconMap = {};
+      pkgList.forEach(p => (iconMap[p] = `ksu://icon/${p}`));
+
+      try {
+        const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 96));
+        icons.forEach(i => i.icon && (iconMap[i.packageName] = i.icon));
+      } catch {}
+
+      if (typeof window.$packageManager !== "undefined") {
+        for (const pkg of pkgList) {
+          if (!iconMap[pkg] || iconMap[pkg].startsWith("ksu://icon")) {
+            try {
+              const iconStream = await window.$packageManager.getApplicationIcon(pkg, 0, 0);
+              const buffer = await wrapInputStream(iconStream).then(r => r.arrayBuffer());
+              const uint8 = new Uint8Array(buffer);
+              let b64 = "";
+              for (let i = 0; i < uint8.length; i++) b64 += String.fromCharCode(uint8[i]);
+              iconMap[pkg] = "data:image/png;base64," + btoa(b64);
+            } catch {}
+          }
+        }
+      }
+
+      cachedPkgList = pkgList;
+      cachedLabelMap = labelMap;
+      cachedIconMap = iconMap;
+      appListLoaded = true;
     }
 
-    pkgList.forEach(p => labelMap[p] ||= p);
-
-    const iconMap = {};
-    pkgList.forEach(p => (iconMap[p] = `ksu://icon/${p}`));
-
-    try {
-      const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 96));
-      icons.forEach(i => i.icon && (iconMap[i.packageName] = i.icon));
-    } catch {}
-
-    container.innerHTML = pkgList.map(pkg => `
+    // Render & animate cards EVERY TIME
+    container.innerHTML = cachedPkgList.map(pkg => `
       <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
-        <img class="appIcon lazy-icon" data-src="${iconMap[pkg]}" src="">
+        <img class="appIcon lazy-icon" data-src="${cachedIconMap[pkg]}" src="">
         <div class="meta">
           <div class="row">
             <div class="text-area">
-              <div class="app-label">${labelMap[pkg]}</div>
+              <div class="app-label">${cachedLabelMap[pkg]}</div>
               <div class="pkg-label">${pkg}</div>
             </div>
             <div class="toggle2 ${gamelist.includes(pkg) ? "active" : ""}"
@@ -628,12 +691,10 @@ const loadAppList = async () => {
     `).join("");
 
     const cardCache = {};
-
     container.querySelectorAll(".appCard").forEach((card, i) => {
       const pkg = card.dataset.pkg;
-      cardCache[pkg] = { card, label: labelMap[pkg], pkg };
+      cardCache[pkg] = { card, label: cachedLabelMap[pkg], pkg };
 
-      // animate IN
       clearTimeout(card.hideTimer);
       card.classList.remove("hidden");
       setTimeout(() => card.classList.remove("showAnim"), i * 12);
@@ -646,6 +707,10 @@ const loadAppList = async () => {
         toggle.dataset.state = on ? "on" : "off";
         if (on && !gamelist.includes(pkg)) gamelist.push(pkg);
         if (!on) gamelist = gamelist.filter(p => p !== pkg);
+
+        const card = cardCache[pkg].card;
+        card.classList.add("showAnim");
+        setTimeout(() => card.classList.remove("showAnim"), 120);
 
         await writeGameList(gamelist);
         sortCards();
@@ -660,9 +725,7 @@ const loadAppList = async () => {
       const cards = Object.values(cardCache);
 
       const positions = new Map();
-      cards.forEach(c => {
-        positions.set(c.card, c.card.getBoundingClientRect());
-      });
+      cards.forEach(c => positions.set(c.card, c.card.getBoundingClientRect()));
 
       cards.forEach(c => {
         c.isOn = set.has(c.pkg);
@@ -699,24 +762,37 @@ const loadAppList = async () => {
       const q = searchInput.value.toLowerCase();
 
       Object.values(cardCache).forEach(({ card, label, pkg }) => {
-        const match =
-          label.toLowerCase().includes(q) ||
-          pkg.toLowerCase().includes(q);
+        const match = label.toLowerCase().includes(q) || pkg.toLowerCase().includes(q);
 
         if (match) {
           clearTimeout(card.hideTimer);
           card.classList.remove("hidden");
           card.classList.add("showAnim");
+
           requestAnimationFrame(() => card.classList.remove("showAnim"));
         } else {
           card.classList.add("showAnim");
           clearTimeout(card.hideTimer);
-          card.hideTimer = setTimeout(() => {
-            card.classList.add("hidden");
-          }, 230);
+          card.hideTimer = setTimeout(() => card.classList.add("hidden"), 230);
         }
       });
     };
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const img = e.target;
+          if (img.dataset.src && !img.loaded) {
+            img.src = img.dataset.src;
+            img.loaded = true;
+            img.classList.add("loaded");
+          }
+          observer.unobserve(img);
+        }
+      });
+    }, { rootMargin: "100px" });
+
+    container.querySelectorAll(".lazy-icon").forEach(img => observer.observe(img));
 
   } catch (e) {
     console.error(e);
