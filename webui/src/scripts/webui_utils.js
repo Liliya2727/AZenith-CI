@@ -671,8 +671,13 @@ const loadAppList = async () => {
       appListLoaded = true;
     }
 
-    // Render & animate cards EVERY TIME
-    container.innerHTML = cachedPkgList.map(pkg => `
+    // Alphabetically sort cachedPkgList by label
+    const sortedPkgList = cachedPkgList.slice().sort((a, b) =>
+      cachedLabelMap[a].toLowerCase().localeCompare(cachedLabelMap[b].toLowerCase())
+    );
+
+    // Render & animate cards every time
+    container.innerHTML = sortedPkgList.map(pkg => `
       <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
         <img class="appIcon lazy-icon" data-src="${cachedIconMap[pkg]}" src="">
         <div class="meta">
@@ -696,7 +701,7 @@ const loadAppList = async () => {
 
       clearTimeout(card.hideTimer);
       card.classList.remove("hidden");
-      setTimeout(() => card.classList.remove("showAnim"), i * 12);
+      setTimeout(() => card.classList.remove("showAnim"), i * 25); // staggered 25ms per card
 
       const toggle = card.querySelector(".toggle2");
       toggle.onclick = async () => {
@@ -767,7 +772,6 @@ const loadAppList = async () => {
           clearTimeout(card.hideTimer);
           card.classList.remove("hidden");
           card.classList.add("showAnim");
-
           requestAnimationFrame(() => card.classList.remove("showAnim"));
         } else {
           card.classList.add("showAnim");
