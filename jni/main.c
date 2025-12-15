@@ -107,6 +107,9 @@ int main(int argc, char* argv[]) {
 
         while (1) {
             runtask();
+            // Check Module Integrity
+            is_kanged();
+            check_module_version();
             if (cur_mode == PERFORMANCE_PROFILE) {
                 usleep(LOOP_INTERVAL_MS * 1000);
             } else {

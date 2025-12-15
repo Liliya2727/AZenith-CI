@@ -240,7 +240,7 @@ int handle_verboselog(int argc, char** argv) {
  * Description        : Show current AZenith daemon version
  ***********************************************************************************/
 void printversion() {
-    printf("%s",MODULE_VERSION);
+    printf("%s\n", MODULE_VERSION);
 }
 
 /***********************************************************************************
