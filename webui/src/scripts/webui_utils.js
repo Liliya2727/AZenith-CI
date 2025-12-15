@@ -431,6 +431,7 @@ const showGameListMenu = async () => {
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
+  gameList.classList.remove("invisible");
   hidePanel(main);
   showPanel(gameList);
   showPanel(search);
@@ -452,6 +453,7 @@ const showMainMenu = async () => {
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
+  gameList.classList.add("invisible");
   hidePanel(gameList);
   hidePanel(search);
   showPanel(main);
@@ -540,7 +542,7 @@ const loadAppList = async () => {
     } catch {}
 
     container.innerHTML = pkgList.map(pkg => `
-      <div class="common-card appCard bg-tonalSurface" data-pkg="${pkg}">
+      <div class="fade-anim hidden common-card appCard bg-tonalSurface" data-pkg="${pkg}">
         <img class="appIcon lazy-icon" data-src="${iconMap[pkg]}" src="">
         <div class="meta">
           <div class="row">
