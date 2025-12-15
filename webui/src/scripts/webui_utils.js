@@ -427,7 +427,7 @@ const showGameListMenu = async () => {
   if (currentScreen === "gamelist") return;
   currentScreen = "gamelist";
   const main = document.getElementById("mainMenu");
-  const gameList = document.getElementById("appList");
+  const gameList = document.getElementById("gameListMenu");
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
@@ -448,7 +448,7 @@ const showMainMenu = async () => {
   if (currentScreen === "main") return;
   currentScreen = "main";
   const main = document.getElementById("mainMenu");
-  const gameList = document.getElementById("appList");
+  const gameList = document.getElementById("gameListMenu");
   const search = document.getElementById("searchInput");
   const avatar = document.getElementById("Avatar");
   const title = document.getElementById("textJudul");
