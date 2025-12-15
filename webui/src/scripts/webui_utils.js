@@ -223,49 +223,71 @@ const checkGPUMaliCompatibility = async () => {
   }
 };
 
-const checkModuleVersion = async () => {
+const checkServiceStatus = async () => {
   const loadingText = document.getElementById("loading-text");
   const loadingScreen = document.getElementById("loading-screen");
-  const verEl = document.getElementById("moduleVer");
 
   let stdout = "";
 
   try {
     const res = await executeCommand(
+      "/system/bin/pidof sys.azenith-service"
+    );
+    stdout = (res?.stdout || "").trim();
+  } catch (_) {}
+
+  if (stdout) return true;
+
+  if (loadingText) {
+    loadingText.textContent =
+      "AZenith daemon is not running.\n\n" +
+      "Run:\n" +
+      "sys.azenith-service --run";
+  }
+
+  if (loadingScreen) {
+    loadingScreen.classList.remove("hidden");
+  }
+
+  return false;
+};
+
+const checkModuleVersion = async () => {
+  try {
+    const { errno: c, stdout: s } = await executeCommand(
       "/data/adb/modules/AZenith/system/bin/sys.azenith-service --version"
     );
 
-    stdout = (res?.stdout || "").trim();
-  } catch (_) {
+    if (c !== 0) return;
+
+    const moduleVersion = s.trim();
+
+    if (moduleVersion !== WEBUI_VERSION) {
+      const loadingText = document.getElementById("loading-text");
+      const loadingScreen = document.getElementById("loading-screen");
+
+      if (loadingText) {
+        loadingText.textContent =
+          `⚠ Version mismatch detected.\n` +
+          `WebUI version doesn't match with\n` +
+          `current Daemon version\n` +
+          `Please update or reinstall to continue.`;
+      }
+
+      if (loadingScreen) {
+        loadingScreen.classList.remove("hidden");
+      }
+
+      throw new Error("WebUI version mismatch — stopping initialization.");
+    }
+
+    const el = document.getElementById("moduleVer");
+    if (el) el.textContent = moduleVersion;
+
+  } catch (err) {
+    console.error("Failed to check module version:", err);
+    throw err;
   }
-
-  if (!stdout) {
-    if (loadingText)
-      loadingText.textContent =
-        "AZenith daemon is not running.\n\nRun:\n" +
-        "sys.azenith-service --run";
-
-    if (loadingScreen)
-      loadingScreen.classList.remove("hidden");
-
-    return;
-  }
-
-  if (version !== WEBUI_VERSION) {
-    if (loadingText)
-      loadingText.textContent =
-        "Version mismatch detected.\n\n" +
-        `Daemon: ${version}\n` +
-        `WebUI: ${WEBUI_VERSION}\n\n` +
-        "Please update or reinstall AZenith.";
-
-    if (loadingScreen)
-      loadingScreen.classList.remove("hidden");
-
-    return;
-  }
-
-  if (verEl) verEl.textContent = version;
 };
 
 const normalize = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "_");
@@ -2807,7 +2829,7 @@ const heavyInit = async () => {
   if (loader) loader.classList.remove("hidden");
   document.body.classList.add("no-scroll");
   
-  const ok = await checkModuleVersion();
+  const ok = await checkServiceStatus();
   if (!ok) return;
 
   const loops = [
@@ -2815,6 +2837,7 @@ const heavyInit = async () => {
     checkServiceStatus, 
     showRandomMessage, 
     updateGameStatus,
+    checkModuleVersion,
   ];
   await Promise.all(loops.map((fn) => fn()));
 
