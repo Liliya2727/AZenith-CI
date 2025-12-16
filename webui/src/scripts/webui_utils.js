@@ -671,73 +671,96 @@ const loadAppList = async () => {
       appListLoaded = true;
     }
 
-    container.innerHTML = cachedPkgList
-      .slice()
-      .sort((a, b) => cachedLabelMap[a].toLowerCase().localeCompare(cachedLabelMap[b].toLowerCase()))
-      .map(pkg => `
-        <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
-          <img class="appIcon lazy-icon" data-src="${cachedIconMap[pkg]}" src="">
-          <div class="meta">
-            <div class="row">
-              <div class="text-area">
-                <div class="app-label">${cachedLabelMap[pkg]}</div>
-                <div class="pkg-label">${pkg}</div>
-              </div>
-              <div class="toggle2 ${gamelist.includes(pkg) ? "active" : ""}"
-                   data-pkg="${pkg}"
-                   data-state="${gamelist.includes(pkg) ? "on" : "off"}"></div>
+    const checkedCards = cachedPkgList.filter(pkg => gamelist.includes(pkg));
+    const uncheckedCards = cachedPkgList.filter(pkg => !gamelist.includes(pkg));
+
+    const sortByLabel = list => list.sort((a, b) =>
+      cachedLabelMap[a].toLowerCase().localeCompare(cachedLabelMap[b].toLowerCase())
+    );
+
+    const sortedChecked = sortByLabel(checkedCards);
+    const sortedUnchecked = sortByLabel(uncheckedCards);
+
+    const finalList = [...sortedChecked, ...sortedUnchecked];
+
+    container.innerHTML = finalList.map(pkg => `
+      <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
+        <img class="appIcon lazy-icon" data-src="${cachedIconMap[pkg]}" src="">
+        <div class="meta">
+          <div class="row">
+            <div class="text-area">
+              <div class="app-label">${cachedLabelMap[pkg]}</div>
+              <div class="pkg-label">${pkg}</div>
             </div>
+            <div class="toggle2 ${gamelist.includes(pkg) ? "active" : ""}"
+                 data-pkg="${pkg}"
+                 data-state="${gamelist.includes(pkg) ? "on" : "off"}"></div>
           </div>
         </div>
-      `).join("");
+      </div>
+    `).join("");
 
     const cardCache = {};
     container.querySelectorAll(".appCard").forEach(card => {
       const pkg = card.dataset.pkg;
       cardCache[pkg] = { card, label: cachedLabelMap[pkg], pkg };
-
       card.classList.add("hidden");
     });
 
-    const cards = Object.values(cardCache).map(c => c.card);
+    const cards = finalList.map(pkg => cardCache[pkg].card);
     requestAnimationFrame(() => {
       cards.forEach((card, i) => {
         setTimeout(() => {
           card.classList.remove("hidden");
           card.classList.add("showAnim");
           requestAnimationFrame(() => card.classList.remove("showAnim"));
-        }, i * 40); 
+        }, i * 40);
       });
+    });
+
+    container.querySelectorAll(".toggle2").forEach(toggle => {
+      const pkg = toggle.dataset.pkg;
+      toggle.onclick = async () => {
+        toggle.classList.toggle("active");
+        const on = toggle.classList.contains("active");
+
+        toggle.dataset.state = on ? "on" : "off";
+        if (on && !gamelist.includes(pkg)) gamelist.push(pkg);
+        if (!on) gamelist = gamelist.filter(p => p !== pkg);
+
+        const card = cardCache[pkg].card;
+        card.classList.add("showAnim");
+        setTimeout(() => card.classList.remove("showAnim"), 120);
+
+        await writeGameList(gamelist);
+        sortCards();
+
+        searchInput.value = "";
+        searchInput.dispatchEvent(new Event("input"));
+      };
+    });
 
     const sortCards = () => {
       const set = new Set(gamelist);
-      const cards = Object.values(cardCache);
-
+      const cardsArr = Object.values(cardCache);
       const positions = new Map();
-      cards.forEach(c => positions.set(c.card, c.card.getBoundingClientRect()));
-
-      cards.forEach(c => {
+      cardsArr.forEach(c => positions.set(c.card, c.card.getBoundingClientRect()));
+      cardsArr.forEach(c => {
         c.isOn = set.has(c.pkg);
         c.sortKey = c.label.toLowerCase();
       });
-
-      cards.sort((a, b) =>
+      cardsArr.sort((a, b) =>
         a.isOn !== b.isOn ? (a.isOn ? -1 : 1) : a.sortKey.localeCompare(b.sortKey)
       );
-
-      cards.forEach(c => container.appendChild(c.card));
-
-      cards.forEach(c => {
+      cardsArr.forEach(c => container.appendChild(c.card));
+      cardsArr.forEach(c => {
         const first = positions.get(c.card);
         const last = c.card.getBoundingClientRect();
         if (!first) return;
-
         const dx = first.left - last.left;
         const dy = first.top - last.top;
-
         c.card.style.transform = `translate(${dx}px, ${dy}px)`;
         c.card.style.transition = "none";
-
         requestAnimationFrame(() => {
           c.card.style.transition = "";
           c.card.style.transform = "";
@@ -745,19 +768,14 @@ const loadAppList = async () => {
       });
     };
 
-    sortCards();
-
     searchInput.oninput = () => {
       const q = searchInput.value.toLowerCase();
-
       Object.values(cardCache).forEach(({ card, label, pkg }) => {
         const match = label.toLowerCase().includes(q) || pkg.toLowerCase().includes(q);
-
         if (match) {
           clearTimeout(card.hideTimer);
           card.classList.remove("hidden");
           card.classList.add("showAnim");
-
           requestAnimationFrame(() => card.classList.remove("showAnim"));
         } else {
           card.classList.add("showAnim");
