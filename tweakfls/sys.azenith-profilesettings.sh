@@ -242,15 +242,20 @@ setfreqppm() {
 }
 
 clear_background_apps() {
-    invisible_pkgs=$(dumpsys window displays | grep "Task{" | grep "visible=false" | sed -n 's/.*A=[0-9]*:\([^ ]*\).*/\1/p' | sort -u)    
+    visible_pkgs=$(dumpsys window displays | grep "Task{" | grep "visible=true" | sed -n 's/.*A=[0-9]*:\([^ ]*\).*/\1/p' | sort -u)
+    invisible_pkgs=$(dumpsys window displays | grep "Task{" | grep "visible=false" | sed -n 's/.*A=[0-9]*:\([^ ]*\).*/\1/p' | sort -u)
     exclude="(com.android.systemui|com.android.settings|android|system)"
-    
+
     for pkg in $invisible_pkgs; do
+        if echo "$visible_pkgs" | grep -qFx "$pkg"; then
+            continue
+        fi
         if ! echo "$pkg" | grep -Eq "$exclude"; then
             am force-stop "$pkg" 2>/dev/null
             AZLog "Stopped app: $pkg"
         fi
-    done    
+    done
+
     dlog "Cleared background apps"
 }
 
