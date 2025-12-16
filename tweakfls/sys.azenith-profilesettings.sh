@@ -1649,15 +1649,17 @@ initialize() {
     # JIT COMPILE
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 	if [ "$JUSTINTIME_STATE" -eq 1 ]; then
-    dlog "Applying JIT Compiler"
-		for app in $(cmd package list packages | cut -f 2 -d ":"); do
-			{
-				echo "$app | $(cmd package compile -m speed-profile "$app")"
-				AZLog "$app | Success"
-			} &
-		done
-		disown
-	fi
+        dlog "Applying JIT Compiler"
+    
+        cmd package list packages -3 | cut -f 2 -d ":" | while IFS= read -r pkg; do
+            (
+                cmd package compile -m speed-profile "$pkg"
+                AZLog "$pkg | Success"
+            ) &
+        done
+    
+        wait
+    fi
 		
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     # SCHED TUNES
