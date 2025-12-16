@@ -1109,7 +1109,6 @@ performance_profile() {
     # Bypass Charge
 	if [ "$BYPASSCHG_STATE" -eq 1 ]; then
 		sys.azenith-utilityconf enableBypass
-		dlog "Bypass Charge Enabled"
 	fi
 	
 	# Fix Target OPP Index
@@ -1270,7 +1269,6 @@ balanced_profile() {
     # Bypass Charge
 	if [ "$BYPASSCHG_STATE" -eq 1 ]; then
 		sys.azenith-utilityconf disableBypass
-		dlog "Bypass Charge Disabled"
 	fi
 
 	# Limit cpu freq
@@ -1417,7 +1415,6 @@ eco_mode() {
 	# Bypass Charge
 	if [ "$BYPASSCHG_STATE" -eq 1 ]; then
 		sys.azenith-utilityconf disableBypass
-		dlog "Bypass Charge Disabled"
 	fi
 	
 	# Power level settings

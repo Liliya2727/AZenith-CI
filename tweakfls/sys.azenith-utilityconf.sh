@@ -169,17 +169,82 @@ disablevsync() {
     esac
 }
 
+# Read current ampere
+read_current_ma() {
+    for f in \
+        /sys/class/power_supply/battery/current_now \
+        /sys/class/power_supply/battery/BatteryAverageCurrent \
+        /sys/class/power_supply/battery/input_current_now \
+        /sys/class/power_supply/usb/current_now; do
+
+        [ -r "$f" ] || continue
+
+        val=$(cat "$f" 2>/dev/null)
+        val=${val#-}
+        [ -z "$val" ] && continue
+
+        if [ "$val" -gt 1000 ]; then
+            echo $((val / 1000))
+        else
+            echo "$val"
+        fi
+        return
+    done
+
+    echo 9999
+}
+
+# Check charging state
+ischarging() {
+    case "$(cat /sys/class/power_supply/battery/status 2>/dev/null)" in
+        Charging|Full) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 # Bypass Charge
 enableBypass() {
+    if ! ischarging; then
+        dlog "Skipping bypass charge: device not charging"
+        return 0
+    fi
+
     key="$BYPASSPATH"
     val="${key}_ON"
-    zeshia "$(eval echo \${$val})" "$(eval echo \${$key})"
+    path="$(eval echo \${$key})"
+    onval="$(eval echo \${$val})"
+
+    max_try=5
+    try=0
+
+    while [ "$try" -lt "$max_try" ]; do
+        try=$((try + 1))
+
+        zeshia "$onval" "$path"
+        sleep 1
+
+        cur_val="$(cat "$path" 2>/dev/null)"
+        cur_ma="$(read_current_ma)"
+
+        AZLog "Bypass check [$try]: path=$cur_val current=${cur_ma}mA"
+
+        if [ "$cur_val" = "$onval" ] && [ "$cur_ma" -le 10 ]; then
+            dlog "Bypass active, current ${cur_ma}mA"
+            return 0
+        fi
+
+        sleep 1
+    done
+
+    dlog "Bypass failed after $max_try retries (current ${cur_ma}mA)"
+    return 1
 }
 
 disableBypass() {
     key="$BYPASSPATH"
     val="${key}_OFF"
     zeshia "$(eval echo \${$val})" "$(eval echo \${$key})"
+    dlog "Bypass charge disabled"
 }
 
 saveLog() {
