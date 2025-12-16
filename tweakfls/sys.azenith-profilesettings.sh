@@ -1662,58 +1662,66 @@ initialize() {
     # SCHED TUNES
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 	if [ "$SCHEDTUNES_STATE" -eq 1 ]; then
-    dlog "Applying Schedtunes for Schedutil and Schedhorizon"
-		settunes() {
-			local policy_path="$1"
-
-			# Check if the policy path exists
-			if [ ! -d "$policy_path" ]; then
-				AZLog "Skipped: $policy_path (not available)"
-				return
-			fi
-
-			# Read available frequencies
-			local available_freqs=$(cat "$policy_path/scaling_available_frequencies" 2>/dev/null)
-			if [ -z "$available_freqs" ]; then
-				AZLog "Skipped: No available frequencies for $policy_path"
-				return
-			fi
-
-			# Select the 6 highest frequencies
-			local selected_freqs=$(echo "$available_freqs" | tr ' ' '\n' | sort -rn | head -n 6 | tr '\n' ' ' | sed 's/ $//')
-
-			# Generate up_delay values dynamically
-			local num_freqs=$(echo "$selected_freqs" | wc -w)
-			local up_delay=""
-			for i in $(seq 1 $num_freqs); do
-				up_delay="$up_delay $((50 * i))"
-			done
-			up_delay=$(echo "$up_delay" | sed 's/^ //')
-
-			# Define universal rate values
-			local up_rate=7500
-			local down_rate=14000
-
-			# Check for schedhorizon and schedutil paths
-			local schedhorizon_path="$policy_path/schedhorizon"
-			local schedutil_path="$policy_path/schedutil"
-
-			if [ -d "$schedhorizon_path" ]; then
-				zeshia "$up_delay" "$schedhorizon_path/up_delay"
-				zeshia "$selected_freqs" "$schedhorizon_path/efficient_freq"
-				zeshia "$up_rate" "$schedhorizon_path/up_rate_limit_us"
-				zeshia "$down_rate" "$schedhorizon_path/down_rate_limit_us"
-			fi
-
-			if [ -d "$schedutil_path" ]; then
-				zeshia "$up_rate" "$schedutil_path/up_rate_limit_us"
-				zeshia "$down_rate" "$schedutil_path/down_rate_limit_us"
-			fi
-		}
-		for policy in /sys/devices/system/cpu/cpufreq/policy*; do
-			settunes "$policy"
-		done
-	fi
+        dlog "Applying Schedtunes for Schedutil and Schedhorizon"
+    
+        settunes() {
+            local policy_path="$1"
+    
+            [ ! -d "$policy_path" ] && return
+    
+            local freqs
+            freqs="$(cat "$policy_path/scaling_available_frequencies" 2>/dev/null)"
+            [ -z "$freqs" ] && return
+    
+            local selected_freqs
+            selected_freqs="$(echo "$freqs" | tr ' ' '\n' | sort -rn | head -n 6 | tr '\n' ' ' | sed 's/ $//')"
+    
+            local num
+            num="$(echo "$selected_freqs" | wc -w)"
+    
+            local up_delay=""
+            for i in $(seq 1 "$num"); do
+                up_delay="$up_delay $((50 * i))"
+            done
+            up_delay="${up_delay# }"
+    
+            local up_rate=6500
+            local down_rate=12000
+            local rate_limit=7000
+    
+            local schedhorizon="$policy_path/schedhorizon"
+            local schedutil="$policy_path/schedutil"
+    
+            if [ -d "$schedhorizon" ]; then
+                [ -f "$schedhorizon/up_delay" ] && zeshia "$up_delay" "$schedhorizon/up_delay"
+                [ -f "$schedhorizon/efficient_freq" ] && zeshia "$selected_freqs" "$schedhorizon/efficient_freq"
+    
+                if [ -f "$schedhorizon/up_rate_limit_us" ]; then
+                    zeshia "$up_rate" "$schedhorizon/up_rate_limit_us"
+                elif [ -f "$schedhorizon/rate_limit_us" ]; then
+                    zeshia "$rate_limit" "$schedhorizon/rate_limit_us"
+                fi
+    
+                if [ -f "$schedhorizon/down_rate_limit_us" ]; then
+                    zeshia "$down_rate" "$schedhorizon/down_rate_limit_us"
+                fi
+            fi
+    
+            if [ -d "$schedutil" ]; then
+                if [ -f "$schedutil/up_rate_limit_us" ]; then
+                    zeshia "$up_rate" "$schedutil/up_rate_limit_us"
+                elif [ -f "$schedutil/rate_limit_us" ]; then
+                    zeshia "$rate_limit" "$schedutil/rate_limit_us"
+                fi
+    
+                [ -f "$schedutil/down_rate_limit_us" ] && zeshia "$down_rate" "$schedutil/down_rate_limit_us"
+            fi
+        }
+    
+        for policy in /sys/devices/system/cpu/cpufreq/policy*; do
+            settunes "$policy"
+        done
+    fi
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     # WALT TUNING
