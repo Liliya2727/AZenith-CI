@@ -2063,87 +2063,90 @@ initialize() {
     # DISABLE THERMAL
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     if [ "$DTHERMAL_STATE" -eq 1 ]; then
-    dlog "Applying Disable Thermal"   
-		
-		thermal() {
-			find /system/etc/init /vendor/etc/init /odm/etc/init -type f 2>/dev/null | xargs grep -h "^service" | awk '{print $2}' | grep thermal
-		}
-
-		for svc in $(thermal); do
-			stop "$svc"
-		done		
-                
-        debug_pid_props=$(getprop | grep -i 'debug_pid.*thermal' | awk -F'[][]' '{print $2}' | sed 's/:.*//')        
-        for pid in $debug_pid_props; do
-            resetprop -n "$pid" 0
-        done
-         
-        boot_time_props=$(getprop | grep -i 'boottime.*thermal' | awk -F'[][]' '{print $2}' | sed 's/:.*//')        
-        for btm in $boot_time_props; do
-            resetprop -n "$btm" 0
-        done
+    
+        list_thermal_services() {
+            find /system/etc/init /vendor/etc/init /odm/etc/init -type f 2>/dev/null \
+            | xargs grep -h "^service" \
+            | awk '{print $2}' \
+            | grep -i thermal
+        }
         
-        # Suspend all thermal service
-        for thrm in $(ps -e | grep -i "thermal" | awk '{print $9}'); do
-            pkill -9 "$thrm"
-        done		
-		
-		# Remove thermal-related props
-        props=$(getprop | grep -i 'thermal.*running' | awk -F'[][]' '{print $2}' | sed 's/:.*//')
-        for prop in $props; do
-            resetprop -n "$prop" suspended
-        done
-        
-		# Disable thermal zones
-		chmod 644 /sys/class/thermal/thermal_zone*/mode
-		for zone in /sys/class/thermal/thermal_zone*/mode; do
-			[ -f "$zone" ] && echo "disabled" >"$zone"
-		done
-
-		for zone2 in /sys/class/thermal/thermal_zone*/policy; do
-			[ -f "$zone2" ] && echo "userspace" >"$zone2"
-		done
-
-		# Disable GPU Power Limitations
-		if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
-			for setting in ignore_batt_oc ignore_batt_percent ignore_low_batt ignore_thermal_protect ignore_pbm_limited; do
-				echo "$setting 1" >/proc/gpufreq/gpufreq_power_limited
-			done
-		fi
-
-		# Set CPU limits based on max frequency
-		if [ -f /sys/devices/virtual/thermal/thermal_message/cpu_limits ]; then
-			for cpu in 0 2 4 6 7; do
-				maxfreq_path="/sys/devices/system/cpu/cpu$cpu/cpufreq/cpuinfo_max_freq"
-				if [ -f "$maxfreq_path" ]; then
-					maxfreq=$(cat "$maxfreq_path")
-					[ -n "$maxfreq" ] && [ "$maxfreq" -gt 0 ] && echo "cpu$cpu $maxfreq" >/sys/devices/virtual/thermal/thermal_message/cpu_limits
-				fi
-			done
-		fi
-
-		# Disable PPM (Power Policy Manager) Limits
-		if [ -d /proc/ppm ]; then
-			if [ -f /proc/ppm/policy_status ]; then
-				for idx in $(grep -E 'FORCE_LIMIT|PWR_THRO|THERMAL' /proc/ppm/policy_status | awk -F'[][]' '{print $2}'); do
-					echo "$idx 0" >/proc/ppm/policy_status
-				done
-			fi
-		fi
-
-		# Hide and disable monitoring of thermal zones
-		find /sys/devices/virtual/thermal -type f -exec chmod 000 {} +
-
-		# Disable Thermal Stats
-		cmd thermalservice override-status 0
-
-		# Disable Battery Overcharge Thermal Throttling
-		if [ -f "/proc/mtk_batoc_throttling/battery_oc_protect_stop" ]; then
-			echo "stop 1" >/proc/mtk_batoc_throttling/battery_oc_protect_stop
-		fi
-
-		AZLog "Thermal service Disabled"
-	fi
+        kill_thermald() {
+            pkill -f thermald
+        }
+    
+        stop_thermal_services() {
+            for svc in $(list_thermal_services); do
+                stop "$svc" 2>/dev/null
+            done
+        }
+    
+        reset_thermal_props() {
+            getprop | grep -iE 'init.svc.thermal*|thermal-cutoff|ro.vendor.*thermal|debug.thermal.*|debug_pid.*thermal|boottime.*thermal|thermal.*running' \
+            | awk -F'[][]' '{print $2}' | sed 's/:.*//' \
+            | while read -r prop; do
+                resetprop -n "$prop" suspended
+            done
+        }
+    
+        kill_thermal_processes() {
+            ps -A | grep -iE 'thermal-engine|thermald|mtk_thermal' \
+            | awk '{print $2}' \
+            | while read -r pid; do
+                kill -9 "$pid" 2>/dev/null
+            done
+        }                
+    
+        disable_thermal_zones() {
+            for f in /sys/class/thermal/thermal_zone*/mode; do
+                [ -f "$f" ] && zeshia "disabled" "$f"
+            done
+            for f in /sys/class/thermal/thermal_zone*/policy; do
+                [ -f "$f" ] && zeshia "userspace" "$f"
+            done
+        }
+    
+        disable_gpu_thermal() {
+            local gpu_limit="/proc/gpufreq/gpufreq_power_limited"
+            [ -f "$gpu_limit" ] || return
+            for k in ignore_batt_oc ignore_batt_percent ignore_low_batt ignore_thermal_protect ignore_pbm_limited; do
+                zeshia "$k 1" "$gpu_limit"
+            done
+        }
+    
+        disable_ppm_limits() {
+            local ppm="/proc/ppm/policy_status"
+            [ -f "$ppm" ] || return
+            grep -E 'FORCE_LIMIT|PWR_THRO|THERMAL' "$ppm" \
+            | awk -F'[][]' '{print $2}' \
+            | while read -r idx; do
+                zeshia "$idx 0" "$ppm"
+            done
+        }
+    
+        restrict_thermal_monitoring() {
+            chmod 000 /sys/devices/virtual/thermal/thermal_zone*/temp 2>/dev/null
+            chmod 000 /sys/devices/virtual/thermal/thermal_zone*/trip_point_* 2>/dev/null
+        }
+    
+        disable_battery_oc() {
+            local batoc="/proc/mtk_batoc_throttling/battery_oc_protect_stop"
+            [ -f "$batoc" ] && zeshia "stop 1" "$batoc"
+        }
+    
+        kill_thermald
+        stop_thermal_services
+        reset_thermal_props
+        kill_thermal_processes
+        disable_thermal_zones
+        disable_gpu_thermal
+        disable_ppm_limits
+        restrict_thermal_monitoring
+        cmd thermalservice override-status 0
+        disable_battery_oc
+    
+        AZLog "Thermal is disabled"
+    fi
 	
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     # DISABLE TRACE
