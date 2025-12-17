@@ -26,113 +26,59 @@
  ***********************************************************************************/
 void GamePreload(const char* package) {
     sleep(5);
-    if (!package || strlen(package) == 0) {
+
+    if (!package || !*package) {
         log_zenith(LOG_WARN, "Package is null or empty");
         return;
     }
 
     char apk_path[256] = {0};
-    char cmd_apk[512];
-    snprintf(cmd_apk, sizeof(cmd_apk), "cmd package path %s | head -n1 | cut -d: -f2", package);
+    char cmd[512];
 
-    FILE* apk = popen(cmd_apk, "r");
-    if (!apk || !fgets(apk_path, sizeof(apk_path), apk)) {
-        log_zenith(LOG_WARN, "Failed to get APK path for %s", package);
-        if (apk)
-            pclose(apk);
+    snprintf(cmd, sizeof(cmd),
+        "cmd package path %s | head -n1 | cut -d: -f2", package);
+
+    FILE* fp = popen(cmd, "r");
+    if (!fp || !fgets(apk_path, sizeof(apk_path), fp)) {
+        log_zenith(LOG_WARN, "Failed to get APK path");
+        if (fp) pclose(fp);
         return;
     }
-    pclose(apk);
+    pclose(fp);
+
     apk_path[strcspn(apk_path, "\n")] = 0;
-
-    char* last_slash = strrchr(apk_path, '/');
-    if (!last_slash) {
-        log_zenith(LOG_WARN, "Failed to determine APK folder from path: %s", apk_path);
-        return;
-    }
-    *last_slash = '\0';
+    char* slash = strrchr(apk_path, '/');
+    if (!slash) return;
+    *slash = '\0';
 
     char lib_path[300];
     snprintf(lib_path, sizeof(lib_path), "%s/lib/arm64", apk_path);
 
-    // check if .so exists
-    bool lib_exists = false;
-    DIR* dir = opendir(lib_path);
-    if (dir) {
-        struct dirent* entry;
-        while ((entry = readdir(dir)) != NULL) {
-            if (strstr(entry->d_name, ".so")) {
-                lib_exists = true;
-                break;
-            }
-        }
-        closedir(dir);
-    }
+    char budget_prop[32] = {0};
+    __system_property_get(
+        "persist.sys.azenithconf.preloadbudget",
+        budget_prop
+    );
 
-    char budget[32] = {0};
-    __system_property_get("persist.sys.azenithconf.preloadbudget", budget);
-    if (strlen(budget) == 0)
-        strcpy(budget, "500M");
+    size_t max_bytes = 0;
+    if (*budget_prop)
+        max_bytes = parse_size(budget_prop); // reuse your util
 
-    // Common variables
-    FILE* fp = NULL;
-    char line[1024];
-    int total_pages = 0;
-    char total_size[32] = {0};
+    preload_stats_t stats = {0};
 
-    if (lib_exists) {
-        char preload_cmd[512];
-        snprintf(preload_cmd, sizeof(preload_cmd), "sys.azenith-preloadbin -v -t -m %s \"%s\"", budget, lib_path);
+    log_zenith(LOG_INFO, "Native preload start for %s", package);
 
-        fp = popen(preload_cmd, "r");
-        if (!fp) {
-            log_zenith(LOG_WARN, "Failed to run preloadbin for %s", package);
-            return;
-        }
-
-        log_zenith(LOG_INFO, "Preloading game libs %s", package);
-        log_preload(LOG_INFO, "Preloading libs %s with budget %s", lib_path, budget);
-
+    if (access(lib_path, F_OK) == 0) {
+        preload_path_native(lib_path, max_bytes, &stats);
     } else {
-        // Fallback to split APKs
-        char preload_cmd[512];
-        snprintf(preload_cmd, sizeof(preload_cmd), "sys.azenith-preloadbin -v -t -m %s \"%s\"", budget, apk_path);
-
-        fp = popen(preload_cmd, "r");
-        if (!fp) {
-            log_zenith(LOG_WARN, "Failed to run preloadbin for %s", package);
-            return;
-        }
-
-        log_zenith(LOG_INFO, "Preloading game split apks %s", package);
-        log_preload(LOG_INFO, "Preloading split apks %s with budget %s", apk_path, budget);
+        preload_path_native(apk_path, max_bytes, &stats);
     }
 
-    while (fgets(line, sizeof(line), fp)) {
-        line[strcspn(line, "\n")] = 0;
-
-        char* p_pages = strstr(line, "Touched Pages:");
-        if (p_pages) {
-            int pages = 0;
-            char size[32] = {0};
-
-            if (sscanf(p_pages, "Touched Pages: %d (%31[^)])", &pages, size) == 2) {
-                total_pages += pages;
-                strncpy(total_size, size, sizeof(total_size) - 1);
-                log_zenith(LOG_DEBUG, "Preloading complete: %d memory pages touched", pages);
-                log_zenith(LOG_DEBUG, "Total memory used for preloaded libraries: %s", size);
-            } else {
-                log_zenith(LOG_WARN, "Failed to parse Touched Pages");
-            }
-        }
-
-        if (strstr(line, ".so") || strstr(line, ".apk") || strstr(line, ".dm") || strstr(line, ".odex") || strstr(line, ".vdex") ||
-            strstr(line, ".art")) {
-            log_preload(LOG_DEBUG, "Touched: %s", line);
-        }
-    }
-
-    log_preload(LOG_INFO, "Game %s preloaded success: total %d pages touched (~%s)", package, total_pages, total_size);
-
-    pclose(fp);
+    log_preload(
+        LOG_INFO,
+        "Game %s preloaded: %lld pages (~%lld MB)",
+        package,
+        (long long)stats.pages_touched,
+        (long long)(stats.bytes_touched >> 20)
+    );
 }
