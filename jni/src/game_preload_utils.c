@@ -24,6 +24,8 @@
 #include <errno.h>
 
 #include <AZenith.h>
+#define PRELOAD_TOUCH   (1 << 0)   // -t
+#define PRELOAD_VERBOSE (1 << 1)   // -v
 
 long g_pagesize = 0;
 
@@ -56,9 +58,13 @@ int is_preload_target(const char* name) {
 int preload_file(
     const char* path,
     size_t max_bytes,
+    int flags,
     preload_stats_t* stats
 ) {
     if (!path || !stats)
+        return -1;
+
+    if (max_bytes && stats->bytes_touched >= max_bytes)
         return -1;
 
     int fd = open(path, O_RDONLY | O_CLOEXEC);
@@ -72,8 +78,15 @@ int preload_file(
     }
 
     size_t size = st.st_size;
-    if (max_bytes && size > max_bytes)
-        size = max_bytes;
+    if (max_bytes) {
+        size_t remain = max_bytes - stats->bytes_touched;
+        if (remain == 0) {
+            close(fd);
+            return -1;
+        }
+        if (size > remain)
+            size = remain;
+    }
 
     void* mem = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
     if (mem == MAP_FAILED) {
@@ -84,11 +97,12 @@ int preload_file(
     if (!g_pagesize)
         g_pagesize = sysconf(_SC_PAGESIZE);
 
-    volatile unsigned char* p = (volatile unsigned char*)mem;
     size_t pages = (size + g_pagesize - 1) / g_pagesize;
 
-    for (size_t i = 0; i < pages; i++) {
-        (void)p[i * g_pagesize];   // VM page fault
+    if (flags & PRELOAD_TOUCH) {
+        volatile unsigned char* p = (volatile unsigned char*)mem;
+        for (size_t i = 0; i < pages; i++)
+            (void)p[i * g_pagesize];
     }
 
     munmap(mem, size);
@@ -97,7 +111,13 @@ int preload_file(
     stats->pages_touched += pages;
     stats->bytes_touched += size;
 
-    log_preload(LOG_DEBUG, "Touched %s (%zu pages)", path, pages);
+    if (flags & PRELOAD_VERBOSE) {
+        log_preload(LOG_DEBUG,
+            "Touched %s (%zu pages)",
+            path, pages
+        );
+    }
+
     return 0;
 }
 
@@ -112,8 +132,12 @@ int preload_file(
 void preload_crawl(
     const char* path,
     size_t max_bytes,
+    int flags,
     preload_stats_t* stats
 ) {
+    if (max_bytes && stats->bytes_touched >= max_bytes)
+        return;
+
     struct stat st;
     if (lstat(path, &st) < 0)
         return;
@@ -131,7 +155,7 @@ void preload_crawl(
                 continue;
 
             snprintf(buf, sizeof(buf), "%s/%s", path, e->d_name);
-            preload_crawl(buf, max_bytes, stats);
+            preload_crawl(buf, max_bytes, flags, stats);
 
             if (max_bytes && stats->bytes_touched >= max_bytes)
                 break;
@@ -140,7 +164,7 @@ void preload_crawl(
     }
     else if (S_ISREG(st.st_mode)) {
         if (is_preload_target(path)) {
-            preload_file(path, max_bytes, stats);
+            preload_file(path, max_bytes, flags, stats);
         }
     }
 }
@@ -156,12 +180,13 @@ void preload_crawl(
 int preload_path_native(
     const char* path,
     size_t max_bytes,
+    int flags,
     preload_stats_t* stats
 ) {
     if (!path || !stats)
         return -1;
 
-    preload_crawl(path, max_bytes, stats);
+    preload_crawl(path, max_bytes, flags, stats);
     return 0;
 }
 

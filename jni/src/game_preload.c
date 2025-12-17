@@ -17,6 +17,7 @@
 #include <AZenith.h>
 #include <dirent.h>
 #include <sys/system_properties.h>
+int flags = PRELOAD_TOUCH | PRELOAD_VERBOSE;
 
 /***********************************************************************************
  * Function Name      : GamePreload
@@ -66,14 +67,16 @@ void GamePreload(const char* package) {
 
     preload_stats_t stats = {0};
 
+    int flags = PRELOAD_TOUCH | PRELOAD_VERBOSE;
+    
     log_zenith(LOG_INFO, "Native preload start for %s", package);
-
+    
     if (access(lib_path, F_OK) == 0) {
-        preload_path_native(lib_path, max_bytes, &stats);
+        preload_path_native(lib_path, max_bytes, flags, &stats);
     } else {
-        preload_path_native(apk_path, max_bytes, &stats);
+        preload_path_native(apk_path, max_bytes, flags, &stats);
     }
-
+    
     log_preload(
         LOG_INFO,
         "Game %s preloaded: %lld pages (~%lld MB)",
