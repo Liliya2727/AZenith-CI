@@ -164,3 +164,39 @@ int preload_path_native(
     preload_crawl(path, max_bytes, stats);
     return 0;
 }
+
+/***********************************************************************************
+ * Function Name      : parse_size
+ * Inputs             : const char* str - size string (e.g. "512M", "1G", "1024K")
+ * Returns            : size_t - size in bytes
+ * Description        : Parses human-readable memory size strings
+ ***********************************************************************************/
+size_t parse_size(const char* str) {
+    if (!str || !*str)
+        return 0;
+
+    char* end;
+    unsigned long long value = strtoull(str, &end, 10);
+
+    if (end == str)
+        return 0;
+
+    switch (*end) {
+        case 'G':
+        case 'g':
+            value <<= 30;
+            break;
+        case 'M':
+        case 'm':
+            value <<= 20;
+            break;
+        case 'K':
+        case 'k':
+            value <<= 10;
+            break;
+        default:
+            break; // bytes
+    }
+
+    return (size_t)value;
+}
