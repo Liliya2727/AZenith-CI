@@ -44,7 +44,7 @@ pm uninstall --user 0 azenith.toast 2>/dev/null
 manager_paths="/data/adb/ap/bin /data/adb/ksu/bin"
 binaries="sys.azenith-service sys.azenith-service_log \
           sys.azenith-profilesettings sys.azenith-utilityconf \
-          sys.azenith-rianixiathermalcorev4"
+          sys.azenith-preloadbin sys.azenith-rianixiathermalcorev4"
 for dir in $manager_paths; do
 	[ -d "$dir" ] || continue
 	for remove in $binaries; do
