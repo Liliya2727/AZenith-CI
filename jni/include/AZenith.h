@@ -100,9 +100,9 @@ int handle_verboselog(int argc, char** argv);
 
 // Preload Utils
 int is_preload_target(const char* name);
-int preload_file(const char* path, size_t max_bytes, preload_stats_t* stats);
-void preload_crawl(const char* path, size_t max_bytes, preload_stats_t* stats);
-int preload_path_native(const char* path, size_t max_bytes, int flags, preload_stats_t* stats);
+int  preload_file(const char* path, size_t max_bytes, int flags, preload_stats_t* stats);
+void preload_crawl(const char* path, size_t max_bytes, int flags, preload_stats_t* stats);
+int  preload_path_native(const char* path, size_t max_bytes, int flags, preload_stats_t* stats);
 size_t parse_size(const char* str);
 extern long g_pagesize;
 
