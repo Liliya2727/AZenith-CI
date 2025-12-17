@@ -577,13 +577,15 @@ const showMainMenu = async () => {
 const readGameList = async () => {
   await executeCommand(`touch ${GAMELIST_PATH}`);
   const { stdout } = await executeCommand(`cat ${GAMELIST_PATH}`);
-  return stdout.trim() ? stdout.trim().split("|") : [];
+  return stdout
+    .split("|")
+    .map(s => s.trim())
+    .filter(Boolean);
 };
 
 const writeGameList = async (list) => {
-  let outputString = list.join("|");
-  if (!outputString.endsWith("|")) outputString += "|";
-  outputString = outputString.replace(/(["\\])/g, '\\$1');
+  const cleaned = [...new Set(list)].filter(Boolean);
+  const outputString = cleaned.join("|");
   await executeCommand(`echo "${outputString}" > ${GAMELIST_PATH}`);
   await executeCommand(`sync`);
 };
