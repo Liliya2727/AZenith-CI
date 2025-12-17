@@ -584,10 +584,10 @@ const readGameList = async () => {
 };
 
 const writeGameList = async (list) => {
-  const cleaned = [...new Set(list)].filter(Boolean);
-  const outputString = cleaned.join("|");
+  let outputString = list.join("|");
+  if (!outputString.endsWith("|")) outputString += "|";
+  outputString = outputString.replace(/(["\\])/g, '\\$1');
   await executeCommand(`echo "${outputString}" > ${GAMELIST_PATH}`);
-  await executeCommand(`sync`);
 };
 
 let cachedPkgList = [];
