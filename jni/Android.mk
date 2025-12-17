@@ -13,6 +13,7 @@ LOCAL_SRC_FILES := \
     src/game_preload.c \
     src/dumpsys.c \
     src/CLI.c \
+    src/game_preload_utils.c \
     src/mlbb_handler.c
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
