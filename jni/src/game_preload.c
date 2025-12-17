@@ -66,8 +66,6 @@ void GamePreload(const char* package) {
         max_bytes = parse_size(budget_prop); // reuse your util
 
     preload_stats_t stats = {0};
-
-    int flags = PRELOAD_TOUCH | PRELOAD_VERBOSE;
     
     log_zenith(LOG_INFO, "Native preload start for %s", package);
     

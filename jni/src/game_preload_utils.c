@@ -24,8 +24,6 @@
 #include <errno.h>
 
 #include <AZenith.h>
-#define PRELOAD_TOUCH   (1 << 0)   // -t
-#define PRELOAD_VERBOSE (1 << 1)   // -v
 
 long g_pagesize = 0;
 
