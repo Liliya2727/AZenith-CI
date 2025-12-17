@@ -14,9 +14,6 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-#include <stdint.h>
-#include <stddef.h>
-
 
 #define TASK_INTERVAL_SEC (12 * 60 * 60)
 #define LOOP_INTERVAL_MS 700
@@ -40,8 +37,7 @@
 #define MODULE_PROP "/data/adb/modules/AZenith/module.prop"
 #define MODULE_UPDATE "/data/adb/modules/AZenith/update"
 #define MODULE_VERSION ".placeholder"
-#define PRELOAD_TOUCH   (1 << 0)
-#define PRELOAD_VERBOSE (1 << 1) 
+
 #define MY_PATH                                                                                                                    \
     "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/" \
     "xbin:/data/data/com.termux/files/usr/bin"
@@ -54,11 +50,6 @@
 #define IS_LOW_POWER(state) (strcmp(state, "true") == 0 || strcmp(state, "1") == 0)
 
 // Basic C knowledge: enum starts with 0
-
-typedef struct {
-    size_t pages_touched;
-    size_t bytes_touched;
-} preload_stats_t;
 
 typedef enum : char {
     LOG_DEBUG,
@@ -97,14 +88,6 @@ int require_daemon_running(void);
 int handle_profile(int argc, char** argv);
 int handle_log(int argc, char** argv);
 int handle_verboselog(int argc, char** argv);
-
-// Preload Utils
-int is_preload_target(const char* name);
-int  preload_file(const char* path, size_t max_bytes, int flags, preload_stats_t* stats);
-void preload_crawl(const char* path, size_t max_bytes, int flags, preload_stats_t* stats);
-int  preload_path_native(const char* path, size_t max_bytes, int flags, preload_stats_t* stats);
-size_t parse_size(const char* str);
-extern long g_pagesize;
 
 // Misc Utilities
 extern void GamePreload(const char* package);
