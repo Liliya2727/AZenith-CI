@@ -24,7 +24,7 @@ import { wrapInputStream, PackageManagerInterface } from "webuix";
 const WEBUI_VERSION = ".placeholder";
 const moduleInterface = window.$AZenith;
 const fileInterface = window.$AZFile;
-const GAMELIST_PATH = "/data/adb/.config/AZenith/gamelist/gamelist.txt";
+const GAMELIST_PATH = "/data/adb/.config/AZenith/gamelist/appzenith.json";
 const RESO_PROP = "persist.sys.azenithconf.resosettings";
 const DEVICE_PROP = "sys.azenith.device";
 const DEVICE_PROPS = [
@@ -39,6 +39,12 @@ const DEVICE_PROPS = [
   "ro.product.vendor.model",
   "ro.product.system.model"
 ];
+const PERAPP_SETTINGS = {
+  perf_lite_mode: false,
+  dnd_on_gaming: false,
+  app_priority: false,
+  game_preload: false,
+};
 let lastGameCheck = { time: 0, status: "" };
 let lastProfile = { time: 0, value: "" };
 let lastServiceCheck = { time: 0, status: "", pid: "" };
@@ -575,24 +581,30 @@ const showMainMenu = async () => {
 };
 
 const readGameList = async () => {
+  await executeCommand(`mkdir -p $(dirname ${GAMELIST_PATH})`);
   await executeCommand(`touch ${GAMELIST_PATH}`);
   const { stdout } = await executeCommand(`cat ${GAMELIST_PATH}`);
-  return stdout
-    .split("|")
-    .map(s => s.trim())
-    .filter(Boolean);
+  if (!stdout.trim()) return {};
+  try {
+    const data = JSON.parse(stdout);
+    Object.keys(data).forEach(pkg => {
+      data[pkg] = { ...PERAPP_SETTINGS, ...data[pkg] };
+    });
+    return data;
+  } catch {
+    return {};
+  }
 };
 
-const writeGameList = async (list) => {
-  let outputString = list.join("|");
-  if (!outputString.endsWith("|")) outputString += "|";
-  outputString = outputString.replace(/(["\\])/g, '\\$1');
-  await executeCommand(`echo "${outputString}" > ${GAMELIST_PATH}`);
+const writeGameList = async (data) => {
+  const json = JSON.stringify(data, null, 2).replace(/(["\\])/g, '\\$1');
+  await executeCommand(`echo "${json}" > ${GAMELIST_PATH}`);
 };
 
 let cachedPkgList = [];
 let cachedLabelMap = {};
 let cachedIconMap = {};
+let appListLoaded = false;
 
 const loadAppList = async () => {
   const container = document.getElementById("appList");
@@ -636,7 +648,7 @@ const loadAppList = async () => {
           if (!labelMap[pkg]) {
             try {
               const appInfo = await window.$packageManager.getApplicationInfo(pkg, 0, 0);
-              labelMap[pkg] = (appInfo?.getLabel?.() || appInfo?.label || appInfo?.appName || pkg);
+              labelMap[pkg] = appInfo?.getLabel?.() || appInfo?.label || appInfo?.appName || pkg;
             } catch {}
           }
         }
@@ -645,14 +657,14 @@ const loadAppList = async () => {
       pkgList.forEach(p => labelMap[p] ||= p);
 
       const iconMap = {};
-      pkgList.forEach(p => (iconMap[p] = `ksu://icon/${p}`));
+      pkgList.forEach(p => iconMap[p] = `ksu://icon/${p}`);
 
       try {
         const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 96));
         icons.forEach(i => i.icon && (iconMap[i.packageName] = i.icon));
       } catch {}
 
-      if (typeof window.$packageManager !== "undefined") {
+      if (window.$packageManager) {
         for (const pkg of pkgList) {
           if (!iconMap[pkg] || iconMap[pkg].startsWith("ksu://icon")) {
             try {
@@ -673,17 +685,18 @@ const loadAppList = async () => {
       appListLoaded = true;
     }
 
-    const checkedCards = cachedPkgList.filter(pkg => gamelist.includes(pkg));
-    const uncheckedCards = cachedPkgList.filter(pkg => !gamelist.includes(pkg));
+    const checkedCards = cachedPkgList.filter(pkg => pkg in gamelist);
+    const uncheckedCards = cachedPkgList.filter(pkg => !(pkg in gamelist));
 
-    const sortByLabel = list => list.sort((a, b) =>
-      cachedLabelMap[a].toLowerCase().localeCompare(cachedLabelMap[b].toLowerCase())
-    );
+    const sortByLabel = list =>
+      list.sort((a, b) =>
+        cachedLabelMap[a].toLowerCase().localeCompare(cachedLabelMap[b].toLowerCase())
+      );
 
-    const sortedChecked = sortByLabel(checkedCards);
-    const sortedUnchecked = sortByLabel(uncheckedCards);
-
-    const finalList = [...sortedChecked, ...sortedUnchecked];
+    const finalList = [
+      ...sortByLabel(checkedCards),
+      ...sortByLabel(uncheckedCards),
+    ];
 
     container.innerHTML = finalList.map(pkg => `
       <div class="common-card appCard bg-tonalSurface showAnim hidden" data-pkg="${pkg}">
@@ -694,9 +707,9 @@ const loadAppList = async () => {
               <div class="app-label">${cachedLabelMap[pkg]}</div>
               <div class="pkg-label">${pkg}</div>
             </div>
-            <div class="toggle2 ${gamelist.includes(pkg) ? "active" : ""}"
+            <div class="toggle2 ${gamelist[pkg] ? "active" : ""}"
                  data-pkg="${pkg}"
-                 data-state="${gamelist.includes(pkg) ? "on" : "off"}"></div>
+                 data-state="${gamelist[pkg] ? "on" : "off"}"></div>
           </div>
         </div>
       </div>
@@ -725,10 +738,13 @@ const loadAppList = async () => {
       toggle.onclick = async () => {
         toggle.classList.toggle("active");
         const on = toggle.classList.contains("active");
-
         toggle.dataset.state = on ? "on" : "off";
-        if (on && !gamelist.includes(pkg)) gamelist.push(pkg);
-        if (!on) gamelist = gamelist.filter(p => p !== pkg);
+
+        if (on) {
+          gamelist[pkg] ||= { ...PERAPP_SETTINGS };
+        } else {
+          delete gamelist[pkg];
+        }
 
         const card = cardCache[pkg].card;
         card.classList.add("showAnim");
@@ -743,12 +759,12 @@ const loadAppList = async () => {
     });
 
     const sortCards = () => {
-      const set = new Set(gamelist);
+      const activeSet = new Set(Object.keys(gamelist));
       const cardsArr = Object.values(cardCache);
       const positions = new Map();
       cardsArr.forEach(c => positions.set(c.card, c.card.getBoundingClientRect()));
       cardsArr.forEach(c => {
-        c.isOn = set.has(c.pkg);
+        c.isOn = activeSet.has(c.pkg);
         c.sortKey = c.label.toLowerCase();
       });
       cardsArr.sort((a, b) =>
@@ -1104,7 +1120,7 @@ const showRandomMessage = () => {
   if (message) {
     c.textContent = message;
   } else {
-    c.textContent = ""; // fallback if translation not loaded
+    c.textContent = "";
   }
 };
 
@@ -1327,7 +1343,7 @@ const getAndroidVersion = async () => {
 
 const checkServiceStatus = async () => {
   const now = Date.now();
-  if (now - lastServiceCheck.time < 1000) return; // 1s throttle
+  if (now - lastServiceCheck.time < 1000) return;
   lastServiceCheck.time = now;
 
   const r = document.getElementById("serviceStatus");
@@ -1335,7 +1351,7 @@ const checkServiceStatus = async () => {
   if (!r || !d) return;
 
   try {
-    // Get PID immediately
+    // Get PID 
     const { errno: pidErr, stdout: pidOut } = await executeCommand(
       "/system/bin/toybox pidof sys.azenith-service"
     );
@@ -3057,5 +3073,3 @@ checkCPUInfo();
 checkDeviceInfo();
 checkKernelVersion();
 getAndroidVersion();
-
-
