@@ -604,7 +604,6 @@ const writeGameList = async (data) => {
 let cachedPkgList = [];
 let cachedLabelMap = {};
 let cachedIconMap = {};
-let appListLoaded = false;
 
 const loadAppList = async () => {
   const container = document.getElementById("appList");
