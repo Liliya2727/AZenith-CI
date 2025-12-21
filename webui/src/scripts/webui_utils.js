@@ -40,12 +40,12 @@ const DEVICE_PROPS = [
   "ro.product.system.model"
 ];
 const PERAPP_SETTINGS = {
-  perf_lite_mode: default,
-  dnd_on_gaming: default,
-  app_priority: default,
-  game_preload: default,
-  refresh_rate: default,
-  renderer: default,
+  perf_lite_mode: "default",
+  dnd_on_gaming: "default",
+  app_priority: "default",
+  game_preload: "default",
+  refresh_rate: "default",
+  renderer: "default",
 };
 let lastGameCheck = { time: 0, status: "" };
 let lastProfile = { time: 0, value: "" };
@@ -661,7 +661,7 @@ const loadAppList = async () => {
       pkgList.forEach(p => iconMap[p] = `ksu://icon/${p}`);
 
       try {
-        const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 96));
+        const icons = JSON.parse(ksu.getPackagesIcons(JSON.stringify(pkgList), 256));
         icons.forEach(i => i.icon && (iconMap[i.packageName] = i.icon));
       } catch {}
 
