@@ -649,6 +649,7 @@ const openPerAppSettings = async (pkg, gamelist) => {
   const modal = document.getElementById("appSettingsModal");
   const list = document.getElementById("appModalSettings");
 
+  document.body.classList.add("modal-open");
   const cfg = gamelist[pkg];
   if (!cfg) return;
 
