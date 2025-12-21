@@ -171,7 +171,16 @@ int main(int argc, char* argv[]) {
             // Only fetch gamestart when user not in-game
             // prevent overhead from dumpsys commands.
             if (!gamestart) {
+                GameOptions opts;
                 gamestart = get_gamestart(&opts);
+                // Debugging 
+                log_zenith(LOG_INFO, "Game Active %s", gamestart);
+                log_zenith(LOG_INFO, "Lite Mode %s", opts.perf_lite_mode);
+                log_zenith(LOG_INFO, "DND %s", opts.dnd_on_gaming);
+                log_zenith(LOG_INFO, "App Priority %s", opts.app_priority);
+                log_zenith(LOG_INFO, "Game Preload %s", opts.game_preload);
+                log_zenith(LOG_INFO, "Refresh Rates %s", opts.refresh_rate);
+                log_zenith(LOG_INFO, "Renderer %s", opts.renderer);
             } else if (game_pid != 0 && kill(game_pid, 0) == -1) [[clang::unlikely]] {
                 log_zenith(LOG_INFO, "Game %s exited, resetting profile...", gamestart);
                 game_pid = 0;
@@ -180,7 +189,7 @@ int main(int argc, char* argv[]) {
                 // Force profile recheck to make sure new game session get boosted
                 need_profile_checkup = true;
             }
-    
+
             if (gamestart)
                 mlbb_is_running = handle_mlbb(gamestart);
     

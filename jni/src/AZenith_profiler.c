@@ -54,8 +54,7 @@ void run_profiler(const int profile) {
  ***********************************************************************************/
 char* get_gamestart(GameOptions* options) {
     char* pkg = get_visible_package();
-    if (!pkg)
-        return NULL;
+    if (!pkg) return NULL;
 
     FILE* fp = fopen(GAMELIST, "r");
     if (!fp) {
@@ -89,50 +88,38 @@ char* get_gamestart(GameOptions* options) {
     fclose(fp);
     buf[size] = '\0';
 
-    cJSON* root = cJSON_Parse(buf);
-    free(buf);
-
-    if (!root) {
+    // Find package key in JSON
+    char* entry = strstr(buf, pkg);
+    if (!entry) {
+        free(buf);
         free(pkg);
         return NULL;
     }
 
-    cJSON* game_entry = cJSON_GetObjectItem(root, pkg);
-    if (!game_entry) {
-        cJSON_Delete(root);
-        free(pkg);
-        return NULL;
-    }
-
+    // Fill options
     if (options) {
-        cJSON* item;
-        item = cJSON_GetObjectItem(game_entry, "perf_lite_mode");
-        strncpy(options->perf_lite_mode, item ? item->valuestring : "default", sizeof(options->perf_lite_mode)-1);
-        options->perf_lite_mode[sizeof(options->perf_lite_mode)-1] = '\0';
+        char* p;
 
-        item = cJSON_GetObjectItem(game_entry, "dnd_on_gaming");
-        strncpy(options->dnd_on_gaming, item ? item->valuestring : "default", sizeof(options->dnd_on_gaming)-1);
-        options->dnd_on_gaming[sizeof(options->dnd_on_gaming)-1] = '\0';
+        p = strstr(entry, "\"perf_lite_mode\":");
+        extract_string_value(options->perf_lite_mode, p, sizeof(options->perf_lite_mode));
 
-        item = cJSON_GetObjectItem(game_entry, "app_priority");
-        strncpy(options->app_priority, item ? item->valuestring : "default", sizeof(options->app_priority)-1);
-        options->app_priority[sizeof(options->app_priority)-1] = '\0';
+        p = strstr(entry, "\"dnd_on_gaming\":");
+        extract_string_value(options->dnd_on_gaming, p, sizeof(options->dnd_on_gaming));
 
-        item = cJSON_GetObjectItem(game_entry, "game_preload");
-        strncpy(options->game_preload, item ? item->valuestring : "default", sizeof(options->game_preload)-1);
-        options->game_preload[sizeof(options->game_preload)-1] = '\0';
+        p = strstr(entry, "\"app_priority\":");
+        extract_string_value(options->app_priority, p, sizeof(options->app_priority));
 
-        item = cJSON_GetObjectItem(game_entry, "refresh_rate");
-        strncpy(options->refresh_rate, item ? item->valuestring : "default", sizeof(options->refresh_rate)-1);
-        options->refresh_rate[sizeof(options->refresh_rate)-1] = '\0';
+        p = strstr(entry, "\"game_preload\":");
+        extract_string_value(options->game_preload, p, sizeof(options->game_preload));
 
-        item = cJSON_GetObjectItem(game_entry, "renderer");
-        strncpy(options->renderer, item ? item->valuestring : "default", sizeof(options->renderer)-1);
-        options->renderer[sizeof(options->renderer)-1] = '\0';
+        p = strstr(entry, "\"refresh_rate\":");
+        extract_string_value(options->refresh_rate, p, sizeof(options->refresh_rate));
+
+        p = strstr(entry, "\"renderer\":");
+        extract_string_value(options->renderer, p, sizeof(options->renderer));
     }
 
-    cJSON_Delete(root);
-
+    free(buf);
     char* ret_pkg = strdup(pkg);
     free(pkg);
     return ret_pkg;

@@ -302,3 +302,29 @@ void runtask(void) {
         systemv("sys.azenith-utilityconf FSTrim");
     }
 }
+
+char* skip_space(char* p) {
+    while (*p && isspace(*p)) p++;
+    return p;
+}
+
+void extract_string_value(char* dest, const char* start, size_t max_len) {
+    if (!start) {
+        strncpy(dest, "default", max_len-1);
+        dest[max_len-1] = '\0';
+        return;
+    }
+
+    while (*start && (*start == ' ' || *start == '\"')) start++;
+    char* end = strchr(start, '\"');
+    if (!end) {
+        strncpy(dest, "default", max_len-1);
+        dest[max_len-1] = '\0';
+        return;
+    }
+
+    size_t len = end - start;
+    if (len >= max_len) len = max_len - 1;
+    strncpy(dest, start, len);
+    dest[len] = '\0';
+}

@@ -14,10 +14,6 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "cJSON.h"
 
 
 #define TASK_INTERVAL_SEC (12 * 60 * 60)
@@ -153,5 +149,7 @@ char* get_gamestart(void);
 bool get_screenstate_normal(void);
 bool get_low_power_state_normal(void);
 void run_profiler(const int profile);
+char* skip_space(char* p);
+void extract_string_value(char* dest, const char* start, size_t max_len);
 
 #endif
