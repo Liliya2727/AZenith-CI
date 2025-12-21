@@ -39,14 +39,7 @@ const DEVICE_PROPS = [
   "ro.product.vendor.model",
   "ro.product.system.model"
 ];
-const PERAPP_SETTINGS = {
-  perf_lite_mode: "default",
-  dnd_on_gaming: "default",
-  app_priority: "default",
-  game_preload: "default",
-  refresh_rate: "default",
-  renderer: "default",
-};
+
 let lastGameCheck = { time: 0, status: "" };
 let lastProfile = { time: 0, value: "" };
 let lastServiceCheck = { time: 0, status: "", pid: "" };
@@ -582,6 +575,33 @@ const showMainMenu = async () => {
   });
 };
 
+const PERAPP_SETTINGS = {
+  perf_lite_mode: "default",
+  dnd_on_gaming: "default",
+  app_priority: "default",
+  game_preload: "default",
+  refresh_rate: "default",
+  renderer: "default",
+};
+
+const PERAPP_SCHEMA = [
+  { key: "perf_lite_mode", label: "Performance Lite Mode", type: "tri" },
+  { key: "dnd_on_gaming", label: "Do Not Disturb", type: "tri" },
+  { key: "app_priority", label: "High App Priority", type: "tri" },
+  { key: "game_preload", label: "Game Preload", type: "tri" },
+  {
+    key: "renderer",
+    label: "Renderer",
+    type: "enum",
+    options: ["default", "skiagl", "vulkan"]
+  },
+  {
+    key: "refresh_rate",
+    label: "Refresh Rate",
+    type: "enum-dynamic"
+  }
+];
+
 const readGameList = async () => {
   await executeCommand(`mkdir -p $(dirname ${GAMELIST_PATH})`);
   await executeCommand(`touch ${GAMELIST_PATH}`);
@@ -601,6 +621,108 @@ const readGameList = async () => {
 const writeGameList = async (data) => {
   const json = JSON.stringify(data, null, 2).replace(/(["\\])/g, '\\$1');
   await executeCommand(`echo "${json}" > ${GAMELIST_PATH}`);
+};
+
+let cachedRefreshRates = null;
+
+const getSupportedRefreshRates = async () => {
+  if (cachedRefreshRates) return cachedRefreshRates;
+
+  const { stdout } = await executeCommand(
+    `dumpsys display | grep -E "mSupportedModes|SupportedModes|fps"`
+  );
+
+  const rates = new Set();
+
+  stdout.split("\n").forEach(line => {
+    const m = line.match(/(\d+(\.\d+)?)\s*fps/i);
+    if (m) rates.add(Math.round(parseFloat(m[1])));
+  });
+
+  if (!rates.size) [60, 90, 120, 144].forEach(v => rates.add(v));
+
+  cachedRefreshRates = ["default", ...Array.from(rates).sort((a,b)=>a-b)];
+  return cachedRefreshRates;
+};
+
+const openPerAppSettings = async (pkg, gamelist) => {
+  const modal = document.getElementById("appSettingsModal");
+  const list = document.getElementById("appModalSettings");
+
+  const cfg = gamelist[pkg];
+  if (!cfg) return;
+
+  document.getElementById("appModalIcon").src = cachedIconMap[pkg];
+  document.getElementById("appModalLabel").textContent = cachedLabelMap[pkg];
+  document.getElementById("appModalPkg").textContent = pkg;
+
+  const rows = [];
+
+  for (const s of PERAPP_SCHEMA) {
+    const value = cfg[s.key] ?? "default";
+
+    if (s.type === "tri") {
+      rows.push(`
+        <div class="settingRow">
+          <span>${s.label}</span>
+          <div class="optionGroup" data-key="${s.key}">
+            ${["false","default","true"].map(v => `
+              <button class="optionBtn ${value === v ? "active" : ""}" data-value="${v}">
+                ${v.charAt(0).toUpperCase() + v.slice(1)}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `);
+    }
+
+    if (s.type === "enum") {
+      rows.push(`
+        <div class="settingRow">
+          <span>${s.label}</span>
+          <div class="optionGroup" data-key="${s.key}">
+            ${s.options.map(v => `
+              <button class="optionBtn ${value === v ? "active" : ""}" data-value="${v}">
+                ${v === "default" ? "Default" : v}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `);
+    }
+
+    if (s.type === "enum-dynamic") {
+      const options = await getSupportedRefreshRates();
+      rows.push(`
+        <div class="settingRow">
+          <span>${s.label}</span>
+          <div class="optionGroup" data-key="${s.key}">
+            ${options.map(v => `
+              <button class="optionBtn ${String(value) === String(v) ? "active" : ""}" data-value="${v}">
+                ${v === "default" ? "Default" : `${v} Hz`}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `);
+    }
+  }
+
+  list.innerHTML = rows.join("");
+
+  list.querySelectorAll(".optionGroup").forEach(group => {
+    const key = group.dataset.key;
+    group.querySelectorAll(".optionBtn").forEach(btn => {
+      btn.onclick = async () => {
+        group.querySelectorAll(".optionBtn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        cfg[key] = btn.dataset.value;
+        await writeGameList(gamelist);
+      };
+    });
+  });
+
+  modal.classList.remove("hidden");
 };
 
 let cachedPkgList = [];
@@ -721,7 +843,14 @@ const loadAppList = async () => {
       const pkg = card.dataset.pkg;
       cardCache[pkg] = { card, label: cachedLabelMap[pkg], pkg };
       card.classList.add("hidden");
+      card.onclick = (e) => {
+        if (e.target.closest(".toggle2")) return;
+        if (!gamelist[pkg]) return;
+        openPerAppSettings(pkg, gamelist);
+      };
     });
+    
+    
 
     const cards = finalList.map(pkg => cardCache[pkg].card);
     requestAnimationFrame(() => {
@@ -2887,6 +3016,10 @@ const setupUIListeners = () => {
     .getElementById("saveconfig")
     .onclick = async () => {
     await saveConfig();
+  };
+
+  document.getElementById("closeAppModal").onclick = () => {
+    document.getElementById("appSettingsModal").classList.add("hidden");
   };
 
   document
