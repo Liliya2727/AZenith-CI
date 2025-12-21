@@ -145,7 +145,7 @@ MLBBState handle_mlbb(const char* gamestart);
 // Profiler
 extern bool (*get_screenstate)(void);
 extern bool (*get_low_power_state)(void);
-char* get_gamestart(&opts);
+char* get_gamestart(GameOptions* options);
 bool get_screenstate_normal(void);
 bool get_low_power_state_normal(void);
 void run_profiler(const int profile);
