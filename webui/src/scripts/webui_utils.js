@@ -958,6 +958,18 @@ const loadAppList = async () => {
   }
 };
 
+const closeAppModal = () => {
+  const modal = document.getElementById("appSettingsModal");
+  if (modal.classList.contains("closing")) return;
+
+  modal.classList.add("closing");
+
+  setTimeout(() => {
+    modal.classList.remove("closing");
+    modal.classList.add("hidden");
+  }, 180);
+};
+
 bannerBox.addEventListener("touchstart", () => {
   pressTimer = setTimeout(() => {
     bannerInput.value = "";
@@ -3018,9 +3030,7 @@ const setupUIListeners = () => {
     await saveConfig();
   };
 
-  document.getElementById("closeAppModal").onclick = () => {
-    document.getElementById("appSettingsModal").classList.add("hidden");
-  };
+  document.getElementById("closeAppModal").onclick = closeAppModal;
 
   document
     .getElementById("loadconfig").addEventListener("change", async (e) => {

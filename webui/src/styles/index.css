@@ -14,10 +14,16 @@
   justify-content: center;
   background: rgba(0,0,0,.55);
   backdrop-filter: blur(6px);
+  opacity: 1;
+  transition: opacity .18s ease;
 }
 
 .app-modal.hidden {
   display: none;
+}
+
+.app-modal.closing {
+  opacity: 0;
 }
 
 .app-modal-content {
@@ -26,14 +32,34 @@
   border-radius: 28px 28px 0 0;
   padding: 1.2rem;
   overflow-y: auto;
+  transform: translateY(0);
   animation: modalUp .22s cubic-bezier(.2,.9,.3,1);
 }
 
-@keyframes modalUp {
-  from { transform: translateY(16%); opacity: 0 }
-  to   { transform: translateY(0);   opacity: 1 }
+.app-modal.closing .app-modal-content {
+  animation: modalDown .18s cubic-bezier(.4,0,.6,1);
 }
 
+@keyframes modalUp {
+  from { 
+    transform: translateY(16%); 
+    opacity: 0 
+  }
+  to { 
+    transform: translateY(0);   
+    opacity: 1 
+  }
+}
+@keyframes modalDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(16%);
+    opacity: 0;
+  }
+}
 .app-modal-header {
   display: flex;
   align-items: center;
