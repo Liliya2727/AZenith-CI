@@ -24,7 +24,7 @@ import { wrapInputStream, PackageManagerInterface } from "webuix";
 const WEBUI_VERSION = ".placeholder";
 const moduleInterface = window.$AZenith;
 const fileInterface = window.$AZFile;
-const GAMELIST_PATH = "/data/adb/.config/AZenith/gamelist/appzenith.json";
+const GAMELIST_PATH = "/data/adb/.config/AZenith/gamelist/azenithApplist.json";
 const RESO_PROP = "persist.sys.azenithconf.resosettings";
 const DEVICE_PROP = "sys.azenith.device";
 const DEVICE_PROPS = [
