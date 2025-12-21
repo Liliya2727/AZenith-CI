@@ -628,16 +628,14 @@ let cachedRefreshRates = null;
 const getSupportedRefreshRates = async () => {
   if (cachedRefreshRates) return cachedRefreshRates;
 
-  const { stdout } = await executeCommand(
-    `dumpsys display | grep -E "mSupportedModes|SupportedModes|fps"`
-  );
-
-  const rates = new Set();
-
-  stdout.split("\n").forEach(line => {
-    const m = line.match(/(\d+(\.\d+)?)\s*fps/i);
-    if (m) rates.add(Math.round(parseFloat(m[1])));
-  });
+  let rates = new Set();
+  try {
+    const { stdout } = await executeCommand(`settings get system peak_refresh_rate`);
+    stdout.split(" ").forEach(v => {
+      const num = parseFloat(v);
+      if (!isNaN(num)) rates.add(Math.round(num));
+    });
+  } catch {}
 
   if (!rates.size) [60, 90, 120, 144].forEach(v => rates.add(v));
 
@@ -962,7 +960,7 @@ const loadAppList = async () => {
 const closeAppModal = () => {
   const modal = document.getElementById("appSettingsModal");
   if (modal.classList.contains("closing")) return;
-
+  document.body.classList.remove("modal-open");
   modal.classList.add("closing");
 
   setTimeout(() => {
