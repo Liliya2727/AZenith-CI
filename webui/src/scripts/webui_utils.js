@@ -40,10 +40,12 @@ const DEVICE_PROPS = [
   "ro.product.system.model"
 ];
 const PERAPP_SETTINGS = {
-  perf_lite_mode: false,
-  dnd_on_gaming: false,
-  app_priority: false,
-  game_preload: false,
+  perf_lite_mode: default,
+  dnd_on_gaming: default,
+  app_priority: default,
+  game_preload: default,
+  refresh_rate: default,
+  renderer: default,
 };
 let lastGameCheck = { time: 0, status: "" };
 let lastProfile = { time: 0, value: "" };

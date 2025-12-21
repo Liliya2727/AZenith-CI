@@ -83,10 +83,13 @@
 #appList {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.7rem;
 }
 
 .appCard {
+  overflow: hidden;
+  min-height: 5rem;
+  max-height: 5rem;
   align-items: center;
   display: flex;  
   position: relative;
@@ -107,10 +110,34 @@
 }
 
 .appIcon {
-  width: 46px;
-  height: 46px;
-  border-radius: 100%;
-  margin-right: 16px;
+  position: absolute;
+  left: -1px;
+  top: 0;
+
+  height: 100%;
+  width: 95px;
+
+  object-fit: cover;
+
+  filter: brightness(1.06) saturate(1.04);
+
+  mask-image: linear-gradient(
+    to right,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 32%,
+
+    rgba(0,0,0,0.94) 42%,
+    rgba(0,0,0,0.86) 48%,
+    rgba(0,0,0,0.76) 54%,
+    rgba(0,0,0,0.64) 60%,
+    rgba(0,0,0,0.52) 66%,
+    rgba(0,0,0,0.40) 72%,
+    rgba(0,0,0,0.28) 77%,
+    rgba(0,0,0,0.18) 82%,
+    rgba(0,0,0,0.10) 86%,
+    rgba(0,0,0,0.05) 89%,
+    transparent 95%
+  );
 }
 
 #appList {
@@ -120,7 +147,7 @@
 }
 
 .app-label {
-
+    padding-left: 4.5rem;
     font-size: 13px;
     top: 1.2rem;
     color:var(--onSurface, #fff);
@@ -133,7 +160,7 @@
 }
 
 .pkg-label {
-    
+    padding-left: 4.5rem;    
     font-size: 10px;
     opacity: 0.7;
     text-align: left;
