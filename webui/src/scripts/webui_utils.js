@@ -39,7 +39,32 @@ const DEVICE_PROPS = [
   "ro.product.vendor.model",
   "ro.product.system.model"
 ];
+const PERAPP_SETTINGS = {
+  perf_lite_mode: "default",
+  dnd_on_gaming: "default",
+  app_priority: "default",
+  game_preload: "default",
+  refresh_rate: "default",
+  renderer: "default",
+};
 
+const PERAPP_SCHEMA = [
+  { key: "perf_lite_mode", label: "Performance Lite Mode", type: "tri" },
+  { key: "dnd_on_gaming", label: "Do Not Disturb", type: "tri" },
+  { key: "app_priority", label: "App Priority", type: "tri" },
+  { key: "game_preload", label: "Game Preload", type: "tri" },
+  {
+    key: "renderer",
+    label: "Renderer",
+    type: "enum",
+    options: ["default", "skiagl", "vulkan"]
+  },
+  {
+    key: "refresh_rate",
+    label: "Refresh Rate",
+    type: "enum-dynamic"
+  }
+];
 let lastGameCheck = { time: 0, status: "" };
 let lastProfile = { time: 0, value: "" };
 let lastServiceCheck = { time: 0, status: "", pid: "" };
@@ -575,33 +600,6 @@ const showMainMenu = async () => {
   });
 };
 
-const PERAPP_SETTINGS = {
-  perf_lite_mode: "default",
-  dnd_on_gaming: "default",
-  app_priority: "default",
-  game_preload: "default",
-  refresh_rate: "default",
-  renderer: "default",
-};
-
-const PERAPP_SCHEMA = [
-  { key: "perf_lite_mode", label: "Performance Lite Mode", type: "tri" },
-  { key: "dnd_on_gaming", label: "Do Not Disturb", type: "tri" },
-  { key: "app_priority", label: "High App Priority", type: "tri" },
-  { key: "game_preload", label: "Game Preload", type: "tri" },
-  {
-    key: "renderer",
-    label: "Renderer",
-    type: "enum",
-    options: ["default", "skiagl", "vulkan"]
-  },
-  {
-    key: "refresh_rate",
-    label: "Refresh Rate",
-    type: "enum-dynamic"
-  }
-];
-
 const readGameList = async () => {
   await executeCommand(`mkdir -p $(dirname ${GAMELIST_PATH})`);
   await executeCommand(`touch ${GAMELIST_PATH}`);
@@ -627,18 +625,19 @@ let cachedRefreshRates = null;
 
 const getSupportedRefreshRates = async () => {
   if (cachedRefreshRates) return cachedRefreshRates;
-
   let rates = new Set();
   try {
     const { stdout } = await executeCommand(`settings get system peak_refresh_rate`);
     stdout.split(" ").forEach(v => {
       const num = parseFloat(v);
-      if (!isNaN(num)) rates.add(Math.round(num));
+      if (!isNaN(num) && num > 60) rates.add(Math.round(num)); // only keep > 60
     });
   } catch {}
-
-  if (!rates.size) [60, 90, 120, 144].forEach(v => rates.add(v));
-
+  if (!rates.size) {
+    cachedRefreshRates = [];
+    return cachedRefreshRates;
+  }
+  rates.add(60);
   cachedRefreshRates = ["default", ...Array.from(rates).sort((a,b)=>a-b)];
   return cachedRefreshRates;
 };
@@ -692,6 +691,7 @@ const openPerAppSettings = async (pkg, gamelist) => {
 
     if (s.type === "enum-dynamic") {
       const options = await getSupportedRefreshRates();
+      if (!options.length) continue;
       rows.push(`
         <div class="settingRow">
           <span>${s.label}</span>
