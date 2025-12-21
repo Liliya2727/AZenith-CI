@@ -18,6 +18,7 @@
 #include <libgen.h>
 char* gamestart = NULL;
 pid_t game_pid = 0;
+GameOptions opts;
 
 int main(int argc, char* argv[]) {
 
@@ -170,8 +171,7 @@ int main(int argc, char* argv[]) {
     
             // Only fetch gamestart when user not in-game
             // prevent overhead from dumpsys commands.
-            if (!gamestart) {
-                GameOptions opts;
+            if (!gamestart) {                
                 gamestart = get_gamestart(&opts);
                 // Debugging 
                 log_zenith(LOG_INFO, "Game Active %s", gamestart);
