@@ -625,20 +625,24 @@ let cachedRefreshRates = null;
 
 const getSupportedRefreshRates = async () => {
   if (cachedRefreshRates) return cachedRefreshRates;
-  let rates = new Set();
+
+  const rates = new Set();
+
   try {
-    const { stdout } = await executeCommand(`settings get system peak_refresh_rate`);
-    stdout.split(" ").forEach(v => {
-      const num = parseFloat(v);
-      if (!isNaN(num) && num > 60) rates.add(Math.round(num)); // only keep > 60
-    });
+    const { stdout } = await executeCommand(`dumpsys display`);
+    const regex = /fps=([\d.]+)/g;
+    let match;
+    while ((match = regex.exec(stdout)) !== null) {
+      rates.add(Math.round(parseFloat(match[1])));
+    }
   } catch {}
-  if (!rates.size) {
-    cachedRefreshRates = [];
-    return cachedRefreshRates;
-  }
-  rates.add(60);
-  cachedRefreshRates = ["default", ...Array.from(rates).sort((a,b)=>a-b)];
+
+  if (!rates.size) rates.add(60);
+
+  const baseRates = [60, 90, 120, 144];
+  const supportedRates = baseRates.filter(v => rates.has(v));
+
+  cachedRefreshRates = ["default", ...supportedRates];
   return cachedRefreshRates;
 };
 
@@ -691,7 +695,6 @@ const openPerAppSettings = async (pkg, gamelist) => {
 
     if (s.type === "enum-dynamic") {
       const options = await getSupportedRefreshRates();
-      if (!options.length) continue;
       rows.push(`
         <div class="settingRow">
           <span>${s.label}</span>
