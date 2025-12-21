@@ -52,7 +52,7 @@ void run_profiler(const int profile) {
  *                      listed in Gamelist.
  * Note               : Caller is responsible for freeing the returned string.
  ***********************************************************************************/
-char* get_gamestart(void) {
+char* get_gamestart(GameOptions* options) {
     char* pkg = get_visible_package();
     if (!pkg)
         return NULL;
@@ -63,27 +63,79 @@ char* get_gamestart(void) {
         return NULL;
     }
 
-    char buf[32768];
-    size_t n = fread(buf, 1, sizeof(buf) - 1, fp);
-    fclose(fp);
+    fseek(fp, 0, SEEK_END);
+    long size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
 
-    if (n == 0) {
+    if (size <= 0) {
+        fclose(fp);
         free(pkg);
         return NULL;
     }
 
-    buf[n] = '\0';
-
-    char* token = strtok(buf, "|");
-    while (token) {
-        if (strcmp(token, pkg) == 0) {
-            return pkg;
-        }
-        token = strtok(NULL, "|");
+    char* buf = malloc(size + 1);
+    if (!buf) {
+        fclose(fp);
+        free(pkg);
+        return NULL;
     }
-    
+
+    if (fread(buf, 1, size, fp) != (size_t)size) {
+        fclose(fp);
+        free(buf);
+        free(pkg);
+        return NULL;
+    }
+    fclose(fp);
+    buf[size] = '\0';
+
+    cJSON* root = cJSON_Parse(buf);
+    free(buf);
+
+    if (!root) {
+        free(pkg);
+        return NULL;
+    }
+
+    cJSON* game_entry = cJSON_GetObjectItem(root, pkg);
+    if (!game_entry) {
+        cJSON_Delete(root);
+        free(pkg);
+        return NULL;
+    }
+
+    if (options) {
+        cJSON* item;
+        item = cJSON_GetObjectItem(game_entry, "perf_lite_mode");
+        strncpy(options->perf_lite_mode, item ? item->valuestring : "default", sizeof(options->perf_lite_mode)-1);
+        options->perf_lite_mode[sizeof(options->perf_lite_mode)-1] = '\0';
+
+        item = cJSON_GetObjectItem(game_entry, "dnd_on_gaming");
+        strncpy(options->dnd_on_gaming, item ? item->valuestring : "default", sizeof(options->dnd_on_gaming)-1);
+        options->dnd_on_gaming[sizeof(options->dnd_on_gaming)-1] = '\0';
+
+        item = cJSON_GetObjectItem(game_entry, "app_priority");
+        strncpy(options->app_priority, item ? item->valuestring : "default", sizeof(options->app_priority)-1);
+        options->app_priority[sizeof(options->app_priority)-1] = '\0';
+
+        item = cJSON_GetObjectItem(game_entry, "game_preload");
+        strncpy(options->game_preload, item ? item->valuestring : "default", sizeof(options->game_preload)-1);
+        options->game_preload[sizeof(options->game_preload)-1] = '\0';
+
+        item = cJSON_GetObjectItem(game_entry, "refresh_rate");
+        strncpy(options->refresh_rate, item ? item->valuestring : "default", sizeof(options->refresh_rate)-1);
+        options->refresh_rate[sizeof(options->refresh_rate)-1] = '\0';
+
+        item = cJSON_GetObjectItem(game_entry, "renderer");
+        strncpy(options->renderer, item ? item->valuestring : "default", sizeof(options->renderer)-1);
+        options->renderer[sizeof(options->renderer)-1] = '\0';
+    }
+
+    cJSON_Delete(root);
+
+    char* ret_pkg = strdup(pkg);
     free(pkg);
-    return NULL;
+    return ret_pkg;
 }
 
 /***********************************************************************************

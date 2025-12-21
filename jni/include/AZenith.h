@@ -14,6 +14,11 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "cJSON.h"
+
 
 #define TASK_INTERVAL_SEC (12 * 60 * 60)
 #define LOOP_INTERVAL_MS 700
@@ -33,7 +38,7 @@
 #define LOG_FILE_PRELOAD "/data/adb/.config/AZenith/preload/AZenithPR.log"
 #define PROFILE_MODE "/data/adb/.config/AZenith/API/current_profile"
 #define GAME_INFO "/data/adb/.config/AZenith/API/gameinfo"
-#define GAMELIST "/data/adb/.config/AZenith/gamelist/gamelist.txt"
+#define GAMELIST "/data/adb/.config/AZenith/gamelist/azenithApplist.json"
 #define MODULE_PROP "/data/adb/modules/AZenith/module.prop"
 #define MODULE_UPDATE "/data/adb/modules/AZenith/update"
 #define MODULE_VERSION ".placeholder"
@@ -50,6 +55,14 @@
 #define IS_LOW_POWER(state) (strcmp(state, "true") == 0 || strcmp(state, "1") == 0)
 
 // Basic C knowledge: enum starts with 0
+typedef struct {
+    char perf_lite_mode[16];
+    char dnd_on_gaming[16];
+    char app_priority[16];
+    char game_preload[16];
+    char refresh_rate[16];
+    char renderer[16];
+} GameOptions;
 
 typedef enum : char {
     LOG_DEBUG,

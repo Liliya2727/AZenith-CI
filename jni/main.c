@@ -171,12 +171,12 @@ int main(int argc, char* argv[]) {
             // Only fetch gamestart when user not in-game
             // prevent overhead from dumpsys commands.
             if (!gamestart) {
-                gamestart = get_gamestart();
+                gamestart = get_gamestart(&opts);
             } else if (game_pid != 0 && kill(game_pid, 0) == -1) [[clang::unlikely]] {
                 log_zenith(LOG_INFO, "Game %s exited, resetting profile...", gamestart);
                 game_pid = 0;
                 free(gamestart);
-                gamestart = get_gamestart();
+                gamestart = get_gamestart(&opts);
                 // Force profile recheck to make sure new game session get boosted
                 need_profile_checkup = true;
             }
