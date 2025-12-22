@@ -158,16 +158,26 @@ disableDND() {
 }
 
 setrefreshrates() {
-    settings set system peak_refresh_rate "$1"
-    settings set system min_refresh_rate "${1}.0"
+    settings put system peak_refresh_rate $1
+    settings put system min_refresh_rate $1.0
     dlog "Set current refresh rates to: $1hz"
 }
 
 setrender() {
-    setprop debug.hwui.renderer $1
+    case "$1" in
+        vulkan)
+            setprop debug.hwui.renderer skiavk
+            ;;
+        skiagl)
+            setprop debug.hwui.renderer skiagl
+            ;;
+        *)
+            # system default → jangan sentuh renderer
+            return
+            ;;
+    esac
     dlog "Set current renderer to: $1"
 }
-
 
 # Read current ampere
 read_current_ma() {

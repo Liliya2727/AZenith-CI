@@ -56,7 +56,7 @@
       "desc": "Intelligently manages system performance and temperature by learning device behavior to minimize heating. (Turn off if you feel lag in performance profile)"
     },
     "litemode": {
-      "title": "Lite Mode (Reboot to apply)",
+      "title": "Performance Lite Mode",
       "desc": "Reduce Overheating by reducing CPU Frequency on Performance Profile"
     }
   },

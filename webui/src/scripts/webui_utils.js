@@ -1276,23 +1276,31 @@ const checkProfile = async () => {
     const { errno: c, stdout: s } = await executeCommand(
       "cat /data/adb/.config/AZenith/API/current_profile"
     );
-
     if (c !== 0) return;
+
     const r = s.trim();
     const d = document.getElementById("CurProfile");
     if (!d) return;
 
+    // Base profile name
     let l =
-      { 0: "Initializing...", 1: "Performance", 2: "Balanced", 3: "ECO Mode" }[
-        r
-      ] || "Unknown";
+      {
+        0: "Initializing...",
+        1: "Performance",
+        2: "Balanced",
+        3: "ECO Mode",
+      }[r] || "Unknown";
 
-    // Check for Lite mode
-    const { errno: c2, stdout: s2 } = await executeCommand(
-      "getprop persist.sys.azenithconf.cpulimit"
-    );
-    if (c2 === 0 && s2.trim() === "1") l += " (Lite)";
+    if (r === "1") {
+      const { errno: c2, stdout: s2 } = await executeCommand(
+        "getprop persist.sys.azenithconf.litemode"
+      );
+      if (c2 === 0 && s2.trim() === "1") {
+        l += " (Lite)";
+      }
+    }
 
+    // Prevent unnecessary DOM update
     if (lastProfile.value === l) return;
     lastProfile = { time: now, value: l };
 
@@ -1318,8 +1326,9 @@ const checkProfile = async () => {
 
     const key = l.replace(" (Lite)", "");
     d.style.color = colors[key] || colors.Default;
-  } catch (m) {
-    console.error("checkProfile error:", m);
+
+  } catch (err) {
+    console.error("checkProfile error:", err);
   }
 };
 

@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
         static bool is_initialize_complete = false;
         ProfileMode cur_mode = PERFCOMMON;
         static bool dnd_enabled = false;
+        static bool lite_mode = false;
         static int saved_refresh_rate = -1;
         
         log_zenith(LOG_INFO, "Daemon started as PID %d", getpid());
@@ -213,7 +214,24 @@ int main(int argc, char* argv[]) {
                 cur_mode = PERFORMANCE_PROFILE;
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying performance profile for %s", gamestart);
-                toast("Applying Performance Profile");
+                toast("Applying Performance Profile");                                
+
+                if (IS_TRUE(opts.perf_lite_mode)) {
+                    systemv("setprop persist.sys.azenithconf.litemode 1");
+                    lite_mode = true;
+                } else if (IS_FALSE(opts.perf_lite_mode)) {
+                    systemv("setprop persist.sys.azenithconf.litemode 0");
+                    lite_mode = false;
+                } else {
+                    char lite_prop[PROP_VALUE_MAX] = {0};
+                    __system_property_get("persist.sys.azenithconf.cpulimit", lite_prop);
+                    if (strcmp(lite_prop, "1") == 0) {
+                        systemv("setprop persist.sys.azenithconf.litemode 1");
+                        lite_mode = true;                    
+                    } else {
+                        systemv("setprop persist.sys.azenithconf.litemode 0");
+                        lite_mode = false;
+                }
                 
                 if (strcmp(opts.renderer, "vulkan") == 0) {
                     systemv("sys.azenith-utilityconf setrender skiavk");

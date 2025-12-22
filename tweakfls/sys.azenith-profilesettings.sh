@@ -46,7 +46,7 @@ JUSTINTIME_STATE="$(getprop persist.sys.azenithconf.justintime)"
 BYPASSCHG_STATE="$(getprop persist.sys.azenithconf.bypasschg)"
 DISTRACE_STATE="$(getprop persist.sys.azenithconf.disabletrace)"
 CLEARAPPS="$(getprop persist.sys.azenithconf.clearbg)"
-LITEMODE="$(getprop persist.sys.azenithconf.cpulimit)"
+LITEMODE="$(getprop persist.sys.azenithconf.litemode)"
 VSYNCVALUE="$(getprop persist.sys.azenithconf.vsync)"
 BYPASSPROPS="persist.sys.azenithconf.bypasspath"
 BYPASSPATH="$(getprop persist.sys.azenithconf.bypasspath)"
@@ -1332,15 +1332,14 @@ balanced_profile() {
 		zeshia TTWU_QUEUE /sys/kernel/debug/sched_features
 	fi
 
-	if [ "$LITEMODE" -eq 0 ]; then
-		case "$(getprop persist.sys.azenithdebug.soctype)" in
-		1) mediatek_balance ;;
-		2) snapdragon_balance ;;
-		3) exynos_balance ;;
-		4) unisoc_balance ;;
-		5) tensor_balance ;;
-		esac
-	fi
+    case "$(getprop persist.sys.azenithdebug.soctype)" in
+	1) mediatek_balance ;;
+	2) snapdragon_balance ;;
+	3) exynos_balance ;;
+	4) unisoc_balance ;;
+	5) tensor_balance ;;
+	esac
+	
 
 	AZLog "Balanced Profile applied successfully!"
 
