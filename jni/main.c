@@ -216,9 +216,9 @@ int main(int argc, char* argv[]) {
                 toast("Applying Performance Profile");
                 
                 if (strcmp(opts.renderer, "vulkan") == 0) {
-                    systemv("sys.azenith-utilityconf setrender skiavk")
+                    systemv("sys.azenith-utilityconf setrender skiavk");
                 } else if (strcmp(opts.renderer, "skiagl") == 0) {
-                    systemv("sys.azenith-utilityconf setrender skiagl")                    
+                    systemv("sys.azenith-utilityconf setrender skiagl");
                 } else {
                     // Do Nothing
                 }               
