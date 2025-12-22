@@ -1629,29 +1629,24 @@ const loadBypassCheck = async () => {
 
   if (!card || !title || !desc) return;
 
-  let bypassPath = "";
+  let value = "";
 
   try {
-    if (window.$ksu && window.$ksu.getProp) {
-      bypassPath = await window.$ksu.getProp("persist.sys.azenithconf.bypasspath");
-    } else if (window.getprop) {
-      bypassPath = await window.getprop("persist.sys.azenithconf.bypasspath");
-    }
-  } catch (_) {
-    bypassPath = "";
-  }
+    const { errno, stdout } = await executeCommand(
+      "getprop persist.sys.azenithconf.bypasspath"
+    );
+    if (errno === 0) value = stdout.trim();
+  } catch (_) {}
 
-  bypassPath = (bypassPath || "").trim();
-
-  if (!bypassPath) {
-    title.textContent = "Check Bypass Compatibility";
+  if (!value) {
+    title.textContent = "Can't Use Bypass Charge";
     desc.textContent =
-      "Check bypass charge compatibility to use this feature! Connect to charger > Restart Service > Wait until done";
+      "Check bypass charge compatibility to use this feature! Connect to charger > Restart Service > Wait until initializing is done and reopen WebUI";
     card.style.display = "flex";
     return;
   }
 
-  if (bypassPath === "UNSUPPORTED") {
+  if (value === "UNSUPPORTED") {
     title.textContent = "Bypass Charge Unsupported";
     desc.textContent = "Your device doesn't support bypass charging";
     card.style.display = "flex";
