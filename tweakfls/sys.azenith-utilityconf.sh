@@ -25,6 +25,7 @@ CONFIGPATH="/data/adb/.config/AZenith"
 # Properties
 DEBUGMODE="$(getprop persist.sys.azenith.debugmode)"
 BYPASSPATH="$(getprop persist.sys.azenithconf.bypasspath)"
+BYPASSPROPS="persist.sys.azenithconf.bypasspath"
 FSTRIM_STATE="$(getprop persist.sys.azenithconf.fstrim)"
 
 # Bypass Charging Path
@@ -43,6 +44,13 @@ TRAN_AICHG_OFF="0"
 MTK_DISABLE_CHARGER="/sys/devices/platform/mt-battery/disable_charger"
 MTK_DISABLE_CHARGER_ON="1"
 MTK_DISABLE_CHARGER_OFF="0"
+
+BYPASSPATHLIST="
+    MTK_BYPASS_CHARGER:/sys/devices/platform/charger/bypass_charger
+    MTK_CURRENT_CMD:/proc/mtk_battery_cmd/current_cmd
+    TRAN_AICHG:/sys/devices/platform/charger/tran_aichg_disable_charger
+    MTK_DISABLE_CHARGER:/sys/devices/platform/mt-battery/disable_charger
+"        
 
 # Logging Functions
 AZLog() {
@@ -255,6 +263,57 @@ disableBypass() {
     val="${key}_OFF"
     zeshia "$(eval echo \${$val})" "$(eval echo \${$key})"
     dlog "Bypass charge disabled"
+}
+
+checkBypass() {
+    if ! ischarging; then
+        dlog "Skipping bypass compatibility check: device not charging"
+        return 0
+    fi
+
+    [ -n "$BYPASSPATH" ] && {
+        dlog "Bypass Charging path already set: $BYPASSPATH"
+        return 0
+    }
+
+    supported=0
+
+    while IFS=":" read -r name path; do
+        [ -z "$name" ] && continue
+
+        name="${name//[[:space:]]/}"
+        path="${path//[[:space:]]/}"
+
+        [ ! -e "$path" ] && continue
+
+        on_key="${name}_ON"
+        off_key="${name}_OFF"
+        on_val="$(eval echo \${$on_key})"
+        off_val="$(eval echo \${$off_key})"
+
+        dlog "Testing bypass charging path: $name"
+
+        zeshia "$on_val" "$path"
+        sleep 1
+
+        cur_ma="$(read_current_ma)"
+        dlog "Charging current: ${cur_ma}mA"
+
+        zeshia "$off_val" "$path"
+        sleep 1
+
+        if [ "$cur_ma" -lt 10 ]; then
+            dlog "Bypass Charging SUPPORTED via $name"
+            setprop "$BYPASSPROPS" "$name"
+            BYPASSPATH="$name"
+            supported=1
+            return 0
+        fi
+    done <<< "$BYPASSPATHLIST"
+
+    dlog "Bypass Charging unsupported: no effective path found"
+    setprop "$BYPASSPROPS" "UNSUPPORTED"
+    return 1
 }
 
 saveLog() {

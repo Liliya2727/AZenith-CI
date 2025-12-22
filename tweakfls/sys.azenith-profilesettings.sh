@@ -26,12 +26,6 @@ CONFIGPATH="/data/adb/.config/AZenith"
 list_logger="logd traced statsd tcpdump cnss_diag subsystem_ramdump charge_logger wlan_logging"
 curprofile=$(<"$CONFIGPATH/API/current_profile")
 POLICIES=$(ls /sys/devices/system/cpu/cpufreq | grep policy)
-BYPASSPATHLIST="
-    MTK_BYPASS_CHARGER:/sys/devices/platform/charger/bypass_charger
-    MTK_CURRENT_CMD:/proc/mtk_battery_cmd/current_cmd
-    TRAN_AICHG:/sys/devices/platform/charger/tran_aichg_disable_charger
-    MTK_DISABLE_CHARGER:/sys/devices/platform/mt-battery/disable_charger
-"        
 
 # Properties
 LIMITER=$(getprop persist.sys.azenithconf.freqoffset | sed -e 's/Disabled/100/' -e 's/%//g')
@@ -448,37 +442,6 @@ setsGPUMali() {
 	chmod 644 $MALI_GOV
 	echo "$1" | tee $MALI_GOV
 	chmod 444 $MALI_GOV
-}
-
-read_current_ma() {
-    for f in \
-        /sys/class/power_supply/battery/current_now \
-        /sys/class/power_supply/battery/BatteryAverageCurrent \
-        /sys/class/power_supply/battery/input_current_now \
-        /sys/class/power_supply/usb/current_now; do
-
-        [ -r "$f" ] || continue
-
-        val=$(cat "$f" 2>/dev/null)
-        val=${val#-}
-        [ -z "$val" ] && continue
-
-        if [ "$val" -gt 1000 ]; then
-            echo $((val / 1000))
-        else
-            echo "$val"
-        fi
-        return
-    done
-
-    echo 9999
-}
-
-ischarging() {
-    case "$(cat /sys/class/power_supply/battery/status 2>/dev/null)" in
-        Charging|Full) return 0 ;;
-        *) return 1 ;;
-    esac
 }
 
 ###############################################
@@ -2205,50 +2168,7 @@ initialize() {
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     # INITIALIZE BYPASS CHARGING PATH 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-    if [ -z "$BYPASSPATH" ]; then
-        supported=0
-        if ! ischarging; then
-          dlog "Skipping bypass compatibility check: device not charging"
-          continue
-        fi
-        while IFS=":" read -r name path; do
-            [ -z "$name" ] && continue
-    
-            name="${name//[[:space:]]/}"
-            path="${path//[[:space:]]/}"
-    
-            [ ! -e "$path" ] && continue
-    
-            dlog "Testing bypass charging path: $name ($path)"
-    
-            # Enable bypass
-            on_key="${name}_ON"
-            on_val="$(eval echo \${$on_key})"
-            zeshia "$on_val" "$path"
-            sleep 1
-    
-            cur_ma="$(read_current_ma)"
-            dlog "Charging current after enable: ${cur_ma}mA"
-    
-            if [ "$cur_ma" -lt 10 ]; then
-                dlog "Bypass Charging SUPPORTED via $name"
-                setprop "$BYPASSPROPS" "$name"
-                BYPASSPATH="$name"
-                supported=1
-                break
-            else
-                dlog "Bypass ineffective on $name, trying next"
-            fi
-    
-        done <<< "$BYPASSPATHLIST"
-    
-        if [ "$supported" -eq 0 ]; then
-            dlog "Bypass Charging unsupported: no effective path found"
-            setprop "$BYPASSPROPS" "UNSUPPORTED"
-        fi
-    else
-        dlog "Bypass Charging path already set: $BYPASSPATH"
-    fi
+    sys.azenith-utilityconf checkBypass
        
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
     # APPLY DISABLE VSYNC IF AVAILABLE
