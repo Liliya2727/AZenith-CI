@@ -125,7 +125,10 @@ const loadGPUMaliDefault = async () => {
   if (!select) return;
 
   select.innerHTML = "";
-  g.trim().split(/\s+/).forEach((gov) => {
+
+  g.trim().split(/\s+/).forEach(gov => {
+    if (gov.startsWith("apu")) return;
+
     const opt = document.createElement("option");
     opt.value = gov;
     opt.textContent = gov;
@@ -135,7 +138,12 @@ const loadGPUMaliDefault = async () => {
   const { errno: l, stdout: m } = await executeCommand(
     `sh -c '[ -n "$(getprop persist.sys.azenith.custom_default_gpumali_gov)" ] && getprop persist.sys.azenith.custom_default_gpumali_gov || getprop persist.sys.azenith.default_gpumali_gov'`
   );
-  if (l === 0 && m.trim()) select.value = m.trim();
+  if (l === 0 && m.trim()) {
+    const val = m.trim();
+    if ([...select.options].some(o => o.value === val)) {
+      select.value = val;
+    }
+  }
 };
 
 const setGPUMaliPowersave = async (c) => {
@@ -171,7 +179,10 @@ const loadGPUMaliPowersave = async () => {
   if (!select) return;
 
   select.innerHTML = "";
-  g.trim().split(/\s+/).forEach((gov) => {
+
+  g.trim().split(/\s+/).forEach(gov => {
+    if (gov.startsWith("apu")) return;
+
     const opt = document.createElement("option");
     opt.value = gov;
     opt.textContent = gov;
@@ -181,7 +192,13 @@ const loadGPUMaliPowersave = async () => {
   const { errno: l, stdout: m } = await executeCommand(
     `sh -c '[ -n "$(getprop persist.sys.azenith.custom_powersave_gpumali_gov)" ] && getprop persist.sys.azenith.custom_powersave_gpumali_gov'`
   );
-  if (l === 0 && m.trim()) select.value = m.trim();
+
+  if (l === 0 && m.trim()) {
+    const val = m.trim();
+    if ([...select.options].some(o => o.value === val)) {
+      select.value = val;
+    }
+  }
 };
 
 const setGPUMaliPerformance = async (c) => {
@@ -217,7 +234,10 @@ const loadGPUMaliPerformance = async () => {
   if (!select) return;
 
   select.innerHTML = "";
-  g.trim().split(/\s+/).forEach((gov) => {
+
+  g.trim().split(/\s+/).forEach(gov => {
+    if (gov.startsWith("apu")) return;
+
     const opt = document.createElement("option");
     opt.value = gov;
     opt.textContent = gov;
@@ -227,7 +247,13 @@ const loadGPUMaliPerformance = async () => {
   const { errno: l, stdout: m } = await executeCommand(
     `sh -c '[ -n "$(getprop persist.sys.azenith.custom_performance_gpumali_gov)" ] && getprop persist.sys.azenith.custom_performance_gpumali_gov'`
   );
-  if (l === 0 && m.trim()) select.value = m.trim();
+
+  if (l === 0 && m.trim()) {
+    const val = m.trim();
+    if ([...select.options].some(o => o.value === val)) {
+      select.value = val;
+    }
+  }
 };
 
 const checkGPUMaliCompatibility = async () => {
@@ -428,38 +454,33 @@ const updateGameStatus = async () => {
   if (!banner) return;
 
   try {
-    const gameRaw = await executeCommand(
-      "cat /data/adb/.config/AZenith/API/gameinfo"
-    );
-    let gameLine = (gameRaw.stdout || "").trim();
-
-    if (
-      !gameLine ||
-      ["null", "(null)", "NULL"].includes(gameLine.toUpperCase()) ||
-      gameLine.toUpperCase().startsWith("NULL 0 0")
-    ) {
-      gameLine = null;
-    }
-
     const aiResult = await executeCommand(
       "getprop persist.sys.azenithconf.AIenabled"
     );
-    const aiEnabled = aiResult.stdout?.trim() === "0";
+    const aiEnabled = aiResult.stdout?.trim() !== "0"; 
 
     let statusText = "";
 
-    if (!gameLine) {
-      statusText = aiEnabled
-        ? getTranslation("serviceStatus.idleMode")
-        : getTranslation("serviceStatus.noApps");
+    if (!aiEnabled) {
+      statusText = getTranslation("serviceStatus.noApps");
     } else {
-      const pkg = gameLine.split(" ")[0]?.trim();
+      const gameRaw = await executeCommand(
+        "cat /data/adb/.config/AZenith/API/gameinfo"
+      );
+      let gameLine = (gameRaw.stdout || "").trim();
 
-      if (!pkg || ["NULL", "null", "(null)"].includes(pkg.toUpperCase())) {
-        statusText = aiEnabled
-          ? getTranslation("serviceStatus.idleMode")
-          : getTranslation("serviceStatus.noApps");
+      if (
+        !gameLine ||
+        ["null", "(null)", "NULL"].includes(gameLine.toUpperCase()) ||
+        gameLine.toUpperCase().startsWith("NULL 0 0")
+      ) {
+        gameLine = null;
+      }
+
+      if (!gameLine) {
+        statusText = getTranslation("serviceStatus.idleMode");
       } else {
+        const pkg = gameLine.split(" ")[0]?.trim() || "";
         let label = pkg;
 
         try {
@@ -467,7 +488,7 @@ const updateGameStatus = async () => {
           if (Array.isArray(infoList) && infoList.length > 0) {
             label = infoList[0].appLabel || infoList[0].label || infoList[0].appName || pkg;
           }
-        } catch (e) {          
+        } catch {
           if (typeof window.$packageManager !== "undefined") {
             try {
               const appInfo = await window.$packageManager.getApplicationInfo(pkg, 0, 0);
@@ -476,16 +497,11 @@ const updateGameStatus = async () => {
                         || appInfo.appName
                         || pkg;
               }
-            } catch (err) {
-              console.warn("Failed to get app label", pkg, err);
-              label = pkg;
-            }
+            } catch {}
           }
         }
 
-        statusText = aiEnabled
-          ? getTranslation("serviceStatus.activeIdle", label)
-          : getTranslation("serviceStatus.active", label);
+        statusText = getTranslation("serviceStatus.activeIdle", label);
       }
     }
 
@@ -3160,7 +3176,6 @@ const setupUIListeners = () => {
     const ok = await loadConfigFile(file);
 
     if (ok) {
-      // Small delay so setprop finishes writing
       setTimeout(() => {
         location.reload();
       }, 500);
@@ -3261,74 +3276,37 @@ const heavyInit = async () => {
   if (loader) loader.classList.remove("hidden");
   document.body.classList.add("no-scroll");  
 
-  const loops = [
-    checkProfile, 
-    checkServiceStatus, 
-    showRandomMessage, 
-    updateGameStatus,    
-  ];
-  await Promise.all(loops.map((fn) => fn()));
-  
-  await checkWebUISupport();
-  await checkServiceRunning();
-  await checkModuleVersion();
+  await Promise.all([
+    checkProfile(),
+    checkServiceStatus(),
+    showRandomMessage(),
+    updateGameStatus(),
+  ]);
 
-  const quickChecks = [
-    checkGPUMaliCompatibility,
-    loadCpuGovernors,
-    loadCpuFreq,    
-    loadIObalance,
-    loadIOperformance,
-    loadIOpowersave,
-    GovernorPowersave,
-  ];
-  await Promise.all(quickChecks.map((fn) => fn()));
+  [checkWebUISupport, checkServiceRunning, checkModuleVersion, checkCPUInfo, 
+   checkDeviceInfo, checkKernelVersion, getAndroidVersion].forEach(fn => fn().catch(()=>{}));
 
-  const heavyAsync = [
-    checkCPUInfo,
-    checkDeviceInfo,
-    checkKernelVersion,
-    getAndroidVersion,
-    checkfpsged,
-    checkLiteModeStatus,
-    checkDThermal,
-    checkiosched,
-    checkGPreload,
-    loadColorSchemeSettings,
-  ];
-  await Promise.all(heavyAsync.map((fn) => fn()));
+  setTimeout(() => {
+    [checkGPUMaliCompatibility, loadCpuGovernors, loadCpuFreq, loadIObalance, 
+     loadIOperformance, loadIOpowersave, GovernorPowersave].forEach(fn => fn().catch(()=>{}));
+  }, 300);
 
-  const heavySequential = [
-    hideBypassIfUnsupported,
-    checkmalisched,
-    checkAI,
-    checkthermalcore,
-    checkDND,
-    checkdtrace,
-    checkjit,
-    checktoast,
-    checkfstrim,
-    loadCurRenderer,
-    loadRRValue,
-    checkBypassChargeStatus,
-    loadBypassCheck,
-    checkschedtunes,
-    checkwalt,
-    checkSFL,
-    checkKillLog,
-    checklogger,
-    checkRamBoost,
-    detectResolution,
-  ];
-  for (const fn of heavySequential) {
-    await fn();
-  }
+  setTimeout(() => {
+    [checkfpsged, checkLiteModeStatus, checkDThermal, checkiosched, checkGPreload, loadColorSchemeSettings].forEach(fn => fn().catch(()=>{}));
+  }, 600);
 
-  startMonitoringLoops();
-  observeVisibility();
+  setTimeout(() => {
+    [hideBypassIfUnsupported, checkmalisched, checkAI, checkthermalcore, checkDND,
+     checkdtrace, checkjit, checktoast, checkfstrim, loadCurRenderer, loadRRValue,
+     checkBypassChargeStatus, loadBypassCheck, checkschedtunes, checkwalt, checkSFL,
+     checkKillLog, checklogger, checkRamBoost, detectResolution].forEach(fn => fn().catch(()=>{}));
+  }, 1000);
 
   if (loader) loader.classList.add("hidden");
   document.body.classList.remove("no-scroll");
+
+  startMonitoringLoops();
+  observeVisibility();
 
   cleaningInterval = setInterval(cleanMemory, 15000);
 };
@@ -3336,7 +3314,3 @@ const heavyInit = async () => {
 // Event Listeners
 setupUIListeners();
 heavyInit();
-checkCPUInfo();
-checkDeviceInfo();
-checkKernelVersion();
-getAndroidVersion();
