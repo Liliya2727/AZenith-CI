@@ -202,15 +202,7 @@ int main(int argc, char* argv[]) {
                     gamestart = NULL;
                     continue;
                 }
-                // Debugging 
-                log_zenith(LOG_INFO, "Game Active %s", gamestart);
-                log_zenith(LOG_INFO, "Lite Mode %s", opts.perf_lite_mode);
-                log_zenith(LOG_INFO, "DND %s", opts.dnd_on_gaming);
-                log_zenith(LOG_INFO, "App Priority %s", opts.app_priority);
-                log_zenith(LOG_INFO, "Game Preload %s", opts.game_preload);
-                log_zenith(LOG_INFO, "Refresh Rates %s", opts.refresh_rate);
-                log_zenith(LOG_INFO, "Renderer %s", opts.renderer);
-    
+                
                 cur_mode = PERFORMANCE_PROFILE;
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying performance profile for %s", gamestart);
@@ -231,6 +223,7 @@ int main(int argc, char* argv[]) {
                     } else {
                         systemv("setprop persist.sys.azenithconf.litemode 0");
                         lite_mode = false;
+                    }
                 }
                 
                 if (strcmp(opts.renderer, "vulkan") == 0) {
@@ -253,8 +246,7 @@ int main(int argc, char* argv[]) {
                         }
                     }
                 }
-                                
-                
+                                                
                 if (IS_TRUE(opts.dnd_on_gaming)) {                   
                     systemv("sys.azenith-utilityconf enableDND");
                     dnd_enabled = true;
