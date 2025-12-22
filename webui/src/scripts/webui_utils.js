@@ -1115,7 +1115,7 @@ export const loadConfigFile = async (file) => {
       config: [
         "justintime","disabletrace","logd","DThermal","SFL","malisched","fpsged",
         "schedtunes","clearbg","bypasschg","APreload","iosched","cpulimit","dnd",
-        "AIenabled","vsync","freqoffset","schemeconfig","scale","showtoast",
+        "AIenabled","renderer","freqoffset","schemeconfig","scale","showtoast",
         "resosettings","preloadbudget","thermalcore"
       ],
       governors: ["custom_default_cpu_gov", "custom_powersave_cpu_gov"],
@@ -1177,7 +1177,7 @@ const collectCurrentConfig = async () => {
       cpulimit: await get("persist.sys.azenithconf.cpulimit"),
       dnd: await get("persist.sys.azenithconf.dnd"),
       AIenabled: await get("persist.sys.azenithconf.AIenabled"),
-      vsync: await get("persist.sys.azenithconf.vsync"),
+      renderer: await get("persist.sys.azenithconf.renderer"),
       freqoffset: await get("persist.sys.azenithconf.freqoffset"),
       schemeconfig: await get("persist.sys.azenithconf.schemeconfig"),
       scale: await get("persist.sys.azenithconf.scale"),
@@ -1228,7 +1228,7 @@ const applySavedConfig = async (saved) => {
     await set("persist.sys.azenithconf.cpulimit", saved.config.cpulimit);
     await set("persist.sys.azenithconf.dnd", saved.config.dnd);
     await set("persist.sys.azenithconf.AIenabled", saved.config.AIenabled);
-    await set("persist.sys.azenithconf.vsync", saved.config.vsync);
+    await set("persist.sys.azenithconf.renderer", saved.config.renderer);
     await set("persist.sys.azenithconf.freqoffset", saved.config.freqoffset);
     await set("persist.sys.azenithconf.schemeconfig", saved.config.schemeconfig);
     await set("persist.sys.azenithconf.scale", saved.config.scale);
@@ -1805,30 +1805,108 @@ const setlogger = async (c) => {
   );
 };
 
-const setVsyncValue = async (c) => {
-  await executeCommand(`setprop persist.sys.azenithconf.vsync ${c}`);
+const setRRValue = async (c) => {
   await executeCommand(
-    `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf disablevsync ${c}`
+    `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setrefreshrates ${c}`
   );
 };
 
-const loadVsyncValue = async () => {
-  let { errno: c, stdout: s } = await executeCommand(
-    "getprop persist.sys.azenithdebug.vsynclist"
-  );
-  if (0 === c) {
-    let r = s.trim().split(/\s+/),
-      d = document.getElementById("disablevsync");
-    (d.innerHTML = ""),
-      r.forEach((c) => {
-        let s = document.createElement("option");
-        (s.value = c), (s.textContent = c), d.appendChild(s);
-      });
-    let { errno: l, stdout: m } = await executeCommand(
-      `sh -c '[ -n "$(getprop persist.sys.azenithconf.vsync)" ] && getprop persist.sys.azenithconf.vsync'`
-    );
-    0 === l && (d.value = m.trim());
+const loadRRValue = async () => {
+  const select = document.getElementById("setrr");
+  if (!select) return;
+
+  select.innerHTML = "";
+
+  const defOpt = document.createElement("option");
+  defOpt.value = "default";
+  defOpt.textContent = "System Default";
+  select.appendChild(defOpt);
+
+  let maxRate = 60;
+
+  try {
+    const { stdout } = await executeCommand("dumpsys display");
+
+    const regex = /fps=([\d.]+)/g;
+    const rates = new Set();
+    let match;
+
+    while ((match = regex.exec(stdout)) !== null) {
+      rates.add(Math.round(parseFloat(match[1])));
+    }
+
+    if (rates.size) {
+      maxRate = Math.max(...rates);
+    }
+  } catch (_) {
+    maxRate = 60;
   }
+  
+  const baseRates = [60, 90, 120, 144];
+
+  const supportedRates = baseRates.filter(v => v <= maxRate);
+
+  supportedRates.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = String(v);
+    opt.textContent = `${v} Hz`;
+    select.appendChild(opt);
+  });
+
+  try {
+    const { errno, stdout } = await executeCommand(
+      `cmd display get-displays | grep -oE "renderFrameRate [0-9.]+" | awk '{print int($2+0.5)}'`
+    );
+
+    if (errno === 0) {
+      const val = stdout.trim();
+      if ([...select.options].some(o => o.value === val)) {
+        select.value = val;
+      }
+    }
+  } catch (_) {}
+};
+
+const setCurRenderer = async (c) => {
+  await executeCommand(`setprop persist.sys.azenithconf.renderer ${c}`)
+  await executeCommand(
+    `/data/adb/modules/AZenith/system/bin/sys.azenith-utilityconf setrender ${c}`
+  );
+};
+
+const loadCurRenderer = async () => {
+  const select = document.getElementById("renderer");
+  if (!select) return;
+
+  select.innerHTML = "";
+
+  const defOpt = document.createElement("option");
+  defOpt.value = "default";
+  defOpt.textContent = "System Default";
+  select.appendChild(defOpt);
+
+  const renderers = ["vulkan", "skiagl"];
+
+  renderers.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r;
+    opt.textContent = r.toUpperCase();
+    select.appendChild(opt);
+  });
+
+  try {
+    const { errno, stdout } = await executeCommand(
+      `sh -c '[ -n "$(getprop persist.sys.azenithconf.renderer)" ] && getprop persist.sys.azenithconf.renderer'`
+    );
+
+    if (errno === 0) {
+      const val = stdout.trim();
+
+      if ([...select.options].some(o => o.value === val)) {
+        select.value = val;
+      }
+    }
+  } catch (_) {}
 };
 
 const setCpuFreqOffsets = async (c) => {
@@ -2944,8 +3022,11 @@ const setupUIListeners = () => {
     .getElementById("cpuFreq")
     ?.addEventListener("change", (e) => setCpuFreqOffsets(e.target.value));
   document
-    .getElementById("disablevsync")
-    ?.addEventListener("change", (e) => setVsyncValue(e.target.value));
+    .getElementById("setrr")
+    ?.addEventListener("change", (e) => setRRValue(e.target.value));
+  document
+    .getElementById("renderer")
+    ?.addEventListener("change", (e) => setCurRenderer(e.target.value));
   
   // Select GPU Gov  
   document
@@ -3189,7 +3270,8 @@ const heavyInit = async () => {
     checkjit,
     checktoast,
     checkfstrim,
-    loadVsyncValue,
+    loadCurRenderer,
+    loadRRValue,
     checkBypassChargeStatus,
     checkschedtunes,
     checkwalt,

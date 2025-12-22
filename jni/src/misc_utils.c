@@ -339,3 +339,24 @@ void extract_string_value(char* dest, const char* key_pos, size_t max_len) {
     strncpy(dest, start, len);
     dest[len] = '\0';
 }
+
+int get_current_refresh_rate(void) {
+    FILE *fp = popen(
+        "cmd display get-displays | "
+        "grep -oE \"renderFrameRate [0-9.]+\" | "
+        "awk '{print int($2+0.5)}'",
+        "r"
+    );
+
+    if (!fp)
+        return -1;
+
+    char buf[32] = {0};
+    if (!fgets(buf, sizeof(buf), fp)) {
+        pclose(fp);
+        return -1;
+    }
+
+    pclose(fp);
+    return atoi(buf);
+}

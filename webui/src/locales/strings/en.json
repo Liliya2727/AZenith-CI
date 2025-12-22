@@ -164,9 +164,13 @@
         "title": "Do Not Disturb",
         "description": "Block all notifications on Performance Profile to enhance gaming experience."
       },
-      "vsync": {
-        "title": "Disable VSync",
-        "description": "Disable synchronization between rendering frame rate and display refresh rate."
+      "refreshr": {
+        "title": "Set Refresh Rate",
+        "description": "Set current device Refresh Rates."        
+      },
+      "renderer": {
+        "title": "Set Renderer",
+        "description": "Set preferred renderer engine."
       },
       "fstrim": {
         "title": "FSTrim Partition",

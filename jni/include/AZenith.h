@@ -38,7 +38,9 @@
 #define MODULE_PROP "/data/adb/modules/AZenith/module.prop"
 #define MODULE_UPDATE "/data/adb/modules/AZenith/update"
 #define MODULE_VERSION ".placeholder"
-
+#define IS_TRUE(v)    ((v) && strcmp((v), "true") == 0)
+#define IS_FALSE(v)   ((v) && strcmp((v), "false") == 0)
+#define IS_DEFAULT(v) (!(v) || strcmp((v), "default") == 0)
 #define MY_PATH                                                                                                                    \
     "PATH=/system/bin:/system/xbin:/data/adb/ap/bin:/data/adb/ksu/bin:/data/adb/magisk:/debug_ramdisk:/sbin:/sbin/su:/su/bin:/su/" \
     "xbin:/data/data/com.termux/files/usr/bin"
@@ -113,6 +115,7 @@ bool return_false(void);
 void runthermalcore(void);
 void check_module_version(void);
 void runtask(void);
+int get_current_refresh_rate(void);
 
 // Shell and Command execution
 char* execute_command(const char* format, ...);

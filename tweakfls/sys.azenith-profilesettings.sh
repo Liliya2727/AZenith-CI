@@ -35,7 +35,6 @@ BYPASSPATHLIST="
 
 # Properties
 LIMITER=$(getprop persist.sys.azenithconf.freqoffset | sed -e 's/Disabled/100/' -e 's/%//g')
-DND_STATE="$(getprop persist.sys.azenithconf.dnd)"
 LOGD_STATE="$(getprop persist.sys.azenithconf.logd)"
 DEBUGMODE="$(getprop persist.sys.azenith.debugmode)"
 DTHERMAL_STATE="$(getprop persist.sys.azenithconf.DThermal)"
@@ -1099,12 +1098,7 @@ performance_profile() {
     	else
     		setsGPUMali "$default_maligov" && dlog "Applying GPU Mali Governor to : $default_maligov"
     	fi
-    fi
-
-	# Set DND Mode
-	if [ "$DND_STATE" -eq 1 ]; then
-		cmd notification set_dnd priority && dlog "DND enabled" || dlog "Failed to enable DND"
-	fi
+    fi	
 
     # Bypass Charge
 	if [ "$BYPASSCHG_STATE" -eq 1 ]; then
@@ -1260,12 +1254,7 @@ balanced_profile() {
     	default_maligov=$(load_default_gpumaligov)
         setsGPUMali "$default_maligov" && dlog "Applying GPU Mali Governor to : $default_maligov"
     fi
-		
-	# Disable DND
-	if [ "$DND_STATE" -eq 1 ]; then
-		cmd notification set_dnd off && dlog "DND disabled" || dlog "Failed to disable DND"
-	fi
-
+			
     # Bypass Charge
 	if [ "$BYPASSCHG_STATE" -eq 1 ]; then
 		sys.azenith-utilityconf disableBypass
@@ -1406,11 +1395,6 @@ eco_mode() {
 	    setfreq
 	fi
 	dlog "Set CPU freq to low Frequencies"
-
-    # Disable DND
-	if [ "$DND_STATE" -eq 1 ]; then
-		cmd notification set_dnd off && dlog "DND disabled" || dlog "Failed to disable DND"
-	fi
 	
 	# Bypass Charge
 	if [ "$BYPASSCHG_STATE" -eq 1 ]; then

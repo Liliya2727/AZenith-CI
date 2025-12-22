@@ -90,7 +90,9 @@ int main(int argc, char* argv[]) {
         bool need_profile_checkup = false;
         MLBBState mlbb_is_running = MLBB_NOT_RUNNING;
         static bool is_initialize_complete = false;
-        ProfileMode cur_mode = PERFCOMMON;        
+        ProfileMode cur_mode = PERFCOMMON;
+        static bool dnd_enabled = false;
+        static int saved_refresh_rate = -1;
         
         log_zenith(LOG_INFO, "Daemon started as PID %d", getpid());
         setspid();
@@ -212,13 +214,72 @@ int main(int argc, char* argv[]) {
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying performance profile for %s", gamestart);
                 toast("Applying Performance Profile");
-                set_priority(game_pid);
+                
+                if (strcmp(opts.renderer, "vulkan") == 0) {
+                    systemv("sys.azenith-utilityconf setrender skiavk")
+                } else if (strcmp(opts.renderer, "skiagl") == 0) {
+                    systemv("sys.azenith-utilityconf setrender skiagl")                    
+                } else {
+                    // Do Nothing
+                }               
+                
+                if (IS_TRUE(opts.app_priority)) {
+                    set_priority(game_pid);
+                } else if (IS_FALSE(opts.app_priority)) {
+                    // do nothing
+                } else {
+                    char val[PROP_VALUE_MAX] = {0};
+                    if (__system_property_get("persist.sys.azenithconf.iosched", val) > 0) {
+                        if (val[0] == '1') {
+                        set_priority(game_pid);
+                        }
+                    }
+                }
+                                
+                
+                if (IS_TRUE(opts.dnd_on_gaming)) {                   
+                    systemv("sys.azenith-utilityconf enableDND");
+                    dnd_enabled = true;
+                } else if (IS_FALSE(opts.dnd_on_gaming)) {
+                    // do nothing
+                } else {
+                    char dnd_state[PROP_VALUE_MAX] = {0};
+                    __system_property_get("persist.sys.azenithconf.dnd", dnd_state);
+                    if (strcmp(dnd_state, "1") == 0) {
+                        systemv("sys.azenith-utilityconf enableDND");
+                        dnd_enabled = true;
+                    }
+                }
+                                
+                if (!IS_DEFAULT(opts.refresh_rate)) {
+                    int rr = atoi(opts.refresh_rate);
+                
+                    if (rr >= 60 && rr <= 144) {
+                
+                        if (saved_refresh_rate < 0) {
+                            saved_refresh_rate = get_current_refresh_rate();
+                            log_zenith(LOG_INFO, "Saved refresh rate: %d", saved_refresh_rate);
+                        }
+                
+                        systemv("sys.azenith-utilityconf setrefreshrates %d", rr);
+                    }
+                
+                } else {
+                    // do nothing
+                }
+                                                
                 run_profiler(PERFORMANCE_PROFILE);
-    
-                char preload_active[PROP_VALUE_MAX] = {0};
-                __system_property_get("persist.sys.azenithconf.APreload", preload_active);
-                if (strcmp(preload_active, "1") == 0) {
+                      
+                if (IS_TRUE(opts.game_preload)) {
                     GamePreload(gamestart);
+                } else if (IS_FALSE(opts.game_preload)) {
+                    // do nothing
+                } else {
+                    char preload_active[PROP_VALUE_MAX] = {0};
+                    __system_property_get("persist.sys.azenithconf.APreload", preload_active);
+                    if (strcmp(preload_active, "1") == 0) {
+                        GamePreload(gamestart);
+                    }
                 }
             } else if (is_initialize_complete && get_low_power_state()) {
                 // Bail out if we already on powersave profile
@@ -229,8 +290,24 @@ int main(int argc, char* argv[]) {
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying ECO Mode");
                 toast("Applying Eco Mode");
-                run_profiler(ECO_MODE);
-    
+                char renderer[PROP_VALUE_MAX] = {0};
+                __system_property_get("persist.sys.azenithconf.renderer", renderer);                
+                if (strcmp(renderer, "vulkan") == 0) {
+                    systemv("sys.azenith-utilityconf setrender skiavk");
+                    
+                } else {
+                    systemv("sys.azenith-utilityconf setrender skiagl");
+                    
+                }           
+                if (saved_refresh_rate > 0) {
+                    systemv("sys.azenith-utilityconf setrefreshrates %d", saved_refresh_rate);
+                    saved_refresh_rate = -1;
+                }   
+                if (dnd_enabled) {
+                    systemv("sys.azenith-utilityconf disableDND");
+                    dnd_enabled = false;
+                }
+                run_profiler(ECO_MODE);    
             } else {
                 // Bail out if we already on normal profile
                 if (cur_mode == BALANCED_PROFILE)
@@ -239,7 +316,24 @@ int main(int argc, char* argv[]) {
                 cur_mode = BALANCED_PROFILE;
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying Balanced profile");
-                toast("Applying Balanced profile");
+                toast("Applying Balanced profile");  
+                char renderer[PROP_VALUE_MAX] = {0};
+                __system_property_get("persist.sys.azenithconf.renderer", renderer);                
+                if (strcmp(renderer, "vulkan") == 0) {
+                    systemv("sys.azenith-utilityconf setrender skiavk");
+                    
+                } else {
+                    systemv("sys.azenith-utilityconf setrender skiagl");
+                    
+                }              
+                if (saved_refresh_rate > 0) {
+                    systemv("sys.azenith-utilityconf setrefreshrates %d", saved_refresh_rate);
+                    saved_refresh_rate = -1;
+                }
+                if (dnd_enabled) {
+                    systemv("sys.azenith-utilityconf disableDND");
+                    dnd_enabled = false;
+                }
                 if (!is_initialize_complete) {
                     notify("AZenith is running successfully");
                     is_initialize_complete = true;

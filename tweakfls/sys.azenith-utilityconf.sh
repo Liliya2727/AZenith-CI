@@ -149,25 +149,25 @@ FSTrim() {
     fi
 }
 
-disablevsync() {
-    case "$1" in
-        60hz)
-            service call SurfaceFlinger 1035 i32 2
-            dlog "Applied 60hz DisableVsync"
-        ;;
-        90hz)
-            service call SurfaceFlinger 1035 i32 1
-            dlog "Applied 90hz DisableVsync"
-        ;;
-        120hz)
-            service call SurfaceFlinger 1035 i32 0
-            dlog "Applied 120hz DisableVsync"
-        ;;
-        Disabled)
-            echo "disabled"
-        ;;
-    esac
+enableDND() {	
+	cmd notification set_dnd priority && dlog "DND enabled" || dlog "Failed to enable DND"
 }
+
+disableDND() {	
+	cmd notification set_dnd off && dlog "DND disabled" || dlog "Failed to disable DND"
+}
+
+setrefreshrates() {
+    settings set system peak_refresh_rate "$1"
+    settings set system min_refresh_rate "${1}.0"
+    dlog "Set current refresh rates to: $1hz"
+}
+
+setrender() {
+    setprop debug.hwui.renderer $1
+    dlog "Set current renderer to: $1"
+}
+
 
 # Read current ampere
 read_current_ma() {
