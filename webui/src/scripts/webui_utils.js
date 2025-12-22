@@ -1860,11 +1860,6 @@ const loadRRValue = async () => {
 
   select.innerHTML = "";
 
-  const defOpt = document.createElement("option");
-  defOpt.value = "default";
-  defOpt.textContent = "System Default";
-  select.appendChild(defOpt);
-
   let maxRate = 60;
 
   try {
@@ -1925,7 +1920,7 @@ const loadCurRenderer = async () => {
 
   const defOpt = document.createElement("option");
   defOpt.value = "default";
-  defOpt.textContent = "System Default";
+  defOpt.textContent = "Default";
   select.appendChild(defOpt);
 
   const renderers = ["vulkan", "skiagl"];
