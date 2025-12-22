@@ -461,7 +461,7 @@ const updateGameStatus = async () => {
 
     let statusText = "";
 
-    if (!aiEnabled) {
+    if (aiEnabled) {
       statusText = getTranslation("serviceStatus.noApps");
     } else {
       const gameRaw = await executeCommand(
@@ -3265,6 +3265,8 @@ const observeVisibility = () => {
   });
 };
 
+const delay = (ms) => new Promise(r => setTimeout(r, ms));
+
 const heavyInit = async () => {
   if (heavyInitDone) return;
   heavyInitDone = true;
@@ -3277,30 +3279,37 @@ const heavyInit = async () => {
   document.body.classList.add("no-scroll");  
 
   await Promise.all([
-    checkProfile(),
-    checkServiceStatus(),
+    checkProfile(),    
     showRandomMessage(),
     updateGameStatus(),
   ]);
 
-  [checkWebUISupport, checkServiceRunning, checkModuleVersion, checkCPUInfo, 
-   checkDeviceInfo, checkKernelVersion, getAndroidVersion].forEach(fn => fn().catch(()=>{}));
+  [
+    checkWebUISupport, checkServiceStatus, checkServiceRunning, 
+    checkModuleVersion, checkCPUInfo, checkDeviceInfo, checkKernelVersion, getAndroidVersion
+  ].forEach(fn => fn().catch(()=>{}));
 
-  setTimeout(() => {
-    [checkGPUMaliCompatibility, loadCpuGovernors, loadCpuFreq, loadIObalance, 
-     loadIOperformance, loadIOpowersave, GovernorPowersave].forEach(fn => fn().catch(()=>{}));
-  }, 300);
+  await delay(300);
+  await Promise.all([
+    checkGPUMaliCompatibility, loadCpuGovernors, loadCpuFreq, 
+    loadIObalance, loadIOperformance, loadIOpowersave, GovernorPowersave
+  ].map(fn => fn().catch(()=>{})));
 
-  setTimeout(() => {
-    [checkfpsged, checkLiteModeStatus, checkDThermal, checkiosched, checkGPreload, loadColorSchemeSettings].forEach(fn => fn().catch(()=>{}));
-  }, 600);
+  await delay(300);
+  await Promise.all([
+    checkfpsged, checkLiteModeStatus, checkDThermal, checkiosched, 
+    checkGPreload, loadColorSchemeSettings
+  ].map(fn => fn().catch(()=>{})));
 
-  setTimeout(() => {
-    [hideBypassIfUnsupported, checkmalisched, checkAI, checkthermalcore, checkDND,
-     checkdtrace, checkjit, checktoast, checkfstrim, loadCurRenderer, loadRRValue,
-     checkBypassChargeStatus, loadBypassCheck, checkschedtunes, checkwalt, checkSFL,
-     checkKillLog, checklogger, checkRamBoost, detectResolution].forEach(fn => fn().catch(()=>{}));
-  }, 1000);
+  await delay(400);
+  for (const fn of [
+    hideBypassIfUnsupported, checkmalisched, checkAI, checkthermalcore, checkDND,
+    checkdtrace, checkjit, checktoast, checkfstrim, loadCurRenderer, loadRRValue,
+    checkBypassChargeStatus, loadBypassCheck, checkschedtunes, checkwalt, checkSFL,
+    checkKillLog, checklogger, checkRamBoost, detectResolution
+  ]) {
+    try { await fn(); } catch(e){ console.warn(`${fn.name} failed`, e); }
+  }
 
   if (loader) loader.classList.add("hidden");
   document.body.classList.remove("no-scroll");
