@@ -450,6 +450,37 @@ setsGPUMali() {
 	chmod 444 $MALI_GOV
 }
 
+read_current_ma() {
+    for f in \
+        /sys/class/power_supply/battery/current_now \
+        /sys/class/power_supply/battery/BatteryAverageCurrent \
+        /sys/class/power_supply/battery/input_current_now \
+        /sys/class/power_supply/usb/current_now; do
+
+        [ -r "$f" ] || continue
+
+        val=$(cat "$f" 2>/dev/null)
+        val=${val#-}
+        [ -z "$val" ] && continue
+
+        if [ "$val" -gt 1000 ]; then
+            echo $((val / 1000))
+        else
+            echo "$val"
+        fi
+        return
+    done
+
+    echo 9999
+}
+
+ischarging() {
+    case "$(cat /sys/class/power_supply/battery/status 2>/dev/null)" in
+        Charging|Full) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 ###############################################
 # # # # # # #  MEDIATEK BALANCE # # # # # # #
 ###############################################
@@ -2174,28 +2205,49 @@ initialize() {
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
     # INITIALIZE BYPASS CHARGING PATH 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-    if [ -z "$BYPASSPATH" ]; then    
-    supported=0
+    if [ -z "$BYPASSPATH" ]; then
+        supported=0
+        if ! ischarging; then
+          dlog "Skipping bypass compatibility check: device not charging"
+          continue
+        fi
         while IFS=":" read -r name path; do
             [ -z "$name" ] && continue
     
             name="${name//[[:space:]]/}"
             path="${path//[[:space:]]/}"
     
-            if [ -e "$path" ]; then
+            [ ! -e "$path" ] && continue
+    
+            dlog "Testing bypass charging path: $name ($path)"
+    
+            # Enable bypass
+            on_key="${name}_ON"
+            on_val="$(eval echo \${$on_key})"
+            zeshia "$on_val" "$path"
+            sleep 1
+    
+            cur_ma="$(read_current_ma)"
+            dlog "Charging current after enable: ${cur_ma}mA"
+    
+            if [ "$cur_ma" -lt 10 ]; then
+                dlog "Bypass Charging SUPPORTED via $name"
                 setprop "$BYPASSPROPS" "$name"
-                dlog "Detected Bypass Charging path: $name"
+                BYPASSPATH="$name"
                 supported=1
                 break
+            else
+                dlog "Bypass ineffective on $name, trying next"
             fi
+    
         done <<< "$BYPASSPATHLIST"
     
         if [ "$supported" -eq 0 ]; then
-            dlog "Bypass Charging unsupported: no valid path found"
+            dlog "Bypass Charging unsupported: no effective path found"
             setprop "$BYPASSPROPS" "UNSUPPORTED"
         fi
     else
-        dlog "Bypass Charging path set: $BYPASSPATH"
+        dlog "Bypass Charging path already set: $BYPASSPATH"
     fi
        
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
