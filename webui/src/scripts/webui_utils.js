@@ -2505,6 +2505,13 @@ const loadIOpowersave = async () => {
   console.log(`Detected block device: ${validBlock}`);
 };
 
+
+const runOnceBatch = async (fns) => {
+  for (const fn of fns) {
+    await runOnce(fn);
+  }
+};
+
 const idle = () =>
   new Promise(r =>
     (window.requestIdleCallback || setTimeout)(r, 50)
@@ -3371,12 +3378,6 @@ const heavyInit = async () => {
   observeVisibility();
 
   cleaningInterval = setInterval(cleanMemory, 15000);
-};
-
-const runOnceBatch = async (fns) => {
-  for (const fn of fns) {
-    await runOnce(fn);
-  }
 };
 
 // Event Listeners
