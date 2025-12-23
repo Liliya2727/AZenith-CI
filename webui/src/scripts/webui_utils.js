@@ -2571,13 +2571,6 @@ const hideAdditionalSettings = () => {
 
 let isPreferenceLoaded = false;
 
-const idle = () =>
-  new Promise(r =>
-    (window.requestIdleCallback || setTimeout)(r, 50)
-  );
-
-let isPreferenceLoaded = false;
-
 const showPreferenceSettings = async () => {
   const c = document.getElementById("preference-modal");
   const s = c.querySelector(".preference-container");
