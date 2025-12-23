@@ -92,6 +92,11 @@ const executeCommand = async (cmd, cwd = null) => {
 window.executeCommand = executeCommand;
 
 // Main Script
+const idle = () =>
+  new Promise(r =>
+    (window.requestIdleCallback || setTimeout)(r, 50)
+  );
+  
 const setGPUMaliDefault = async (c) => {
   const s = "/data/adb/.config/AZenith",
         r = `${s}/API/current_profile`;
@@ -2505,17 +2510,7 @@ const loadIOpowersave = async () => {
   console.log(`Detected block device: ${validBlock}`);
 };
 
-
-const runOnceBatch = async (fns) => {
-  for (const fn of fns) {
-    await runOnce(fn);
-  }
-};
-
-const idle = () =>
-  new Promise(r =>
-    (window.requestIdleCallback || setTimeout)(r, 50)
-  );
+let isAdditionalLoaded = false;
 
 const showAdditionalSettings = async () => {
   const c = document.getElementById("additional-modal");
@@ -2524,48 +2519,44 @@ const showAdditionalSettings = async () => {
   document.body.classList.add("modal-open");
   c.classList.add("show");
 
+  // animasi dulu (UI prioritas)
   s.style.transition = "none";
   s.style.opacity = "0";
   s.style.transform = "translateY(20px) scale(0.98)";
+  void s.offsetWidth;
 
-  requestAnimationFrame(() => {
-    s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
-    s.style.opacity = "1";
-    s.style.transform = "translateY(0) scale(1)";
-  });
+  s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
+  s.style.opacity = "1";
+  s.style.transform = "translateY(0) scale(1)";
 
-  const baseH = window.innerHeight;
-  const resize = () => {
+  const r = window.innerHeight;
+  const d = () => {
     s.style.transform =
-      window.innerHeight < baseH - 150
+      window.innerHeight < r - 150
         ? "translateY(-10%) scale(1)"
         : "translateY(0) scale(1)";
   };
-  window.addEventListener("resize", resize, { passive: true });
-  c._resizeHandler = resize;
+  requestAnimationFrame(d);
+  window.addEventListener("resize", d, { passive: true });
+  c._resizeHandler = d;
 
-  await idle();
+  // logic cuma jalan 1x
+  if (isAdditionalLoaded) return;
+  isAdditionalLoaded = true;
 
-  await runOnceBatch([
+  // jalan berurutan = stabil + no spike
+  for (const fn of [
     hideBypassIfUnsupported,
     checkDND,
     checkfstrim,
-  ]);
-
-  await idle();
-
-  await runOnceBatch([
     checkBypassChargeStatus,
     loadBypassCheck,
     checkRamBoost,
-  ]);
-
-  await idle();
-
-  await runOnceBatch([
     detectResolution,
-    loadColorSchemeSettings,
-  ]);
+    loadColorSchemeSettings
+  ]) {
+    try { await fn(); } catch {}
+  }
 };
 
 const hideAdditionalSettings = () => {
@@ -2578,6 +2569,15 @@ const hideAdditionalSettings = () => {
   }
 };
 
+let isPreferenceLoaded = false;
+
+const idle = () =>
+  new Promise(r =>
+    (window.requestIdleCallback || setTimeout)(r, 50)
+  );
+
+let isPreferenceLoaded = false;
+
 const showPreferenceSettings = async () => {
   const c = document.getElementById("preference-modal");
   const s = c.querySelector(".preference-container");
@@ -2586,51 +2586,47 @@ const showPreferenceSettings = async () => {
   c.classList.add("show");
 
   s.style.transition = "none";
-  s.style.opacity = "0";
   s.style.transform = "translateY(20px) scale(0.98)";
+  s.style.opacity = "0";
+  void s.offsetWidth;
 
-  requestAnimationFrame(() => {
-    s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
-    s.style.opacity = "1";
-    s.style.transform = "translateY(0) scale(1)";
-  });
+  s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
+  s.style.opacity = "1";
+  s.style.transform = "translateY(0) scale(1)";
 
-  const baseH = window.innerHeight;
-  const resize = () => {
+  const r = window.innerHeight;
+  const d = () => {
     s.style.transform =
-      window.innerHeight < baseH - 150
+      window.innerHeight < r - 150
         ? "translateY(-10%) scale(1)"
         : "translateY(0) scale(1)";
   };
+  requestAnimationFrame(d);
+  window.addEventListener("resize", d, { passive: true });
+  c._resizeHandler = d;
 
-  window.addEventListener("resize", resize, { passive: true });
-  c._resizeHandler = resize;
+  if (isPreferenceLoaded) return;
+  isPreferenceLoaded = true;
 
-  await idle();
+  // SAME STYLE as showSettings
+  for (const fn of [
+    checkfpsged, checkDThermal, checkiosched,
+    checkGPreload, checkmalisched, checkjit,
+    checkdtrace, checkKillLog, checkschedtunes,
+    checkwalt, checkSFL
+  ]) {
+    try { await fn(); } catch {}
+  }
+};
 
-  await runOnceBatch([
-    checkfpsged,
-    checkDThermal,
-    checkiosched,
-  ]);
-
-  await idle();
-
-  await runOnceBatch([
-    checkGPreload,
-    checkmalisched,
-    checkjit,
-    checkdtrace,
-  ]);
-
-  await idle();
-
-  await runOnceBatch([
-    checkKillLog,
-    checkschedtunes,
-    checkwalt,
-    checkSFL,
-  ]);
+const hidePreferenceSettings = () => {
+  const c = document.getElementById("preference-modal");
+  c.classList.remove("show");
+  document.body.classList.remove("modal-open");
+  if (c._resizeHandler) {
+    window.removeEventListener("resize", c._resizeHandler);
+    delete c._resizeHandler;
+  }
 };
 
 const hideSchemeSettings = () => {
@@ -2913,9 +2909,12 @@ const hideResoSettings = () => {
   }
 };
 
+let isSettingsLoaded = false;
+
 const showSettings = async () => {
   const c = document.getElementById("settingsModal");
-  const s = c.querySelector(".settings-container");
+  const s = c?.querySelector(".settings-container");
+  if (!c || !s) return;
 
   document.body.classList.add("modal-open");
   c.classList.add("show");
@@ -2937,17 +2936,17 @@ const showSettings = async () => {
         ? "translateY(-10%) scale(1)"
         : "translateY(0) scale(1)";
   };
-
   window.addEventListener("resize", resize, { passive: true });
   c._resizeHandler = resize;
 
+  if (isSettingsLoaded) return;
+  isSettingsLoaded = true;
+
   await idle();
 
-  await runOnceBatch([
-    checkAI,
-    checktoast,
-    checklogger,
-  ]);
+  try { await checkAI(); } catch {}
+  try { await checktoast(); } catch {}
+  try { await checklogger(); } catch {}
 };
 
 const hideSettings = () => {
