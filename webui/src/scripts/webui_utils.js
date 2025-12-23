@@ -2510,6 +2510,13 @@ const showAdditionalSettings = async () => {
   const s = c.querySelector(".additional-container");
   document.body.classList.add("modal-open");
   c.classList.add("show");
+  
+  await Promise.all([
+    hideBypassIfUnsupported, checkDND,
+    checkfstrim, 
+    checkBypassChargeStatus, loadBypassCheck, 
+    checkRamBoost, detectResolution, loadColorSchemeSettings
+  ].map(fn => fn().catch(()=>{})));
 
   s.style.transition = "none";
   s.style.transform = "translateY(20px) scale(0.98)";
@@ -2543,6 +2550,12 @@ const showPreferenceSettings = async () => {
   const s = c.querySelector(".preference-container");
   document.body.classList.add("modal-open");
   c.classList.add("show");
+  
+  await Promise.all([
+    checkfpsged, checkDThermal, checkiosched, 
+    checkGPreload, checkmalisched, checkjit, checkdtrace,
+    checkKillLog, checkschedtunes, checkwalt, checkSFL
+  ].map(fn => fn().catch(()=>{})));
 
   s.style.transition = "none";
   s.style.transform = "translateY(20px) scale(0.98)";
@@ -2856,6 +2869,10 @@ const showSettings = async () => {
   const s = c.querySelector(".settings-container");
   document.body.classList.add("modal-open");
   c.classList.add("show");
+  
+  await Promise.all([
+    checkAI, checktoast, checklogger
+  ].map(fn => fn().catch(()=>{})));
 
   s.style.transition = "none";
   s.style.transform = "translateY(20px) scale(0.98)";
@@ -3289,27 +3306,11 @@ const heavyInit = async () => {
     checkModuleVersion, checkCPUInfo, checkDeviceInfo, checkKernelVersion, getAndroidVersion
   ].forEach(fn => fn().catch(()=>{}));
 
-  await delay(300);
   await Promise.all([
     checkGPUMaliCompatibility, loadCpuGovernors, loadCpuFreq, 
-    loadIObalance, loadIOperformance, loadIOpowersave, GovernorPowersave
-  ].map(fn => fn().catch(()=>{})));
-
-  await delay(300);
-  await Promise.all([
-    checkfpsged, checkLiteModeStatus, checkDThermal, checkiosched, 
-    checkGPreload, loadColorSchemeSettings
-  ].map(fn => fn().catch(()=>{})));
-
-  await delay(400);
-  for (const fn of [
-    hideBypassIfUnsupported, checkmalisched, checkAI, checkthermalcore, checkDND,
-    checkdtrace, checkjit, checktoast, checkfstrim, loadCurRenderer, loadRRValue,
-    checkBypassChargeStatus, loadBypassCheck, checkschedtunes, checkwalt, checkSFL,
-    checkKillLog, checklogger, checkRamBoost, detectResolution
-  ]) {
-    try { await fn(); } catch(e){ console.warn(`${fn.name} failed`, e); }
-  }
+    loadIObalance, loadIOperformance, loadIOpowersave, GovernorPowersave,
+    loadCurRenderer, loadRRValue, checkLiteModeStatus, checkthermalcore
+  ].map(fn => fn().catch(()=>{})));      
 
   if (loader) loader.classList.add("hidden");
   document.body.classList.remove("no-scroll");
