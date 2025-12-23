@@ -2601,7 +2601,6 @@ const showPreferenceSettings = async () => {
   if (isPreferenceLoaded) return;
   isPreferenceLoaded = true;
 
-  // SAME STYLE as showSettings
   for (const fn of [
     checkfpsged, checkDThermal, checkiosched,
     checkGPreload, checkmalisched, checkjit,
@@ -2935,11 +2934,11 @@ const showSettings = async () => {
   if (isSettingsLoaded) return;
   isSettingsLoaded = true;
 
-  await idle();
-
-  try { await checkAI(); } catch {}
-  try { await checktoast(); } catch {}
-  try { await checklogger(); } catch {}
+  for (const fn of [
+    checkAI, checktoast, checklogger    
+  ]) {
+    try { await fn(); } catch {}
+  }  
 };
 
 const hideSettings = () => {
