@@ -2505,34 +2505,60 @@ const loadIOpowersave = async () => {
   console.log(`Detected block device: ${validBlock}`);
 };
 
+const idle = () =>
+  new Promise(r =>
+    (window.requestIdleCallback || setTimeout)(r, 50)
+  );
+
 const showAdditionalSettings = async () => {
   const c = document.getElementById("additional-modal");
   const s = c.querySelector(".additional-container");
+
   document.body.classList.add("modal-open");
   c.classList.add("show");
-  
-  await Promise.all([
-    hideBypassIfUnsupported, checkDND,
-    checkfstrim, 
-    checkBypassChargeStatus, loadBypassCheck, 
-    checkRamBoost, detectResolution, loadColorSchemeSettings
-  ].map(fn => fn().catch(()=>{})));
 
   s.style.transition = "none";
+  s.style.opacity = "0";
   s.style.transform = "translateY(20px) scale(0.98)";
-  void s.offsetWidth;
-  s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
-  s.style.opacity = "1";
-  const r = window.innerHeight;
-  const d = () => {
+
+  requestAnimationFrame(() => {
+    s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
+    s.style.opacity = "1";
+    s.style.transform = "translateY(0) scale(1)";
+  });
+
+  const baseH = window.innerHeight;
+  const resize = () => {
     s.style.transform =
-      window.innerHeight < r - 150
+      window.innerHeight < baseH - 150
         ? "translateY(-10%) scale(1)"
         : "translateY(0) scale(1)";
   };
-  requestAnimationFrame(() => d());
-  window.addEventListener("resize", d, { passive: true });
-  c._resizeHandler = d;
+  window.addEventListener("resize", resize, { passive: true });
+  c._resizeHandler = resize;
+
+  await idle();
+
+  await runOnceBatch([
+    hideBypassIfUnsupported,
+    checkDND,
+    checkfstrim,
+  ]);
+
+  await idle();
+
+  await runOnceBatch([
+    checkBypassChargeStatus,
+    loadBypassCheck,
+    checkRamBoost,
+  ]);
+
+  await idle();
+
+  await runOnceBatch([
+    detectResolution,
+    loadColorSchemeSettings,
+  ]);
 };
 
 const hideAdditionalSettings = () => {
@@ -2548,40 +2574,56 @@ const hideAdditionalSettings = () => {
 const showPreferenceSettings = async () => {
   const c = document.getElementById("preference-modal");
   const s = c.querySelector(".preference-container");
+
   document.body.classList.add("modal-open");
   c.classList.add("show");
-  
-  await Promise.all([
-    checkfpsged, checkDThermal, checkiosched, 
-    checkGPreload, checkmalisched, checkjit, checkdtrace,
-    checkKillLog, checkschedtunes, checkwalt, checkSFL
-  ].map(fn => fn().catch(()=>{})));
 
   s.style.transition = "none";
+  s.style.opacity = "0";
   s.style.transform = "translateY(20px) scale(0.98)";
-  void s.offsetWidth;
-  s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
-  s.style.opacity = "1";
-  const r = window.innerHeight;
-  const d = () => {
+
+  requestAnimationFrame(() => {
+    s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
+    s.style.opacity = "1";
+    s.style.transform = "translateY(0) scale(1)";
+  });
+
+  const baseH = window.innerHeight;
+  const resize = () => {
     s.style.transform =
-      window.innerHeight < r - 150
+      window.innerHeight < baseH - 150
         ? "translateY(-10%) scale(1)"
         : "translateY(0) scale(1)";
   };
-  requestAnimationFrame(() => d());
-  window.addEventListener("resize", d, { passive: true });
-  c._resizeHandler = d;
-};
 
-const hidePreferenceSettings = () => {
-  const c = document.getElementById("preference-modal");
-  c.classList.remove("show");
-  document.body.classList.remove("modal-open");
-  if (c._resizeHandler) {
-    window.removeEventListener("resize", c._resizeHandler);
-    delete c._resizeHandler;
-  }
+  window.addEventListener("resize", resize, { passive: true });
+  c._resizeHandler = resize;
+
+  await idle();
+
+  await runOnceBatch([
+    checkfpsged,
+    checkDThermal,
+    checkiosched,
+  ]);
+
+  await idle();
+
+  await runOnceBatch([
+    checkGPreload,
+    checkmalisched,
+    checkjit,
+    checkdtrace,
+  ]);
+
+  await idle();
+
+  await runOnceBatch([
+    checkKillLog,
+    checkschedtunes,
+    checkwalt,
+    checkSFL,
+  ]);
 };
 
 const hideSchemeSettings = () => {
@@ -2867,28 +2909,38 @@ const hideResoSettings = () => {
 const showSettings = async () => {
   const c = document.getElementById("settingsModal");
   const s = c.querySelector(".settings-container");
+
   document.body.classList.add("modal-open");
   c.classList.add("show");
-  
-  await Promise.all([
-    checkAI, checktoast, checklogger
-  ].map(fn => fn().catch(()=>{})));
 
   s.style.transition = "none";
+  s.style.opacity = "0";
   s.style.transform = "translateY(20px) scale(0.98)";
-  void s.offsetWidth;
-  s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
-  s.style.opacity = "1";
-  const r = window.innerHeight;
-  const d = () => {
+
+  requestAnimationFrame(() => {
+    s.style.transition = "transform 0.25s ease, opacity 0.25s ease";
+    s.style.opacity = "1";
+    s.style.transform = "translateY(0) scale(1)";
+  });
+
+  const baseH = window.innerHeight;
+  const resize = () => {
     s.style.transform =
-      window.innerHeight < r - 150
+      window.innerHeight < baseH - 150
         ? "translateY(-10%) scale(1)"
         : "translateY(0) scale(1)";
   };
-  requestAnimationFrame(() => d());
-  window.addEventListener("resize", d, { passive: true });
-  c._resizeHandler = d;
+
+  window.addEventListener("resize", resize, { passive: true });
+  c._resizeHandler = resize;
+
+  await idle();
+
+  await runOnceBatch([
+    checkAI,
+    checktoast,
+    checklogger,
+  ]);
 };
 
 const hideSettings = () => {
@@ -3319,6 +3371,12 @@ const heavyInit = async () => {
   observeVisibility();
 
   cleaningInterval = setInterval(cleanMemory, 15000);
+};
+
+const runOnceBatch = async (fns) => {
+  for (const fn of fns) {
+    await runOnce(fn);
+  }
 };
 
 // Event Listeners
