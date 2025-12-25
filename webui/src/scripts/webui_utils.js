@@ -481,7 +481,7 @@ const updateGameStatus = async () => {
 
     if (!gameLine) {
       statusText = aiEnabled
-        ? getTranslation("serviceStatus.aiIdle")
+        ? getTranslation("serviceStatus.noApps")
         : getTranslation("serviceStatus.idleMode");
     } else {
       const pkg = gameLine.split(" ")[0]?.trim() || "";
@@ -516,9 +516,7 @@ const updateGameStatus = async () => {
         }
       }
 
-      statusText = aiEnabled
-        ? getTranslation("serviceStatus.aiActive", label)
-        : getTranslation("serviceStatus.activeIdle", label);
+      statusText = getTranslation("serviceStatus.active", label);
     }
 
     if (lastGameCheck.status !== statusText) {
