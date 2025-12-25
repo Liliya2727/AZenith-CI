@@ -462,60 +462,70 @@ const updateGameStatus = async () => {
     const aiResult = await executeCommand(
       "getprop persist.sys.azenithconf.AIenabled"
     );
-    const aiEnabled = aiResult.stdout?.trim() !== "0"; 
+    const aiEnabled = aiResult.stdout?.trim() === "1";
+
+    const gameRaw = await executeCommand(
+      "cat /data/adb/.config/AZenith/API/gameinfo"
+    );
+
+    let gameLine = (gameRaw.stdout || "").trim();
+    if (
+      !gameLine ||
+      ["NULL", "(NULL)", "null", "(null)"].includes(gameLine) ||
+      gameLine.toUpperCase().startsWith("NULL 0 0")
+    ) {
+      gameLine = null;
+    }
 
     let statusText = "";
 
-    if (aiEnabled) {
-      statusText = getTranslation("serviceStatus.noApps");
+    if (!gameLine) {
+      statusText = aiEnabled
+        ? getTranslation("serviceStatus.aiIdle")
+        : getTranslation("serviceStatus.idleMode");
     } else {
-      const gameRaw = await executeCommand(
-        "cat /data/adb/.config/AZenith/API/gameinfo"
-      );
-      let gameLine = (gameRaw.stdout || "").trim();
+      const pkg = gameLine.split(" ")[0]?.trim() || "";
+      let label = pkg;
 
-      if (
-        !gameLine ||
-        ["null", "(null)", "NULL"].includes(gameLine.toUpperCase()) ||
-        gameLine.toUpperCase().startsWith("NULL 0 0")
-      ) {
-        gameLine = null;
-      }
-
-      if (!gameLine) {
-        statusText = getTranslation("serviceStatus.idleMode");
-      } else {
-        const pkg = gameLine.split(" ")[0]?.trim() || "";
-        let label = pkg;
-
-        try {
-          const infoList = JSON.parse(ksu.getPackagesInfo(JSON.stringify([pkg])));
-          if (Array.isArray(infoList) && infoList.length > 0) {
-            label = infoList[0].appLabel || infoList[0].label || infoList[0].appName || pkg;
-          }
-        } catch {
-          if (typeof window.$packageManager !== "undefined") {
-            try {
-              const appInfo = await window.$packageManager.getApplicationInfo(pkg, 0, 0);
-              if (appInfo) {
-                label = (typeof appInfo.getLabel === "function" ? appInfo.getLabel() : appInfo.label)
-                        || appInfo.appName
-                        || pkg;
-              }
-            } catch {}
-          }
+      try {
+        const infoList = JSON.parse(
+          ksu.getPackagesInfo(JSON.stringify([pkg]))
+        );
+        const info = infoList?.[0];
+        if (info) {
+          label =
+            info.appLabel ||
+            info.label ||
+            info.appName ||
+            pkg;
         }
-
-        statusText = getTranslation("serviceStatus.activeIdle", label);
+      } catch {
+        if (typeof window.$packageManager !== "undefined") {
+          try {
+            const appInfo =
+              await window.$packageManager.getApplicationInfo(pkg, 0, 0);
+            if (appInfo) {
+              label =
+                (typeof appInfo.getLabel === "function"
+                  ? appInfo.getLabel()
+                  : appInfo.label) ||
+                appInfo.appName ||
+                pkg;
+            }
+          } catch {}
+        }
       }
+
+      statusText = aiEnabled
+        ? getTranslation("serviceStatus.aiActive", label)
+        : getTranslation("serviceStatus.activeIdle", label);
     }
 
     if (lastGameCheck.status !== statusText) {
       banner.textContent = statusText;
       lastGameCheck.status = statusText;
     }
-  } catch (e) {
-    console.warn("updateGameStatus error:", e);
+  } catch {
     banner.textContent = getTranslation("serviceStatus.error");
   }
 };
