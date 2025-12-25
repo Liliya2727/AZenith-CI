@@ -3344,6 +3344,10 @@ const heavyInit = async () => {
   const loader = document.getElementById("loading-screen");
   if (loader) loader.classList.remove("hidden");
   document.body.classList.add("no-scroll");  
+  
+  await checkWebUISupport();
+  await checkServiceRunning();
+  await checkModuleVersion();
 
   await Promise.all([
     checkProfile(),    
@@ -3352,8 +3356,8 @@ const heavyInit = async () => {
   ]);
 
   [
-    checkWebUISupport, checkServiceStatus, checkServiceRunning, 
-    checkModuleVersion, checkCPUInfo, checkDeviceInfo, checkKernelVersion, getAndroidVersion
+    checkServiceStatus,
+    checkCPUInfo, checkDeviceInfo, checkKernelVersion, getAndroidVersion
   ].forEach(fn => fn().catch(()=>{}));
 
   await Promise.all([
