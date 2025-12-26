@@ -6,17 +6,17 @@
 }
 
 .app-modal {
-  overflow: hidden;
-  inset: 0;
-  height: 100vh;
   position: fixed;
-  z-index: 999;
+  inset: 0;
+  z-index: 9999;
+
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
+
+  background: rgba(0,0,0,.5);
   opacity: 1;
-  transition: opacity .3s ease;
+  transition: opacity .25s ease;
 }
 
 .app-modal.hidden {
@@ -28,45 +28,18 @@
 }
 
 .app-modal-content {
-  width: 100%;
-  max-width: 600px;
+  width: 85vw;
   max-height: 90vh;
-  border-radius: 28px 28px 0 0;
   padding: 1.5rem;
-  padding-top: 2.5rem;
-  padding-bottom: calc(1.5rem + var(--window-inset-bottom, 20px));
+
+  background: var(--tonalSurface, #12141b);
+  border-radius: 2rem;
+
   overflow-y: auto;
-  background-color: var(--tonalSurface, #12141b);
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
-  transform: translateY(0);
-  animation: modalUp .4s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-}
+  overflow-x: hidden;
 
-.app-modal-content::before {
-  content: '';
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 5px;
-  background-color: var(--onSurfaceVariant, rgba(255, 255, 255, 0.2));
-  border-radius: 99px;
-}
-
-.app-modal.closing .app-modal-content {
-  animation: modalDown .3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes modalUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-@keyframes modalDown {
-  from { transform: translateY(0); }
-  to { transform: translateY(100%); }
+  opacity: 0;
+  transform: translateY(20px) scale(.98);
 }
 
 .app-modal-header {
@@ -86,18 +59,20 @@
 }
 
 #appModalLabel {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--onSurface, #fff);
   line-height: 1.2;
+  max-width: 160px;
 }
 
 #appModalPkg {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+  max-width: 20px;
   opacity: .7;
   color: var(--onSurfaceVariant, #ccc);
   margin-top: 2px;
-  display: block;
+  line-height: 1.2;
 }
 
 #appModalSettings {
@@ -1035,12 +1010,77 @@ input[type=checkbox]:checked + .toggle::after {
     border-radius: 2rem;
     max-height: 90vh;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 1.5rem;
-    width: 90%;
+    width: 85vw;
     background-color:var(--tonalSurface, #12141b);
-    max-width: 500px;
     transform: scale(.95);
     transition: transform .3s;    
+}
+
+.additional-desc,
+.preference-desc,
+.profiler-desc,
+.reso-desc,
+.spoof-desc,
+.scheme-desc,
+.settings-desc {
+    font-size: .65rem;
+    color: var(--onSurface, #ccc);
+    text-align: left;
+    max-width: 85%;
+    margin-bottom: .7rem;
+    padding-bottom: .7rem;
+    position: relative;
+}
+
+.additional-desc::after,
+.preference-desc::after,
+.profiler-desc::after,
+.reso-desc::after,
+.spoof-desc::after,
+.scheme-desc::after,
+.settings-desc::after {
+    content: "";
+    position: absolute;
+    left: -2rem;
+    bottom: 0;
+    width: 150%;
+    height: 2px;
+    background: var(--surfaceContainerHighest);
+}
+
+.additional-title,
+.preference-title,
+.profiler-title,
+.reso-title,
+.spoof-title,
+.scheme-title,
+.settings-title {
+    font-size: 1.25rem;
+    font-weight: 650;
+    letter-spacing: .3px;
+    text-align: left;
+    color: var(--onSurface, #e6e6e6);
+    margin-top: -.5rem;
+    margin-bottom: -.3rem;
+}
+
+.settings-title {
+    margin-bottom: .6rem;
+    padding-bottom: .9rem;
+    position: relative;
+    max-width: 85%;
+}
+
+.settings-title::after {
+    content: "";
+    position: absolute;
+    left: -2rem;
+    bottom: 0;
+    width: 150%;
+    height: 2px;
+    background: var(--surfaceContainerHighest);
 }
 
 .additional-modal.show .additional-container,
@@ -1053,42 +1093,10 @@ input[type=checkbox]:checked + .toggle::after {
     transform: scale(1)
 }
 
-.additional-title,
-.preference-title,
-.profiler-title,
-.reso-title,
-.spoof-title,
-.scheme-title,
-.settings-title {
-    font-size: 1.5rem;
-    text-align: center;
-    font-weight: 600;
-    color:var(--onSurface, #ccc);
-    margin-bottom: 0;
-    margin-top: 1rem
-}
-
-.settings-title {
-    margin-bottom: 2.1rem
-}
-
-.additional-desc,
-.preference-desc,
-.profiler-desc,
-.reso-desc,
-.spoof-desc,
-.scheme-desc,
-.settings-desc {
-    font-size: .75rem;
-    color:var(--onSurface, #ccc);
-    text-align: center;
-    margin-bottom: 1rem
-}
-
 .close-btn {
     position: absolute;
-    top: .85rem;
-    right: 1.35rem;
+    top: 1.05rem;
+    right: 1.65rem;
     margin-bottom: 5rem;
     background: 0 0;
     border: none;
@@ -1345,12 +1353,10 @@ body.modal-open {
     background: linear-gradient(135deg, var(--primary, #7fa9ff), var(--onPrimaryContainer, #a5b8ff));
     color:var(--inverseOnSurface, #e8ecff);
     border-radius: 6rem;
-    box-shadow: 0 3px 10px rgba(120, 150, 255, .25);
 }
 
 .modal-btn.apply:active {
     background: linear-gradient(135deg, var(--onPrimaryContainer, #a5b8ff), var(--primary, #7fa9ff));
-    box-shadow: 0 0 8px rgba(110, 130, 255, .3);
     transform: scale(0.97);
 }
 
@@ -1358,8 +1364,8 @@ body.modal-open {
     background: linear-gradient(135deg, var(--primary, #4853a0), var(--onPrimaryContainer, #7c86c0));
     color:var(--inverseOnSurface, #e9edff);
     font-size: 14px;
-    padding: 12px 18px;
-    margin-top: 4px;
+    padding: 10px 14px;
+    margin-top: 0px;
     margin-bottom: 0;
     border-radius: 6rem;
     border: none;
@@ -1634,7 +1640,7 @@ body.modal-open {
 
 .common-arrowsvg {
   color: var(--primary, #e6e6e6);
-  right: 1.5rem;
+  right: 2.1rem;
   position: absolute;
   width: 20px;
   height: 20px;

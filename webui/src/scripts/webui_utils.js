@@ -677,9 +677,36 @@ const getSupportedRefreshRates = async () => {
 
 const openPerAppSettings = async (pkg, gamelist) => {
   const modal = document.getElementById("appSettingsModal");
+  const content = modal.querySelector(".app-modal-content");
   const list = document.getElementById("appModalSettings");
+  if (!modal || !content || !list) return;
 
   document.body.classList.add("modal-open");
+  modal.classList.remove("hidden", "closing");
+
+  // reset (no animation)
+  content.style.transition = "none";
+  content.style.opacity = "0";
+  content.style.transform = "translateY(20px) scale(.98)";
+  void content.offsetHeight;
+
+  // animate in
+  content.style.transition =
+    "opacity .25s ease, transform .25s cubic-bezier(0.16,1,0.3,1)";
+  content.style.opacity = "1";
+  content.style.transform = "translateY(0) scale(1)";
+
+  const baseH = window.innerHeight;
+  const resize = () => {
+    content.style.transform =
+      window.innerHeight < baseH - 150
+        ? "translateY(-8px) scale(1)"
+        : "translateY(0) scale(1)";
+  };
+
+  window.addEventListener("resize", resize, { passive: true });
+  modal._resizeHandler = resize;
+
   const cfg = gamelist[pkg];
   if (!cfg) return;
 
@@ -699,7 +726,7 @@ const openPerAppSettings = async (pkg, gamelist) => {
           <div class="optionGroup" data-key="${s.key}">
             ${["false","default","true"].map(v => `
               <button class="optionBtn ${value === v ? "active" : ""}" data-value="${v}">
-                ${v.charAt(0).toUpperCase() + v.slice(1)}
+                ${v[0].toUpperCase() + v.slice(1)}
               </button>
             `).join("")}
           </div>
@@ -752,8 +779,6 @@ const openPerAppSettings = async (pkg, gamelist) => {
       };
     });
   });
-
-  modal.classList.remove("hidden");
 };
 
 let cachedPkgList = [];
