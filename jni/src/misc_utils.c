@@ -258,8 +258,8 @@ void runthermalcore(void) {
     char thermalcore[PROP_VALUE_MAX] = {0};
     __system_property_get("persist.sys.azenithconf.thermalcore", thermalcore);
     if (strcmp(thermalcore, "1") == 0) {
-        systemv("sys.azenith-rianixiathermalcorev4 &");
-        FILE* fp = popen("pidof sys.azenith-rianixiathermalcorev4", "r");
+        systemv("sys.azenith-rianixiathermalcore &");
+        FILE* fp = popen("pidof sys.azenith-rianixiathermalcore", "r");
         if (fp == NULL) {
             perror("pidof failed");
             log_zenith(LOG_INFO, "Failed to run Thermalcore service");

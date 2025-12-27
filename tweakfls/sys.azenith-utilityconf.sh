@@ -128,7 +128,7 @@ setsIO() {
 setthermalcore() {
     local state="$1"
     if [ "$state" -eq 1 ]; then
-        sys.azenith-rianixiathermalcorev4 &
+        sys.azenith-rianixiathermalcore &
         sleep 1
         local pid
         pid="$(pgrep -f sys.azenith-rianixiathermalcore)"
