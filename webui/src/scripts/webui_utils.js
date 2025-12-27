@@ -516,7 +516,9 @@ const updateGameStatus = async () => {
         }
       }
 
-      statusText = getTranslation("serviceStatus.active", label);
+      statusText = aiEnabled
+        ? getTranslation("serviceStatus.noApps")
+        : getTranslation("serviceStatus.active", label);
     }
 
     if (lastGameCheck.status !== statusText) {
