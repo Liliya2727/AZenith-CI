@@ -468,23 +468,26 @@ const updateGameStatus = async () => {
       "cat /data/adb/.config/AZenith/API/gameinfo"
     );
 
-    let gameLine = (gameRaw.stdout || "").trim();
-    if (
-      !gameLine ||
-      ["NULL", "(NULL)", "null", "(null)"].includes(gameLine) ||
-      gameLine.toUpperCase().startsWith("NULL 0 0")
-    ) {
-      gameLine = null;
+    const rawLine = gameRaw.stdout?.trim();
+    let gamePkg = null;
+
+    if (rawLine) {
+      const parts = rawLine.split(/\s+/);
+      const name = parts[0];
+
+      if (!/^\(?null\)?$/i.test(name)) {
+        gamePkg = name;
+      }
     }
 
     let statusText = "";
 
-    if (!gameLine) {
+    if (!gamePkg) {
       statusText = aiEnabled
         ? getTranslation("serviceStatus.noApps")
         : getTranslation("serviceStatus.idleMode");
     } else {
-      const pkg = gameLine.split(" ")[0]?.trim() || "";
+      const pkg = gamePkg;
       let label = pkg;
 
       try {
@@ -500,7 +503,7 @@ const updateGameStatus = async () => {
             pkg;
         }
       } catch {
-        if (typeof window.$packageManager !== "undefined") {
+        if (window.$packageManager) {
           try {
             const appInfo =
               await window.$packageManager.getApplicationInfo(pkg, 0, 0);
@@ -516,9 +519,7 @@ const updateGameStatus = async () => {
         }
       }
 
-      statusText = aiEnabled
-        ? getTranslation("serviceStatus.noApps")
-        : getTranslation("serviceStatus.active", label);
+      statusText = getTranslation("serviceStatus.active", label);
     }
 
     if (lastGameCheck.status !== statusText) {
