@@ -72,7 +72,7 @@ ui_print "- Extracting system directory..."
 extract "$ZIPFILE" 'system/bin/sys.azenith-profilesettings' "$MODPATH"
 extract "$ZIPFILE" 'system/bin/sys.azenith-utilityconf' "$MODPATH"
 extract "$ZIPFILE" 'system/bin/sys.azenith-preloadbin' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/sys.azenith-rianixiathermalcorev4' "$MODPATH"
+extract "$ZIPFILE" 'system/bin/sys.azenith-rianixiathermalcore' "$MODPATH"
 ui_print "- Extracting service.sh..."
 extract "$ZIPFILE" service.sh "$MODPATH"
 ui_print "- Extracting module.prop..."
@@ -120,7 +120,7 @@ if [ "$KSU" = "true" ] || [ "$APATCH" = "true" ]; then
 			ln -sf "$BIN_PATH/sys.azenith-profilesettings" "$dir/sys.azenith-profilesettings"
 			ln -sf "$BIN_PATH/sys.azenith-utilityconf" "$dir/sys.azenith-utilityconf"
 			ln -sf "$BIN_PATH/sys.azenith-preloadbin" "$dir/sys.azenith-preloadbin"
-            ln -sf "$BIN_PATH/sys.azenith-rianixiathermalcorev4" "$dir/sys.azenith-rianixiathermalcorev4"
+            ln -sf "$BIN_PATH/sys.azenith-rianixiathermalcore" "$dir/sys.azenith-rianixiathermalcore"
 		}
 	done
 fi
@@ -252,6 +252,6 @@ chmod +x "$MODPATH/system/bin/sys.azenith-service"
 chmod +x "$MODPATH/system/bin/sys.azenith-profilesettings"
 chmod +x "$MODPATH/system/bin/sys.azenith-utilityconf"
 chmod +x "$MODPATH/system/bin/sys.azenith-preloadbin"
-chmod +x "$MODPATH/system/bin/sys.azenith-rianixiathermalcorev4"
+chmod +x "$MODPATH/system/bin/sys.azenith-rianixiathermalcore"
 
 ui_print "- Installation complete!"

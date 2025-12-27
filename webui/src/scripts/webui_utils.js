@@ -2173,7 +2173,6 @@ const hidecolorscheme = () => {
   if (!c) return; // exit if modal not found
 
   c.classList.remove("show");
-  document.body.classList.remove("modal-open");
   const colorSchemeSavedToast = getTranslation("toast.colorSchemeSaved");
   toast(colorSchemeSavedToast);
 
@@ -2657,7 +2656,6 @@ const hidePreferenceSettings = () => {
 const hideSchemeSettings = () => {
   const c = document.getElementById("schemeModal");
   c.classList.remove("show");
-  document.body.classList.remove("modal-open");
   if (c._resizeHandler) {
     window.removeEventListener("resize", c._resizeHandler);
     delete c._resizeHandler;
@@ -2927,7 +2925,6 @@ const showCustomResolution = async () => {
 const hideResoSettings = () => {
   const c = document.getElementById("resomodal");
   c.classList.remove("show");
-  document.body.classList.remove("modal-open");
   if (c._resizeHandler) {
     window.removeEventListener("resize", c._resizeHandler);
     delete c._resizeHandler;

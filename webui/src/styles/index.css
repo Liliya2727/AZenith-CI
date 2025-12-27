@@ -43,19 +43,19 @@
 }
 
 .app-modal-header {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
 #appModalIcon {
   width: 64px;
   height: 64px;
-  border-radius: 18px;
+  border-radius: 1rem;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 #appModalLabel {
@@ -63,16 +63,19 @@
   font-weight: 700;
   color: var(--onSurface, #fff);
   line-height: 1.2;
-  max-width: 160px;
+  max-width: 180px;  
 }
 
 #appModalPkg {
   font-size: 0.75rem;
-  max-width: 20px;
   opacity: .7;
   color: var(--onSurfaceVariant, #ccc);
   margin-top: 2px;
   line-height: 1.2;
+
+  max-width: 180px;
+  word-break: break-all; 
+  overflow-wrap: anywhere;  
 }
 
 #appModalSettings {
@@ -97,7 +100,7 @@
   font-size: 0.7rem;
   line-height: 1;
   color: var(--onSurface);
-  background: var(--surfaceContainerHighest);
+  background: var(--surfaceVariant);
   padding: 6px 10px;
   border-radius: 999px;
   user-select: none;
@@ -119,24 +122,27 @@
   background: rgba(255, 255, 255, 0);
   color: var(--onSurface, #fff);
   transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+  border-right: none;
   cursor: pointer;
+  outline: none;
 }
 
 .optionBtn:first-child {
   border-top-left-radius: 999px;
   border-bottom-left-radius: 999px;
+  
+  border: 0.8px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
+  border-right: none;
 }
 
 .optionBtn:last-child {
   border-top-right-radius: 999px;
   border-bottom-right-radius: 999px;
+  border: 0.8px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
 }
 
 .optionBtn.active {
-  color: var(--onPrimary, #141414);
-  background: linear-gradient(145deg, var(--primary, #7fa9ff), var(--onPrimaryContainer, #a5b8ff));
-  border-color: var(--outline, #6a74c0);
-  transform: scale(1.01);
+  background: var(--surfaceVariant);
 }
 
 .modal-close {
@@ -1028,7 +1034,7 @@ input[type=checkbox]:checked + .toggle::after {
     font-size: .65rem;
     color: var(--onSurface, #ccc);
     text-align: left;
-    max-width: 85%;
+    max-width: 80%;
     margin-bottom: .7rem;
     padding-bottom: .7rem;
     position: relative;
@@ -1045,9 +1051,58 @@ input[type=checkbox]:checked + .toggle::after {
     position: absolute;
     left: -2rem;
     bottom: 0;
-    width: 150%;
+    width: 100vh;
     height: 2px;
     background: var(--surfaceContainerHighest);
+}
+
+.close-btn {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.5rem;
+
+  display: flex;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(
+    in srgb,
+    var(--outlineVariant, #d4d4d4) 35%,
+    transparent
+  );
+
+  background-color: color-mix(
+    in srgb,
+    var(--surfaceContainerHigh, #1a1b22) 45%,
+    transparent
+  );
+
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--primary, #d2d2d6);
+
+  cursor: pointer;
+  transition: .25s;
+}
+
+.close-btn:active {
+  border-color: var(--primary, #C9C6FF);
+  box-shadow: 0 0 0 2px color-mix(
+    in srgb,
+    var(--primary, #9bb5ff) 35%,
+    transparent
+  );
+  transform: scale(.95);
+}
+
+.settings-container .close-btn {  
+  top: .8rem;
+  right: 1.5rem;
 }
 
 .additional-title,
@@ -1057,7 +1112,7 @@ input[type=checkbox]:checked + .toggle::after {
 .spoof-title,
 .scheme-title,
 .settings-title {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 650;
     letter-spacing: .3px;
     text-align: left;
@@ -1093,27 +1148,6 @@ input[type=checkbox]:checked + .toggle::after {
     transform: scale(1)
 }
 
-.close-btn {
-    position: absolute;
-    top: 1.05rem;
-    right: 1.65rem;
-    margin-bottom: 5rem;
-    background: 0 0;
-    border: none;
-    font-size: 28px;
-    color:var(--inverseSurface, #bbb);
-    transition: color .2s, transform .2s;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center
-}
-
-.close-btn:hover {
-    color: #fff;
-    transform: scale(1.1)
-}
-
 .reso-actions,
 .scheme-actions {
     display: flex;
@@ -1147,25 +1181,24 @@ input[type=checkbox]:checked + .toggle::after {
     align-items: center
 }
 
+.reso-modal,
+.scheme-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity .3s;
+}
+
 .additional-modal,
 .preference-modal,
 .profiler-modal,
 .spoof-modal,
-.reso-modal,
 .settings-modal {
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.5);
     transition: opacity .3s
-}
-
-.scheme-modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
-    transition: opacity .3s;
 }
 
 body.modal-open {
