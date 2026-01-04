@@ -243,13 +243,14 @@ ui_print "- Installing AZenith apk..."
 pm install "$MODPATH/AZenith.apk" > /dev/null 2>&1
 rm "$MODPATH/AZenith.apk"
 
-# Remove old module avatar
+# Remove old module files
+ui_print "- Cleaning old files"
 rm -rf "/data/local/tmp/module.avatar.webp"
-# Remove old toast apk
 pm uninstall --user 0 azenith.toast 2>/dev/null
 
 # Set Permissions
 ui_print "- Setting Permissions..."
+pm grant zx.azenith android.permission.POST_NOTIFICATIONS
 set_perm_recursive "$MODPATH/system/bin" 0 2000 0777 0777
 chmod +x "$MODPATH/system/bin/sys.azenith-service"
 chmod +x "$MODPATH/system/bin/sys.azenith-profilesettings"
