@@ -8,7 +8,7 @@ import android.os.Looper;
 
 public class MyReceiver extends BroadcastReceiver {
     @Override
-        public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent) {
         if ("RE-SHOW_NOTIF".equals(intent.getAction())) {
             boolean isProfile = intent.getBooleanExtra("isProfile", false);
             if (isProfile) {
@@ -21,12 +21,13 @@ public class MyReceiver extends BroadcastReceiver {
                     reshow.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     reshow.putExtra("notifytitle", title);
                     reshow.putExtra("notifytext", msg);
-                    // Kirim balik sebagai String "true" agar terbaca di MainActivity
+                    
+                    // Ini kuncinya: kirim balik sebagai String agar terbaca di MainActivity
                     reshow.putExtra("chrono", chrono ? "true" : "false"); 
+                    
                     context.startActivity(reshow);
                 }, 3000);
             }
         }
     }
-
 }

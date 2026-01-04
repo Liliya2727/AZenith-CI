@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
         finish();
     }
 
-    private void showNotification(String title, String message, boolean chrono, long timeoutMs) {
+        private void showNotification(String title, String message, boolean chrono, long timeoutMs) {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         
         boolean isProfile = title.toLowerCase().contains("profile") || title.toLowerCase().contains("mode") || title.toLowerCase().contains("initializing...");
@@ -86,15 +86,15 @@ public class MainActivity extends Activity {
             intentLagi.putExtra("chrono_bool", chrono);
 
             int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                flags |= PendingIntent.FLAG_MUTABLE;
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 flags |= PendingIntent.FLAG_IMMUTABLE;
             }
 
             PendingIntent deleteIntent = PendingIntent.getBroadcast(this, PROFILE_ID, intentLagi, flags);
             builder.setDeleteIntent(deleteIntent);
         }
-
-
 
         if (timeoutMs > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setTimeoutAfter(timeoutMs);
@@ -109,4 +109,5 @@ public class MainActivity extends Activity {
             new Handler().postDelayed(() -> manager.cancel(notificationId), timeoutMs);
         }
     }
+
 }
