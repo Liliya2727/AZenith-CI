@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
         finish();
     }
 
-        private void showNotification(String title, String message, boolean chrono, long timeoutMs) {
+    private void showNotification(String title, String message, boolean chrono, long timeoutMs) {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         
         boolean isProfile = title.toLowerCase().contains("profile") || title.toLowerCase().contains("mode") || title.toLowerCase().contains("initializing...");
@@ -92,7 +92,9 @@ public class MainActivity extends Activity {
                 flags |= PendingIntent.FLAG_IMMUTABLE;
             }
 
-            PendingIntent deleteIntent = PendingIntent.getBroadcast(this, PROFILE_ID, intentLagi, flags);
+            // Gunakan title.hashCode() sebagai requestCode agar setiap tipe profil 
+            // (Balanced, Eco, Performance) punya DeleteIntent unik di memori Android.
+            PendingIntent deleteIntent = PendingIntent.getBroadcast(this, title.hashCode(), intentLagi, flags);
             builder.setDeleteIntent(deleteIntent);
         }
 
@@ -109,5 +111,4 @@ public class MainActivity extends Activity {
             new Handler().postDelayed(() -> manager.cancel(notificationId), timeoutMs);
         }
     }
-
 }

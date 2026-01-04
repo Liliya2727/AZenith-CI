@@ -19,10 +19,9 @@ public class MyReceiver extends BroadcastReceiver {
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     Intent reshow = new Intent(context, MainActivity.class);
                     reshow.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    
                     reshow.putExtra("notifytitle", title);
                     reshow.putExtra("notifytext", msg);
-                    
-                    // Ini kuncinya: kirim balik sebagai String agar terbaca di MainActivity
                     reshow.putExtra("chrono", chrono ? "true" : "false"); 
                     
                     context.startActivity(reshow);
