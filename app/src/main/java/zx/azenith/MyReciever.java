@@ -1,0 +1,28 @@
+package zx.azenith;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
+
+public class MyReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if ("RE-SHOW_NOTIF".equals(intent.getAction())) {
+            boolean isProfile = intent.getBooleanExtra("isProfile", false);
+            if (isProfile) {
+                String title = intent.getStringExtra("title");
+                String msg = intent.getStringExtra("message");
+
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    Intent reshow = new Intent(context, MainActivity.class);
+                    reshow.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    reshow.putExtra("notifytitle", title);
+                    reshow.putExtra("notifytext", msg);
+                    context.startActivity(reshow);
+                }, 3000);
+            }
+        }
+    }
+}

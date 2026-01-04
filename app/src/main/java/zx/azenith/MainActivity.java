@@ -4,13 +4,14 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-    // Bedakan Channel agar tidak saling ganggu
     private static final String CH_PROFILE = "az_profile";
     private static final String CH_SYSTEM = "az_system";
     private static final int PROFILE_ID = 1001;
@@ -19,7 +20,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     
-        // Ambil data intent
         String clearAll = getIntent().getStringExtra("clearall");
         String toastMsg = getIntent().getStringExtra("toasttext");
         String notifyTitle = getIntent().getStringExtra("notifytitle");
@@ -32,7 +32,6 @@ public class MainActivity extends Activity {
         if ("true".equals(clearAll)) {
             manager.cancelAll();            
         }
-
     
         if (toastMsg != null) {
             Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
@@ -48,19 +47,17 @@ public class MainActivity extends Activity {
         finish();
     }
 
-
     private void showNotification(String title, String message, boolean chrono, long timeoutMs) {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         
         boolean isProfile = title.toLowerCase().contains("profile") || title.toLowerCase().contains("mode") || title.toLowerCase().contains("initializing...");
         String currentChannel = isProfile ? CH_PROFILE : CH_SYSTEM;
 
-        // Buat Channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 currentChannel, 
                 isProfile ? "AZenith Profiles" : "AZenith System", 
-                NotificationManager.IMPORTANCE_LOW // LOW agar tidak menimpa notif lain secara agresif
+                NotificationManager.IMPORTANCE_LOW
             );
             manager.createNotificationChannel(channel);
         }
@@ -78,11 +75,23 @@ public class MainActivity extends Activity {
                .setContentTitle(title)
                .setContentText(message)
                .setUsesChronometer(chrono)
-               .setAutoCancel(!isProfile);
+               .setAutoCancel(true);
 
-        // TRUE PERSISTENT: Agar benar-benar tidak bisa dihapus
         if (isProfile) {
-            builder.setOngoing(true); 
+            Intent intentLagi = new Intent(this, MyReceiver.class);
+            intentLagi.setAction("RE-SHOW_NOTIF");
+            intentLagi.putExtra("title", title);
+            intentLagi.putExtra("message", message);
+            intentLagi.putExtra("isProfile", true);
+
+            int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                flags |= PendingIntent.FLAG_IMMUTABLE;
+            }
+
+            PendingIntent deleteIntent = PendingIntent.getBroadcast(this, PROFILE_ID, intentLagi, flags);
+            builder.setDeleteIntent(deleteIntent);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 builder.setPriority(Notification.PRIORITY_MAX);
             }
@@ -94,12 +103,6 @@ public class MainActivity extends Activity {
 
         Notification notification = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) 
                                     ? builder.build() : builder.getNotification();
-
-        // Tambahan Flag Paksa agar tidak bisa di-clear manual
-        if (isProfile) {
-            notification.flags |= Notification.FLAG_ONGOING_EVENT;
-            notification.flags |= Notification.FLAG_NO_CLEAR;
-        }
 
         manager.notify(notificationId, notification);
 
