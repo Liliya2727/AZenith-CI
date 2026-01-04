@@ -49,6 +49,7 @@ jobs:
 
       - name: Build APK
         run: |
+          chmod +x ./gradlew
           ./gradlew assembleRelease
         env:
           KS_PWD: ${{ secrets.KEYSTORE_PASSWORD }}
