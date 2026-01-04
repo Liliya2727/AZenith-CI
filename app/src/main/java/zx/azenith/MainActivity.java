@@ -18,13 +18,21 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+    
+        // Ambil data intent
+        String clearAll = getIntent().getStringExtra("clearall");
         String toastMsg = getIntent().getStringExtra("toasttext");
         String notifyTitle = getIntent().getStringExtra("notifytitle");
         String notifyMsg = getIntent().getStringExtra("notifytext");
         String useChrono = getIntent().getStringExtra("chrono");
         String timeoutStr = getIntent().getStringExtra("timeout");
-
+    
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    
+        if ("true".equals(clearAll)) {
+            manager.cancelAll();
+        }
+    
         if (toastMsg != null) {
             Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
         } 
@@ -35,9 +43,10 @@ public class MainActivity extends Activity {
             long timeout = (timeoutStr != null) ? Long.parseLong(timeoutStr) : 0;
             showNotification(title, notifyMsg, chrono, timeout);
         }
-
+    
         finish();
-    }    
+    }
+
 
     private void showNotification(String title, String message, boolean chrono, long timeoutMs) {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

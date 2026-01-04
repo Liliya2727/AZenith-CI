@@ -48,7 +48,9 @@ int main(int argc, char* argv[]) {
 
         systemv("rm -f /data/adb/.config/AZenith/debug/AZenith.log");
         systemv("rm -f /data/adb/.config/AZenith/debug/AZenithVerbose.log");
-        systemv("rm -f /data/adb/.config/AZenith/preload/AZenithPR.log");
+        systemv("rm -f /data/adb/.config/AZenith/preload/AZenithPR.log");        
+        systemv("su -c \"/system/bin/am start --user 0 -n zx.azenith/.MainActivity -e clearall true >/dev/null 2>&1\"");
+
 
                
         // Sanity check for dumpsys
@@ -157,6 +159,7 @@ int main(int argc, char* argv[]) {
                     toast("Applying Balanced Profile");
                     cur_mode = BALANCED_PROFILE;
                     run_profiler(BALANCED_PROFILE);
+                    notify("Balanced Profile", "System is now at Optimal state", "false", 0);
                 }
     
                 if (strcmp(prev_ai_state, "0") == 0 && strcmp(ai_state, "1") == 0) {
@@ -164,6 +167,7 @@ int main(int argc, char* argv[]) {
                     toast("Applying Balanced Profile");
                     cur_mode = BALANCED_PROFILE;
                     run_profiler(BALANCED_PROFILE);
+                    notify("Balanced Profile", "System is now at Optimal state", "false", 0);
                 }
                 strcpy(prev_ai_state, ai_state);
                 // Skip applying if enabled
@@ -285,7 +289,7 @@ int main(int argc, char* argv[]) {
                     char preload_active[PROP_VALUE_MAX] = {0};
                     __system_property_get("persist.sys.azenithconf.APreload", preload_active);
                     if (strcmp(preload_active, "1") == 0) {
-                        notify("AZenith Preload", "Preloading Complete at : %s", "true", 5000, gamestart);
+                        notify("AZenith Preload", "Preloading Complete at : %s", "true", 10000, gamestart);
                         GamePreload(gamestart);
                     }
                 }
@@ -294,8 +298,7 @@ int main(int argc, char* argv[]) {
                 if (cur_mode == ECO_MODE)
                     continue;
     
-                cur_mode = ECO_MODE;
-                notify("ECO Mode", "is Applied successfully", "false", 0);
+                cur_mode = ECO_MODE;                
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying ECO Mode");
                 toast("Applying Eco Mode");
@@ -316,14 +319,14 @@ int main(int argc, char* argv[]) {
                     systemv("sys.azenith-utilityconf disableDND");
                     dnd_enabled = false;
                 }
-                run_profiler(ECO_MODE);    
+                run_profiler(ECO_MODE);
+                notify("ECO Mode", "System is now at Endurance state", "false", 0);
             } else {
                 // Bail out if we already on normal profile
                 if (cur_mode == BALANCED_PROFILE)
                     continue;
     
-                cur_mode = BALANCED_PROFILE;
-                notify("Balanced Profile", "is Applied successfully", "false", 0);
+                cur_mode = BALANCED_PROFILE;               
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying Balanced profile");
                 toast("Applying Balanced profile");  
@@ -345,10 +348,11 @@ int main(int argc, char* argv[]) {
                     dnd_enabled = false;
                 }
                 if (!is_initialize_complete) {
-                    notify("Daemon Info", "AZenith is running successfully", "false", 0);
+                    notify("Daemon Info", "AZenith is running successfully", "false", 60000);
                     is_initialize_complete = true;
                 }
                 run_profiler(BALANCED_PROFILE);
+                notify("Balanced Profile", "System is now at Optimal state", "false", 0);
     
             }
         }

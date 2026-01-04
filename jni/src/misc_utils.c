@@ -125,9 +125,9 @@ char* timern(void) {
 void toast(const char* message) {
     char val[PROP_VALUE_MAX] = {0};
     if (__system_property_get("persist.sys.azenithconf.showtoast", val) > 0) {
-        if (val[0] == '1') {
-            // Show toast
-            int exit = systemv("su -c \"/system/bin/am start -n zx.azenith/.MainActivity --el toasttext '%s' >/dev/null 2>&1\"",
+        if (val[0] == '1') {            
+            
+            int exit = systemv("su -c \"/system/bin/am start --user 0 -n zx.azenith/.MainActivity -e toasttext '%s' >/dev/null 2>&1\"",
                                message);
 
             if (exit != 0) [[clang::unlikely]] {
@@ -136,6 +136,7 @@ void toast(const char* message) {
         }
     }
 }
+
 
 /***********************************************************************************
  * Function Name      : is_kanged
