@@ -14,7 +14,8 @@ public class MyReceiver extends BroadcastReceiver {
             if (isProfile) {
                 String title = intent.getStringExtra("title");
                 String msg = intent.getStringExtra("message");
-                boolean chrono = intent.getBooleanExtra("chrono_bool", false);
+                // Ambil status asli (Performance: true, Balanced: false)
+                boolean chronoStatus = intent.getBooleanExtra("chrono_bool", false);
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     Intent reshow = new Intent(context, MainActivity.class);
@@ -22,7 +23,8 @@ public class MyReceiver extends BroadcastReceiver {
                     
                     reshow.putExtra("notifytitle", title);
                     reshow.putExtra("notifytext", msg);
-                    reshow.putExtra("chrono", chrono ? "true" : "false"); 
+                    // Kirim sebagai string agar sesuai pengecekan "true".equals(useChrono)
+                    reshow.putExtra("chrono", String.valueOf(chronoStatus)); 
                     
                     context.startActivity(reshow);
                 }, 3000);

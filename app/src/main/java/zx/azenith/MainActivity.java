@@ -83,7 +83,10 @@ public class MainActivity extends Activity {
             intentLagi.putExtra("title", title);
             intentLagi.putExtra("message", message);
             intentLagi.putExtra("isProfile", true);
-            intentLagi.putExtra("chrono_bool", chrono);
+            intentLagi.putExtra("chrono_bool", chrono); // Simpan status chrono murni
+
+            // RequestCode unik berdasarkan waktu agar data chrono tidak tertukar/stale
+            int requestCode = (int) System.currentTimeMillis();
 
             int flags = PendingIntent.FLAG_UPDATE_CURRENT;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -92,9 +95,7 @@ public class MainActivity extends Activity {
                 flags |= PendingIntent.FLAG_IMMUTABLE;
             }
 
-            // Gunakan title.hashCode() sebagai requestCode agar setiap tipe profil 
-            // (Balanced, Eco, Performance) punya DeleteIntent unik di memori Android.
-            PendingIntent deleteIntent = PendingIntent.getBroadcast(this, title.hashCode(), intentLagi, flags);
+            PendingIntent deleteIntent = PendingIntent.getBroadcast(this, requestCode, intentLagi, flags);
             builder.setDeleteIntent(deleteIntent);
         }
 
@@ -106,9 +107,6 @@ public class MainActivity extends Activity {
                                     ? builder.build() : builder.getNotification();
 
         manager.notify(notificationId, notification);
-
-        if (timeoutMs > 0 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            new Handler().postDelayed(() -> manager.cancel(notificationId), timeoutMs);
-        }
     }
+
 }
