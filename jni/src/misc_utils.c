@@ -127,7 +127,7 @@ void toast(const char* message) {
     if (__system_property_get("persist.sys.azenithconf.showtoast", val) > 0) {
         if (val[0] == '1') {
             // Show toast
-            int exit = systemv("su -c \"am start -n zx.azenith/.MainActivity --el toasttext '%s' >/dev/null 2>&1\"",
+            int exit = systemv("su -c \"/system/bin/am start -n zx.azenith/.MainActivity --el toasttext '%s' >/dev/null 2>&1\"",
                                message);
 
             if (exit != 0) [[clang::unlikely]] {
