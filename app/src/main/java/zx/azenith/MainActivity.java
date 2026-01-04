@@ -30,8 +30,9 @@ public class MainActivity extends Activity {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     
         if ("true".equals(clearAll)) {
-            manager.cancelAll();
+            manager.cancelAll();            
         }
+
     
         if (toastMsg != null) {
             Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
