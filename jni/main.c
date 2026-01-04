@@ -55,14 +55,15 @@ int main(int argc, char* argv[]) {
         if (access("/system/bin/dumpsys", F_OK) != 0) {
             fprintf(stderr, "\033[31mFATAL ERROR:\033[0m /system/bin/dumpsys: inaccessible or not found\n");
             log_zenith(LOG_FATAL, "/system/bin/dumpsys: inaccessible or not found");
-            notify("Something wrong happening in the daemon, please check module log.");
+            notify("Daemon Error", "Something wrong happening in the daemon, please check module log.", "false", 0);
+
             exit(EXIT_FAILURE);
         }
     
         if (is_file_empty("/system/bin/dumpsys") == 1) {
             fprintf(stderr, "\033[31mFATAL ERROR:\033[0m /system/bin/dumpsys was tampered by kill logger module.\n");
             log_zenith(LOG_FATAL, "/system/bin/dumpsys was tampered by kill logger module");
-            notify("Please remove your stupid kill logger module.");
+            notify("Daemon Error", "Please remove your stupid kill logger module.", "false", 0);
             exit(EXIT_FAILURE);
         }
         
@@ -99,7 +100,7 @@ int main(int argc, char* argv[]) {
 
         systemv("setprop persist.sys.rianixia.learning_enabled true");
         systemv("setprop persist.sys.azenith.state running");
-        notify("Initializing...");
+        notify("Initializing...", "Starting AZenith service...", "false", 0);
 
         systemv("setprop persist.sys.rianixia.thermalcore-bigdata.path /data/adb/.config/AZenith/debug");
         runthermalcore();
@@ -122,7 +123,7 @@ int main(int argc, char* argv[]) {
             // Handle case when module gets updated
             if (access(MODULE_UPDATE, F_OK) == 0) [[clang::unlikely]] {
                 log_zenith(LOG_INFO, "Module update detected, exiting.");
-                notify("Please reboot your device to complete module update.");
+                notify("Module Update", "Please reboot your device to complete module update.", "false", 0);
                 systemv("setprop persist.sys.azenith.service \"\"");
                 systemv("setprop persist.sys.azenith.state stopped");
                 break;
@@ -274,6 +275,7 @@ int main(int argc, char* argv[]) {
                 }
                                                 
                 run_profiler(PERFORMANCE_PROFILE);
+                notify("Performance Profile", "Running at : %s", "true", 0, gamestart);
                       
                 if (IS_TRUE(opts.game_preload)) {
                     GamePreload(gamestart);
@@ -283,6 +285,7 @@ int main(int argc, char* argv[]) {
                     char preload_active[PROP_VALUE_MAX] = {0};
                     __system_property_get("persist.sys.azenithconf.APreload", preload_active);
                     if (strcmp(preload_active, "1") == 0) {
+                        notify("AZenith Preload", "Preloading Complete at : %s", "true", 5000, gamestart);
                         GamePreload(gamestart);
                     }
                 }
@@ -292,6 +295,7 @@ int main(int argc, char* argv[]) {
                     continue;
     
                 cur_mode = ECO_MODE;
+                notify("ECO Mode", "is Applied successfully", "false", 0);
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying ECO Mode");
                 toast("Applying Eco Mode");
@@ -319,6 +323,7 @@ int main(int argc, char* argv[]) {
                     continue;
     
                 cur_mode = BALANCED_PROFILE;
+                notify("Balanced Profile", "is Applied successfully", "false", 0);
                 need_profile_checkup = false;
                 log_zenith(LOG_INFO, "Applying Balanced profile");
                 toast("Applying Balanced profile");  
@@ -340,7 +345,7 @@ int main(int argc, char* argv[]) {
                     dnd_enabled = false;
                 }
                 if (!is_initialize_complete) {
-                    notify("AZenith is running successfully");
+                    notify("Daemon Info", "AZenith is running successfully", "false", 0);
                     is_initialize_complete = true;
                 }
                 run_profiler(BALANCED_PROFILE);

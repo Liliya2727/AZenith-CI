@@ -252,7 +252,7 @@
 #appList {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .appCard {
@@ -412,7 +412,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 5;
+  z-index: 0;
   text-align: center;
   border-top-left-radius: 1.5rem;
     border-top-right-radius: 1.5rem;
@@ -692,10 +692,16 @@ button {
     width: 100%;
     display: flex;
     justify-content: center;
+    position: fixed;
+    z-index: 9999;
     align-items: center;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--surface);
     opacity: 1;    
     transition: opacity .75s ease-in-out
+}
+
+#loading-screen2 {
+    z-index: 40;
 }
 
 .loading-content {
@@ -773,7 +779,7 @@ input[type=checkbox] {
 .toggle {
     position: relative;
     width: 3rem;
-    height: 1.5rem;
+    height: 1.8rem;
     background-color: var(--surfaceContainer, #090b11);
     border: 1px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
     border-radius: 9999px;
@@ -788,8 +794,8 @@ input[type=checkbox] {
     top: 50%;
     left: .3rem;
     transform: translateY(-50%);
-    width: .8rem;
-    height: .8rem;
+    width: 1rem;
+    height: 1rem;
     background-color: var(--outlineVariant, #151920);
     border: 1px solid var(--outlineVariant, #20242c);
     border-radius: 9999px;
@@ -805,11 +811,11 @@ input[type=checkbox]:checked + .toggle {
         var(--onPrimaryContainer, #7c86c0)
     );
     border-color: var(--onPrimaryContainer, #a6b3ff);
-    transform: scale(1.04);
+    transform: scale(1.01);
 }
 
 input[type=checkbox]:checked + .toggle::after {
-    transform: translate(1.5rem, -50%) scale(1.45);
+    transform: translate(1.3rem, -50%) scale(1.45);
     background-color: var(--onPrimary, #e6e9ff);
     border: 2px solid var(--onPrimary, #b5beff);
 }
@@ -818,7 +824,7 @@ input[type=checkbox]:checked + .toggle::after {
     position: absolute;
     right: 5%;
     width: 3rem;
-    height: 1.5rem;
+    height: 1.8rem;
     background-color:var(--surfaceContainer, #090b11);
     border: 1px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
     border-radius: 9999px;
@@ -981,8 +987,6 @@ input[type=checkbox]:checked + .toggle::after {
   white-space: nowrap;
 }
 
-#loading-screen,
-#loading-screen2,
 .additional-modal,
 .preference-modal,
 .profiler-modal,
@@ -1422,7 +1426,7 @@ body.modal-open {
 }
 
 .common-card {
-    margin-top: -10px;
+    margin-top: -15px;
     padding: 1.5rem;
     padding-top: 1rem;
     padding-bottom: 1rem;
@@ -1509,7 +1513,7 @@ body.modal-open {
 .cardTitle {
     position: absolute;     
     font-size: 17px;     
-    top: 1.4rem;     
+    top: 1.7rem;     
     left: 4.3rem;
     font-weight: 700;
     margin-bottom: .95
@@ -1704,12 +1708,12 @@ body.modal-open {
 .selector2 {
     width: 30%;
     appearance: none;
-    border: 1px solid var(--outlineVariant, rgba(255, 255, 255, 0.12));
     
-    background-color: rgba(255, 255, 255, 0.0);
+    
+    background-color: var(--surfaceContainerHigh);
 
     color:var(--onSurface, #E4E8FF);
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 10px 20px 10px 12px;
     font-size: 8.5px;
     font-family: Inter, Roboto, sans-serif;
@@ -1788,17 +1792,23 @@ body.modal-open {
 }
 
 .cardsvg {
-    margin-top: 0.2rem;
-    margin-bottom: 1.25rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.2rem;
     margin-left: 0rem;
     width: 30px;
     height: 30px;
     padding: 4px;
-    border-radius: 50%;
+    border-radius: 10px;
     background:var(--primary, #CCCAEC); 
     fill:var(--primary, #CCCAEC);
     color:var(--surfaceContainerHighest, #2C2C33);  
     transition: all 0.25s ease;
+}
+
+.divider3 {
+    border-bottom:1.5px solid color-mix(in srgb,var(--outline, #12141f) 12%, transparent);
+    margin: 0rem 0 .5rem;
+    margin-bottom: 1rem;
 }
 
 .after\:border-gray-300:after {
@@ -1823,7 +1833,7 @@ body.modal-open {
 
 #loading-text,
 #loading-text2 {
-    color: #fff;
+    color: var(--onSurface);
     font-size: 10px;
     margin-top: 30px
 }
