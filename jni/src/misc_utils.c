@@ -127,15 +127,12 @@ void toast(const char* message) {
     if (__system_property_get("persist.sys.azenithconf.showtoast", val) > 0) {
         if (val[0] == '1') {
             // Show toast
-            int exit = systemv("su -lp 2000 -c \"/system/bin/am start -a android.intent.action.MAIN "
-                               "-e toasttext '%s' -n azenith.toast/.MainActivity >/dev/null 2>&1\"",
+            int exit = systemv("su -c \"am start -n zx.azenith/.MainActivity --el toasttext '%s' >/dev/null 2>&1\"",
                                message);
 
             if (exit != 0) [[clang::unlikely]] {
                 log_zenith(LOG_WARN, "Unable to show toast message: %s", message);
             }
-            sleep(2);
-            systemv("am force-stop azenith.toast");
         }
     }
 }
