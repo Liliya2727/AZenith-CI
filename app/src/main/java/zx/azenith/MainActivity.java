@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
             intentLagi.putExtra("title", title);
             intentLagi.putExtra("message", message);
             intentLagi.putExtra("isProfile", true);
-            intentLagi.putExtra("chrono", chrono);
+            intentLagi.putExtra("chrono_bool", chrono);
 
             int flags = PendingIntent.FLAG_UPDATE_CURRENT;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -92,11 +92,8 @@ public class MainActivity extends Activity {
 
             PendingIntent deleteIntent = PendingIntent.getBroadcast(this, PROFILE_ID, intentLagi, flags);
             builder.setDeleteIntent(deleteIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setPriority(Notification.PRIORITY_MAX);
-            }
         }
+
 
 
         if (timeoutMs > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
