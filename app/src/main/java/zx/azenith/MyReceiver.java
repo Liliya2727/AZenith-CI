@@ -14,12 +14,14 @@ public class MyReceiver extends BroadcastReceiver {
             if (isProfile) {
                 String title = intent.getStringExtra("title");
                 String msg = intent.getStringExtra("message");
+                boolean chrono = intent.getBooleanExtra("chrono", false);
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     Intent reshow = new Intent(context, MainActivity.class);
                     reshow.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     reshow.putExtra("notifytitle", title);
                     reshow.putExtra("notifytext", msg);
+                    reshow.putExtra("chrono", String.valueOf(chrono));
                     context.startActivity(reshow);
                 }, 3000);
             }

@@ -83,6 +83,7 @@ public class MainActivity extends Activity {
             intentLagi.putExtra("title", title);
             intentLagi.putExtra("message", message);
             intentLagi.putExtra("isProfile", true);
+            intentLagi.putExtra("chrono", chrono);
 
             int flags = PendingIntent.FLAG_UPDATE_CURRENT;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -96,6 +97,7 @@ public class MainActivity extends Activity {
                 builder.setPriority(Notification.PRIORITY_MAX);
             }
         }
+
 
         if (timeoutMs > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setTimeoutAfter(timeoutMs);
