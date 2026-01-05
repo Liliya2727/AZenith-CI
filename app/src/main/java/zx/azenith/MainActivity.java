@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
         
         boolean isProfile = title.toLowerCase().contains("profile") || title.toLowerCase().contains("mode") || title.toLowerCase().contains("initializing...");
         String currentChannel = isProfile ? CH_PROFILE : CH_SYSTEM;
-    
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 currentChannel, 
@@ -61,53 +61,52 @@ public class MainActivity extends Activity {
             );
             manager.createNotificationChannel(channel);
         }
-    
+
         int notificationId = isProfile ? PROFILE_ID : title.hashCode();
-    
+
         Notification.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder = new Notification.Builder(this, currentChannel);
         } else {
             builder = new Notification.Builder(this);
         }
-    
+
         builder.setSmallIcon(getApplicationInfo().icon)
                .setContentTitle(title)
                .setContentText(message)
                .setUsesChronometer(chrono)
                .setAutoCancel(true);
-    
+
         if (isProfile) {
             Intent intentLagi = new Intent(this, MyReceiver.class);
             intentLagi.setAction("RE-SHOW_NOTIF");
             intentLagi.putExtra("title", title);
             intentLagi.putExtra("message", message);
             intentLagi.putExtra("isProfile", true);
-            intentLagi.putExtra("chrono_bool", chrono); // Kirim boolean murni ke receiver
-    
-            // PENTING: Gunakan waktu sekarang agar RequestCode selalu unik.
-            // Ini memaksa Android membuang cache Intent lama dari profil sebelumnya.
-            int uniqueRequestCode = (int) System.currentTimeMillis();
-    
+            intentLagi.putExtra("chrono_bool", chrono); // Simpan status chrono murni
+
+            // RequestCode unik berdasarkan waktu agar data chrono tidak tertukar/stale
+            int requestCode = (int) System.currentTimeMillis();
+
             int flags = PendingIntent.FLAG_UPDATE_CURRENT;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 flags |= PendingIntent.FLAG_MUTABLE;
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 flags |= PendingIntent.FLAG_IMMUTABLE;
             }
-    
-            PendingIntent deleteIntent = PendingIntent.getBroadcast(this, uniqueRequestCode, intentLagi, flags);
+
+            PendingIntent deleteIntent = PendingIntent.getBroadcast(this, requestCode, intentLagi, flags);
             builder.setDeleteIntent(deleteIntent);
         }
-    
+
         if (timeoutMs > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setTimeoutAfter(timeoutMs);
         }
-    
-        Notification n = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) 
-                         ? builder.build() : builder.getNotification();
-    
-        manager.notify(notificationId, n);
+
+        Notification notification = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) 
+                                    ? builder.build() : builder.getNotification();
+
+        manager.notify(notificationId, notification);
     }
 
 }
