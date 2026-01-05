@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
                 }
                                                 
                 run_profiler(PERFORMANCE_PROFILE);
-                notify("Performance Profile", "Running at : %s", "true", 0, gamestart);
+                notify("Performance Profile", "Running at : %s", "false", 0, gamestart);
                       
                 if (IS_TRUE(opts.game_preload)) {
                     GamePreload(gamestart);

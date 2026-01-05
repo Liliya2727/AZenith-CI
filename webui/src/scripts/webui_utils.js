@@ -2582,6 +2582,7 @@ const showAdditionalSettings = async () => {
   // jalan berurutan = stabil + no spike
   for (const fn of [
     hideBypassIfUnsupported,
+    checkGPreload,
     checkDND,
     checkfstrim,
     checkBypassChargeStatus,
@@ -2638,7 +2639,7 @@ const showPreferenceSettings = async () => {
 
   for (const fn of [
     checkfpsged, checkDThermal, checkiosched,
-    checkGPreload, checkmalisched, checkjit,
+    checkmalisched, checkjit,
     checkdtrace, checkKillLog, checkschedtunes,
     checkwalt, checkSFL
   ]) {
