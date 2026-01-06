@@ -53,6 +53,18 @@ This is a **Magisk Module**, so you must install it via your preferred Root Mana
 
 ---
 
+## 🤝 Contributing & Bug Reports
+We welcome contributions to make **AZenith** even better!
+
+* **Report Bugs:** If you find any issues, please open an [Issue](https://github.com/Liliya2727/AZenith/issues) and provide detailed logs.
+* **Feature Requests:** Have an idea? Feel free to open an issue to discuss it.
+* **Pull Requests:** Want to contribute code? 
+    1. Fork the repository.
+    2. Create a new branch for your feature/fix.
+    3. Submit a **Pull Request** with a clear description of your changes.
+
+---
+
 ## 🤝 Credits & Acknowledgements
 
 ### Core Developers
@@ -69,7 +81,18 @@ This is a **Magisk Module**, so you must install it via your preferred Root Mana
 ---
 
 ## 📢 Stay Updated
-[![Telegram](https://img.shields.io/badge/Telegram-Join%20Channel-blue?style=for-the-badge&logo=telegram)](https://t.me/ZeshArch)
+Get the latest news, updates, and support by following our official channels:
+
+<p align="left">
+  <a href="https://t.me/ZeshArch">
+    <img src="https://img.shields.io/badge/Telegram-Channel-blue?style=for-the-badge&logo=telegram" alt="Telegram Channel">
+  </a>
+  <a href="https://t.me/Zexshia">
+    <img src="https://img.shields.io/badge/Support-Author-red?style=for-the-badge&logo=telegram" alt="Support">
+  </a>
+</p>
+
+*Feel free to report bugs or give suggestions via our Telegram community!*
 
 ---
 
