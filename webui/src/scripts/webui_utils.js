@@ -3379,10 +3379,7 @@ const heavyInit = async () => {
   if (loader) loader.classList.remove("hidden");
   document.body.classList.add("no-scroll");  
   
-  await checkWebUISupport();
-  await checkServiceRunning();
-  await checkModuleVersion();
-
+  
   await Promise.all([
     checkProfile(),    
     showRandomMessage(),
@@ -3399,7 +3396,11 @@ const heavyInit = async () => {
     loadIObalance, loadIOperformance, loadIOpowersave, GovernorPowersave,
     loadCurRenderer, loadRRValue, checkLiteModeStatus, checkthermalcore
   ].map(fn => fn().catch(()=>{})));      
-
+  
+  await checkServiceRunning();
+  await checkModuleVersion();
+  await checkWebUISupport();
+  
   if (loader) loader.classList.add("hidden");
   document.body.classList.remove("no-scroll");
 
