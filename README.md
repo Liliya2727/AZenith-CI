@@ -58,7 +58,7 @@ We welcome contributions to make **AZenith** even better!
 
 * **Report Bugs:** If you find any issues, please open an [Issue](https://github.com/Liliya2727/AZenith/issues) and provide detailed logs.
 * **Feature Requests:** Have an idea? Feel free to open an issue to discuss it.
-* **Pull Requests:** Want to contribute code? 
+* **Pull Requests:** Want to contribute in Development? 
     1. Fork the repository.
     2. Create a new branch for your feature/fix.
     3. Submit a **Pull Request** with a clear description of your changes.
@@ -75,8 +75,8 @@ We welcome contributions to make **AZenith** even better!
 | **Collaborator** | [@kanaochar](https://github.com/kanaodnd) |
 
 ### Sources & References
-- **Performance:** @Rem01Gaming, @MiAzami, @KanagawaYamadaVTeacher, @ShiraXblood, @Laynsb, @Koneko_dev
-- **Preload:** @HoyoSlave, @KutuMoba, @Feravolt, @iamlooper
+- **Tweak Sources:** @Rem01Gaming, @MiAzami, @KanagawaYamadaVTeacher, @ShiraXblood, @Laynsb, @Koneko_dev
+- **Game Preload:** @HoyoSlave, @KutuMoba, @Feravolt, @iamlooper
 
 ---
 
