@@ -27,7 +27,7 @@
 * **Custom CPU Governors:** Custom Default CPU Governor based on your preference.
 * **Custom I/O Scheduler:** Custom Default I/O Scheduler based on your preference.
 * **CPU Freq Limiter:** Prevents Device heating by limiting CPU Frequency based on percentage.
-* **Thermalcore Service:** Intelligent throttling management—preventing overheating while maintaining a stable FPS floor.
+* **Thermalcore Service:** automatically manage system thermal based on device behavior, prevent phone getting too hot in daily use while maintaining device stability.
 
 ---
 

@@ -41,11 +41,14 @@ cp -r ./thermalcore/* mainfiles/system/bin
 cp -r ./preloadbin/* mainfiles/system/bin
 cp -r azenithApplist.json ./mainfiles
 cp LICENSE ./mainfiles
-if [ -f "./app/build/outputs/apk/release/app-release.apk" ]; then
-    cp "./app/build/outputs/apk/release/app-release.apk" "mainfiles/AZenith.apk"
-    echo "APK copied to mainfiles successfully."
+APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+APK_PATH_DEBUG=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+if [ -n "$APK_PATH" ]; then
+    cp "$APK_PATH" "mainfiles/AZenith.apk"
+    echo "APK found at $APK_PATH and copied to mainfiles successfully."
 else
-    echo "Warning: Compiled APK not found!"
+    cp "$APK_PATH_DEBUG" "mainfiles/AZenith.apk"
+    echo "APK found at $APK_PATH_DEBUG and copied to mainfiles successfully."
 fi
 
 
