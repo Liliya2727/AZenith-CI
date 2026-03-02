@@ -36,7 +36,7 @@ sed -i "s/versionCode=.*/versionCode=$version_code/" mainfiles/module.prop
 
 # Copy module files
 cp -r ./libs mainfiles
-cp -r ./tweakfls/* mainfiles/system/bin
+# Notice: tweakfls binaries are now handled per-architecture in the libs directory inside build.yml
 cp -r ./thermalcore/* mainfiles/system/bin
 cp -r ./preloadbin/* mainfiles/system/bin
 cp -r azenithApplist.json ./mainfiles

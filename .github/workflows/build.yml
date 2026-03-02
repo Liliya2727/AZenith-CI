@@ -56,6 +56,7 @@ jobs:
                     
       - name: NDK Setup
         uses: nttld/setup-ndk@v1.5.0
+        id: setup-ndk
         with:
           ndk-version: r29
 
@@ -64,6 +65,30 @@ jobs:
 
       - name: Build AZenith JNI
         run: ndk-build
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android, i686-linux-android
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+
+      - name: Build AZenith Rust Binaries
+        working-directory: ./tweakfls
+        run: |
+          cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -t x86 build --release
+          mkdir -p ../libs/arm64-v8a ../libs/armeabi-v7a ../libs/x86_64 ../libs/x86
+          cp target/aarch64-linux-android/release/sys_azenith_utilityconf ../libs/arm64-v8a/sys.azenith-utilityconf
+          cp target/aarch64-linux-android/release/sys_azenith_profilesettings ../libs/arm64-v8a/sys.azenith-profilesettings
+          cp target/armv7-linux-androideabi/release/sys_azenith_utilityconf ../libs/armeabi-v7a/sys.azenith-utilityconf
+          cp target/armv7-linux-androideabi/release/sys_azenith_profilesettings ../libs/armeabi-v7a/sys.azenith-profilesettings
+          cp target/x86_64-linux-android/release/sys_azenith_utilityconf ../libs/x86_64/sys.azenith-utilityconf
+          cp target/x86_64-linux-android/release/sys_azenith_profilesettings ../libs/x86_64/sys.azenith-profilesettings
+          cp target/i686-linux-android/release/sys_azenith_utilityconf ../libs/x86/sys.azenith-utilityconf
+          cp target/i686-linux-android/release/sys_azenith_profilesettings ../libs/x86/sys.azenith-profilesettings
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
       - name: Building WebRoots
         working-directory: ./webui
