@@ -468,7 +468,8 @@ fn main() {
             "checkBypass" => { check_bypass(); }
             "saveLog" => save_log(),
             _ => {
-                az_log(&format!("Unknown command {}", command));
+                // Command passthrough (similar to $@ in bash)
+                let _ = Command::new(command).args(&args[2..]).output();
             }
         }
     }

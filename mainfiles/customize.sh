@@ -69,8 +69,6 @@ source "$TMPDIR/verify.sh"
 
 # Extract Module files
 ui_print "- Extracting system directory..."
-extract "$ZIPFILE" 'system/bin/sys.azenith-profilesettings' "$MODPATH"
-extract "$ZIPFILE" 'system/bin/sys.azenith-utilityconf' "$MODPATH"
 extract "$ZIPFILE" 'system/bin/sys.azenith-preloadbin' "$MODPATH"
 extract "$ZIPFILE" 'system/bin/sys.azenith-rianixiathermalcore' "$MODPATH"
 ui_print "- Extracting service.sh..."
@@ -97,8 +95,10 @@ case $ARCH in
 esac
 
 # Extract daemon
-ui_print "- Extracting sys.azenith-service for $ARCH_TMP"
+ui_print "- Extracting Binaries for $ARCH_TMP"
 extract "$ZIPFILE" "libs/$ARCH_TMP/sys.azenith-service" "$TMPDIR"
+extract "$ZIPFILE" "libs/$ARCH_TMP/sys.azenith-profilesettings" "$TMPDIR"
+extract "$ZIPFILE" "libs/$ARCH_TMP/sys.azenith-utilityconf" "$TMPDIR"
 cp "$TMPDIR"/libs/"$ARCH_TMP"/* "$MODPATH/system/bin"
 rm -rf "$TMPDIR/libs"
 ui_print "- Installing for Arch : $ARCH_TMP"
