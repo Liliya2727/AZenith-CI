@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import BannerDarkZenith from "/webui.bannerdarkmode.avif";
+import BannerDarkZenith from "../public/webui.bannerdarkmode.png";
 import BannerLightZenith from "/webui.bannerlightmode.avif";
 import AvatarZenith from "/webui.avatar.avif";
 import SchemeBanner from "/webui.schemebanner.avif";
@@ -2145,7 +2145,7 @@ const showMaliSchedIfMediatek = () => {
 };
 
 const showColorScheme = async () => {
-  const c = document.getElementById("schemeModal");
+  const c = document.getElementById("{{{{{{{scheme}}}}}}}Modal");
   if (!c) return; // Modal element not found
 
   const s = c.querySelector(".scheme-container");
